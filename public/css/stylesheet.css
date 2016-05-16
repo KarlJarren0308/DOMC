@@ -53,10 +53,15 @@ hr {
 
 .btn {
     display: inline-block;
+    text-align: center;
+    height: 46px;
+    min-width: 75px;
 }
 
 .btn-sm {
     font-size: 0.75em;
+    line-height: 8px;
+    height: 30px;
 }
 
 .btn-green {
@@ -284,6 +289,10 @@ hr {
 
 .text-right {
     text-align: right;
+}
+
+.tray {
+    margin-bottom: 25px;
 }
 
 /* Custom */
