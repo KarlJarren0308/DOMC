@@ -60,7 +60,7 @@
                             </td>
                             <td>
                                 @if(strlen(session()->has('username')))
-                                    <a href="" class="btn-orange btn-sm">Reserve</a>
+                                    <a href="" class="btn btn-orange btn-sm">Reserve</a>
                                 @endif
                             </td>
                         </tr>

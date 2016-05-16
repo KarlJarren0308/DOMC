@@ -37,7 +37,7 @@
                             {!! Form::password('password', array('class' => 'u-full-width', 'placeholder' => 'Enter Password Here', 'required' => 'required')) !!}
                         </div>
                         <div class="input-block text-right">
-                            {!! Form::submit('Login', array('class' => 'btn-orange')) !!}
+                            {!! Form::submit('Login', array('class' => 'btn btn-orange')) !!}
                         </div>
                     {!! Form::close() !!}
                 </div>
