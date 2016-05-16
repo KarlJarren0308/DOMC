@@ -51,6 +51,10 @@ hr {
     color: white;
 }
 
+.btn {
+    display: inline-block;
+}
+
 .btn-sm {
     font-size: 0.75em;
 }
