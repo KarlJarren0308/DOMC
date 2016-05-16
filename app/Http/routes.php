@@ -22,3 +22,4 @@ Route::get('panel/manage/{what}/edit/{id}', array('as' => 'panel.getEdit', 'uses
 Route::get('panel/manage/{what}/delete/{id}', array('as' => 'panel.getDelete', 'uses' => 'PanelController@getDelete'));
 
 Route::post('login', array('as' => 'main.postLogin', 'uses' => 'MainController@postLogin'));
+Route::post('opac/reserve/{what}', array('as' => 'main.postReserve', 'uses' => 'MainController@postReserve'));
