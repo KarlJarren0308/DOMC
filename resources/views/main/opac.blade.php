@@ -60,7 +60,7 @@
                             </td>
                             <td>
                                 @if(strlen(session()->has('username')))
-                                    <a href="" class="btn btn-orange btn-sm">Reserve</a>
+                                    <a href="{{ route('main.postReserve', $material->Material_ID) }}" class="btn btn-orange btn-sm">Reserve</a>
                                 @endif
                             </td>
                         </tr>

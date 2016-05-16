@@ -39,6 +39,9 @@
             </div>
             <div class="nine columns">
                 <div class="banner">Manage Faculties</div>
+                <div class="tray text-right">
+                    <a href="{{ route('panel.getAdd', $what) }}" class="btn btn-orange">Add</a>
+                </div>
                 <table id="faculties-table" class="u-full-width">
                     <thead>
                         <tr>
