@@ -17,6 +17,7 @@ Route::get('logout', array('as' => 'main.getLogout', 'uses' => 'MainController@g
 Route::get('opac', array('as' => 'main.getOpac', 'uses' => 'MainController@getOpac'));
 Route::get('panel', array('as' => 'panel.getIndex', 'uses' => 'PanelController@getIndex'));
 Route::get('panel/manage/{what}', array('as' => 'panel.getManage', 'uses' => 'PanelController@getManage'));
+Route::get('panel/manage/{what}/add/{id}', array('as' => 'panel.getAdd', 'uses' => 'PanelController@getAdd'));
 Route::get('panel/manage/{what}/edit/{id}', array('as' => 'panel.getEdit', 'uses' => 'PanelController@getEdit'));
 Route::get('panel/manage/{what}/delete/{id}', array('as' => 'panel.getDelete', 'uses' => 'PanelController@getDelete'));
 
