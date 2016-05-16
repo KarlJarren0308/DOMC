@@ -24,7 +24,7 @@
             </div>
         </div>
     </div>
-    <div id="main-container" class="container">
+    <div id="main-container" class="container-fluid">
         <div class="row">
             <div class="three columns">
                 <ul class="list-group">

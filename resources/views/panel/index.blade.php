@@ -24,7 +24,7 @@
             </div>
         </div>
     </div>
-    <div id="main-container" class="container">
+    <div id="main-container" class="container-fluid">
         <div class="row">
             <div class="three columns">
                 <ul class="list-group">
@@ -39,6 +39,9 @@
             </div>
             <div class="nine columns">
                 <div class="banner">What's New?</div>
+                <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem nulla suscipit sunt blanditiis temporibus excepturi praesentium. Tempore accusamus ad fugit, maxime consequatur quas incidunt ipsum, vitae consequuntur possimus laboriosam dolores.</p>
+                <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipisicing elit. A explicabo eum impedit delectus laudantium sequi, et debitis ea, alias dignissimos dolor ipsa aut inventore doloribus, ex voluptate voluptatem veritatis ratione!</p>
+                <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus maxime alias laboriosam temporibus tempore facere sit. Quia quisquam amet repellat, maxime. Eum sequi libero recusandae repudiandae aliquid ipsum ad quas?</p>
             </div>
         </div>
     </div>
