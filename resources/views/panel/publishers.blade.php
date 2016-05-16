@@ -53,8 +53,8 @@
                                     </td>
                                     <td class="text-center">
                                         @if(strlen(session()->has('username')))
-                                            <a href="{{ route('panel.getEdit', array($what, $publisher->Publisher_ID)) }}" class="btn-green btn-sm">Edit</a>
-                                            <a href="{{ route('panel.getDelete', array($what, $publisher->Publisher_ID)) }}" class="btn-red btn-sm">Delete</a>
+                                            <a href="{{ route('panel.getEdit', array($what, $publisher->Publisher_ID)) }}" class="btn btn-green btn-sm">Edit</a>
+                                            <a href="{{ route('panel.getDelete', array($what, $publisher->Publisher_ID)) }}" class="btn btn-red btn-sm">Delete</a>
                                         @endif
                                     </td>
                                 </tr>
