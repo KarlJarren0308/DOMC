@@ -59,7 +59,7 @@
                                     <td>{{ date('F d, Y', strtotime($student->Student_Birth_Date)) }}</td>
                                     <td class="text-center">
                                         @if(strlen(session()->has('username')))
-                                            <a href="{{ route('panel.getEdit', array($what, $student->Student_ID)) }}" class="btn-orange btn-sm">Edit</a>
+                                            <a href="{{ route('panel.getEdit', array($what, $student->Student_ID)) }}" class="btn-green btn-sm">Edit</a>
                                             <a href="{{ route('panel.getDelete', array($what, $student->Student_ID)) }}" class="btn-red btn-sm">Delete</a>
                                         @endif
                                     </td>

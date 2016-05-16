@@ -72,7 +72,7 @@
                                     </td>
                                     <td>
                                         @if(strlen(session()->has('username')))
-                                            <a href="{{ route('panel.getEdit', array($what, $material->Material_ID)) }}" class="btn-orange btn-sm">Edit</a>
+                                            <a href="{{ route('panel.getEdit', array($what, $material->Material_ID)) }}" class="btn-green btn-sm">Edit</a>
                                             <a href="{{ route('panel.getDelete', array($what, $material->Material_ID)) }}" class="btn-red btn-sm">Delete</a>
                                         @endif
                                     </td>
