@@ -55,6 +55,24 @@ hr {
     font-size: 0.75em;
 }
 
+.btn-green {
+    background-color: #2c8700 !important;
+    color: white !important;
+    border: 1px solid white !important;
+    outline: none !important;
+    text-decoration: none;
+    padding: 10px 15px;
+    box-sizing: border-box;
+}
+
+.btn-green:hover {
+    background-color: #3d9811 !important;
+}
+
+.btn-green:active {
+    background-color: #1b7600 !important;
+}
+
 .btn-orange {
     background-color: #e98a2a !important;
     color: white !important;
