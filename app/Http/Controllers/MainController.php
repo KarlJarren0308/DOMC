@@ -8,6 +8,7 @@ use App\Accounts;
 use App\Authors;
 use App\Faculties;
 use App\Librarians;
+use App\Reservations;
 use App\Students;
 use App\Works;
 
@@ -24,6 +25,7 @@ class MainController extends Controller
     public function getOpac() {
         $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
         $data['works_materials'] = Works::join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->groupBy('works.Material_ID')->get();
+        $data['reservations'] = Reservations::where('Account_Username', session()->get('username'))->get();
 
         return view('main.opac', $data);
     }

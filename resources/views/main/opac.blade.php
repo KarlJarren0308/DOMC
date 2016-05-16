@@ -11,13 +11,18 @@
                         <a href="{{ route('panel.getIndex') }}" class="navbar-element">Control Panel</a>
                     @endif
 
-                    <a href="" class="navbar-element">
-                        @if(strlen(session()->get('middle_name')) > 1)
-                            {{ session()->get('first_name') . ' ' . substr(session()->get('middle_name'), 0, 1) . '. ' . session()->get('last_name') }}
-                        @else
-                            {{ session()->get('first_name') . ' ' . session()->get('last_name') }}
-                        @endif
-                    </a>
+                    <div class="dropdown">
+                        <a class="navbar-element dropdown-toggle">
+                            @if(strlen(session()->get('middle_name')) > 1)
+                                {{ session()->get('first_name') . ' ' . substr(session()->get('middle_name'), 0, 1) . '. ' . session()->get('last_name') }}
+                            @else
+                                {{ session()->get('first_name') . ' ' . session()->get('last_name') }}
+                            @endif
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{{ route('main.getLogout') }}">Logout</a></li>
+                        </ul>
+                    </div>
                 @else
                     <a href="{{ route('main.getLogin') }}" class="navbar-element">Login</a>
                 @endif
@@ -25,6 +30,7 @@
         </div>
     </div>
     <div id="main-container" class="container">
+        <div class="banner">Online Public Access Catalog</div>
         <table id="materials-table" class="u-full-width">
             <thead>
                 <tr>
@@ -58,9 +64,21 @@
                                     @endif
                                 @endforeach
                             </td>
-                            <td>
+                            <td class="text-center">
                                 @if(strlen(session()->has('username')))
-                                    <a href="{{ route('main.postReserve', $material->Material_ID) }}" class="btn btn-orange btn-sm">Reserve</a>
+                                    <?php $isReserved = false; ?>
+                                    @foreach($reservations as $reservation)
+                                        @if($reservation->Material_ID == $material->Material_ID)
+                                            <?php $isReserved = true; ?>
+                                            @break
+                                        @endif
+                                    @endforeach
+
+                                    @if($isReserved)
+                                        <div class="btn btn-red btn-sm">Already Reserved</div>
+                                    @else
+                                        <a href="{{ route('main.postReserve', $material->Material_ID) }}" class="btn btn-orange btn-sm">Reserve</a>
+                                    @endif
                                 @endif
                             </td>
                         </tr>

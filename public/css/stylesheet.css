@@ -52,6 +52,7 @@ hr {
 }
 
 .btn {
+    background: white;
     border-radius: 4px;
     display: inline-block;
     text-align: center;
@@ -216,7 +217,7 @@ hr {
 }
 
 .navbar-element + .dropdown-menu.show {
-    background: white;
+    background: #eeeeee;
     box-shadow: 0 2px 2px rgba(25, 40, 35, 0.5);
     display: inline-block;
     list-style-type: none;
