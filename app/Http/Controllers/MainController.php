@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Accounts;
 use App\Authors;
+use App\Faculties;
 use App\Librarians;
 use App\Students;
 use App\Works;
@@ -31,14 +32,14 @@ class MainController extends Controller
         $account = Accounts::where('Account_Username', $request->input('username'))->where('Account_Password', md5($request->input('password')))->first();
 
         if($account) {
-            if($account->Account_Type == 'Student') {
-                $student = Students::where('Student_ID', $account->Account_Owner)->first();
+            if($account->Account_Type == 'Faculty') {
+                $faculty = Faculties::where('Faculty_ID', $account->Account_Owner)->first();
 
-                if($student) {
+                if($faculty) {
                     session()->put('username', $account->Account_Username);
-                    session()->put('first_name', $student->Student_First_Name);
-                    session()->put('middle_name', $student->Student_Middle_Name);
-                    session()->put('last_name', $student->Student_Last_Name);
+                    session()->put('first_name', $faculty->Faculty_First_Name);
+                    session()->put('middle_name', $faculty->Faculty_Middle_Name);
+                    session()->put('last_name', $faculty->Faculty_Last_Name);
                     session()->put('account_type', $account->Account_Type);
 
                     return redirect()->route('main.getOpac');
@@ -54,6 +55,18 @@ class MainController extends Controller
                     session()->put('account_type', $account->Account_Type);
 
                     return redirect()->route('panel.getIndex');
+                }
+            } else if($account->Account_Type == 'Student') {
+                $student = Students::where('Student_ID', $account->Account_Owner)->first();
+
+                if($student) {
+                    session()->put('username', $account->Account_Username);
+                    session()->put('first_name', $student->Student_First_Name);
+                    session()->put('middle_name', $student->Student_Middle_Name);
+                    session()->put('last_name', $student->Student_Last_Name);
+                    session()->put('account_type', $account->Account_Type);
+
+                    return redirect()->route('main.getOpac');
                 }
             }
         }
