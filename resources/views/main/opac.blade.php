@@ -5,10 +5,10 @@
         <div class="navbar-content">
             <div class="navbar-element title">De Ocampo Memorial College</div>
             <div class="u-pull-right">
-                <a href="./opac" class="navbar-element active">OPAC</a>
+                <a href="{{ route('main.getOpac') }}" class="navbar-element active">OPAC</a>
                 @if(session()->has('username'))
                     @if(session()->get('account_type') == 'Librarian')
-                        <a href="./panel" class="navbar-element">Control Panel</a>
+                        <a href="{{ route('panel.getIndex') }}" class="navbar-element">Control Panel</a>
                     @endif
 
                     <a href="" class="navbar-element">
@@ -19,7 +19,7 @@
                         @endif
                     </a>
                 @else
-                    <a href="./login" class="navbar-element">Login</a>
+                    <a href="{{ route('main.getLogin') }}" class="navbar-element">Login</a>
                 @endif
             </div>
         </div>

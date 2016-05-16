@@ -5,16 +5,21 @@
         <div class="navbar-content">
             <div class="navbar-element title">De Ocampo Memorial College</div>
             <div class="u-pull-right">
-                <a href="./opac" class="navbar-element">OPAC</a>
-                <a href="./panel" class="navbar-element active">Control Panel</a>
+                <a href="{{ route('main.getOpac') }}" class="navbar-element">OPAC</a>
+                <a href="{{ route('panel.getIndex') }}" class="navbar-element active">Control Panel</a>
                 @if(session()->has('username'))
-                    <a href="" class="navbar-element">
-                        @if(strlen(session()->get('middle_name')) > 1)
-                            {{ session()->get('first_name') . ' ' . substr(session()->get('middle_name'), 0, 1) . '. ' . session()->get('last_name') }}
-                        @else
-                            {{ session()->get('first_name') . ' ' . session()->get('last_name') }}
-                        @endif
-                    </a>
+                    <div class="dropdown">
+                        <a class="navbar-element dropdown-toggle">
+                            @if(strlen(session()->get('middle_name')) > 1)
+                                {{ session()->get('first_name') . ' ' . substr(session()->get('middle_name'), 0, 1) . '. ' . session()->get('last_name') }}
+                            @else
+                                {{ session()->get('first_name') . ' ' . session()->get('last_name') }}
+                            @endif
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{{ route('main.getLogout') }}">Logout</a></li>
+                        </ul>
+                    </div>
                 @endif
             </div>
         </div>
@@ -23,16 +28,18 @@
         <div class="row">
             <div class="three columns">
                 <ul class="list-group">
-                    <li class="list-group-item active"><a href="./panel">Home</a></li>
-                    <li class="list-group-item"><a href="./panel/manage/materials">Manage Materials</a></li>
-                    <li class="list-group-item"><a href="./panel/manage/authors">Manage Authors</a></li>
-                    <li class="list-group-item"><a href="./panel/manage/publishers">Manage Publishers</a></li>
-                    <li class="list-group-item"><a href="./panel/manage/students">Manage Students</a></li>
-                    <li class="list-group-item"><a href="./panel/manage/faculties">Manage Faculties</a></li>
-                    <li class="list-group-item"><a href="./panel/manage/settings">System Settings</a></li>
+                    <li class="list-group-item active"><a href="{{ route('panel.getIndex') }}">Home</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'materials') }}">Manage Materials</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'authors') }}">Manage Authors</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'publishers') }}">Manage Publishers</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'students') }}">Manage Students</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'faculties') }}">Manage Faculties</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'settings') }}">System Settings</a></li>
                 </ul>
             </div>
-            <div class="nine columns">Nine</div>
+            <div class="nine columns">
+                <div class="banner">What's New?</div>
+            </div>
         </div>
     </div>
 @stop

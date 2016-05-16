@@ -10,6 +10,18 @@ hr {
     margin-bottom: 15px;
 }
 
+.banner {
+    background: #2c8700;
+    border-bottom: 4px solid #0a6500;
+    border-radius: 4px;
+    color: white;
+    font-size: 1.5em;
+    font-weight: bold;
+    text-shadow: #264c6c 1px 1px 0;
+    padding: 10px 15px;
+    margin-bottom: 25px;
+}
+
 .block {
     background: #eeeeee;
     padding: 10px 15px;
@@ -61,6 +73,29 @@ hr {
     background-color: #d87919 !important;
 }
 
+.btn-red {
+    background-color: #dd1e2e !important;
+    color: white !important;
+    border: 1px solid white !important;
+    outline: none !important;
+    text-decoration: none;
+    padding: 10px 15px;
+    box-sizing: border-box;
+}
+
+.btn-red:hover {
+    background-color: #ee2f3f !important;
+}
+
+.btn-red:active {
+    background-color: #cc0d1d !important;
+}
+
+.dropdown {
+    display: inline-block;
+    position: relative;
+}
+
 .input-block {
     margin-bottom: 1.5rem;
 }
@@ -90,13 +125,17 @@ hr {
 }
 
 .list-group > li.list-group-item > a:hover {
-    background: rgba(25, 40, 35, 0.5);
+    background: rgba(44, 135, 0, 0.5);
     color: white;
 }
 
 .list-group > li.list-group-item.active > a {
-    border-right: 5px solid black;
+    background: #2c8700;
+    border-bottom: 5px solid #0a6500;
+    color: white;
+    text-shadow: #264c6c 1px 1px 0;
     padding: 5px 5px 5px 10px;
+    height: 34px;
 }
 
 .navbar {
@@ -131,6 +170,40 @@ hr {
     line-height: 30px;
     height: 50px;
     min-width: 100px;
+    box-sizing: border-box;
+}
+
+.navbar-element:not(.title) {
+    cursor: pointer;
+}
+
+.navbar-element + .dropdown-menu {
+    display: none;
+}
+
+.navbar-element + .dropdown-menu.show {
+    background: #2c8700;
+    box-shadow: 0 2px 2px rgba(25, 40, 35, 0.5);
+    display: inline-block;
+    list-style-type: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: 55px;
+    min-width: 150px;
+}
+
+.navbar-element + .dropdown-menu > li {
+    margin: 0;
+}
+
+.navbar-element + .dropdown-menu > li > a {
+    color: white;
+    display: inline-block;
+    text-decoration: none;
+    padding: 5px 10px;
+    height: 100%;
+    width: 100%;
     box-sizing: border-box;
 }
 

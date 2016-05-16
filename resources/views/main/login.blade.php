@@ -5,7 +5,7 @@
         <div class="navbar-content">
             <div class="navbar-element title">De Ocampo Memorial College</div>
             <div class="u-pull-right">
-                <a href="./opac" class="navbar-element">OPAC</a>
+                <a href="{{ route('main.getOpac') }}" class="navbar-element">OPAC</a>
                 @if(session()->has('username'))
                     <a href="" class="navbar-element">
                         @if(strlen(session()->get('middle_name')) > 1)
@@ -15,7 +15,7 @@
                         @endif
                     </a>
                 @else
-                    <a href="./login" class="navbar-element active">Login</a>
+                    <a href="{{ route('main.getLogin') }}" class="navbar-element active">Login</a>
                 @endif
             </div>
         </div>
@@ -45,8 +45,4 @@
             <div class="three columns">&nbsp;</div>
         </div>
     </div>
-@stop
-
-@section('post_ref')
-    <script src="/js/main.login.js"></script>
 @stop

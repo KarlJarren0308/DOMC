@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/css/stylesheet.css">
     <script src="/js/jquery.min.js"></script>
     <script src="/js/jquery.dataTables.min.js"></script>
+    <script src="/js/script.js"></script>
 @yield('pre_ref')
 </head>
 <body>

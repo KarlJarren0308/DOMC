@@ -60,4 +60,10 @@ class MainController extends Controller
 
         return redirect()->route('main.getIndex');
     }
+
+    public function getLogout() {
+        session()->flush();
+
+        return redirect()->route('main.getIndex');
+    }
 }
