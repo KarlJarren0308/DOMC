@@ -20,6 +20,14 @@ hr {
     background: #dd1e2e;
 }
 
+.alert.success {
+    background: #2c8700;
+}
+
+.alert.warning {
+    background: #d2cc20;
+}
+
 .banner {
     background: #2c8700;
     border-bottom: 4px solid #0a6500;

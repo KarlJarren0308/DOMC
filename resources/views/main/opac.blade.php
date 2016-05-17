@@ -31,6 +31,17 @@
     </div>
     <div id="main-container" class="container">
         <div class="banner">Online Public Access Catalog</div>
+        @if(session()->has('global_status'))
+            @if(session()->get('global_status') == 'Success')
+                <?php $class = ' success'; ?>
+            @elseif(session()->get('global_status') == 'Warning')
+                <?php $class = ' warning'; ?>
+            @else
+                <?php $class = ' danger'; ?>
+            @endif
+
+            <div class="alert{{ $class }}">{{ session()->get('global_message') }}</div>
+        @endif
         <table id="materials-table" class="u-full-width">
             <thead>
                 <tr>
@@ -77,7 +88,7 @@
                                     @if($isReserved)
                                         <div class="btn btn-red btn-sm">Already Reserved</div>
                                     @else
-                                        <a href="{{ route('main.postReserve', $material->Material_ID) }}" class="btn btn-orange btn-sm">Reserve</a>
+                                        <a href="{{ route('main.getReserve', $material->Material_ID) }}" class="btn btn-orange btn-sm">Reserve</a>
                                     @endif
                                 @endif
                             </td>

@@ -48,6 +48,7 @@
                             <th>Call Number</th>
                             <th>Title</th>
                             <th>Author(s)</th>
+                            <th>Reserved By</th>
                             <th></th>
                         </tr>
                         <tbody>
@@ -74,6 +75,45 @@
                                                         @endif
                                                     @endif
                                                 @endforeach
+                                            </td>
+                                            <td>
+                                                @if($reservation->Account_Type == 'Faculty')
+                                                    @foreach($faculty_accounts as $faculty)
+                                                        @if($reservation->Account_Owner == $faculty->Faculty_ID)
+                                                            @if(strlen($faculty->Faculty_Middle_Name) > 1)
+                                                                {{ $faculty->Faculty_First_Name . ' ' . substr($faculty->Faculty_Middle_Name, 0, 1) . '. ' . $faculty->Faculty_Last_Name }}
+                                                            @else
+                                                                {{ $faculty->Faculty_First_Name . ' ' . $faculty->Faculty_Last_Name }}
+                                                            @endif
+
+                                                            @break
+                                                        @endif
+                                                    @endforeach
+                                                @elseif($reservation->Account_Type == 'Librarian')
+                                                    @foreach($librarian_accounts as $librarian)
+                                                        @if($reservation->Account_Owner == $librarian->Librarian_ID)
+                                                            @if(strlen($librarian->Librarian_Middle_Name) > 1)
+                                                                {{ $librarian->Librarian_First_Name . ' ' . substr($librarian->Librarian_Middle_Name, 0, 1) . '. ' . $librarian->Librarian_Last_Name }}
+                                                            @else
+                                                                {{ $librarian->Librarian_First_Name . ' ' . $librarian->Librarian_Last_Name }}
+                                                            @endif
+
+                                                            @break
+                                                        @endif
+                                                    @endforeach
+                                                @elseif($reservation->Account_Type == 'Student')
+                                                    @foreach($student_accounts as $student)
+                                                        @if($reservation->Account_Owner == $student->Student_ID)
+                                                            @if(strlen($student->Student_Middle_Name) > 1)
+                                                                {{ $student->Student_First_Name . ' ' . substr($student->Student_Middle_Name, 0, 1) . '. ' . $student->Student_Last_Name }}
+                                                            @else
+                                                                {{ $student->Student_First_Name . ' ' . $student->Student_Last_Name }}
+                                                            @endif
+
+                                                            @break
+                                                        @endif
+                                                    @endforeach
+                                                @endif
                                             </td>
                                             <td class="text-center">
                                                 @if(strlen(session()->has('username')))

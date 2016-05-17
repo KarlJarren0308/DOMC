@@ -12,6 +12,8 @@ use App\Reservations;
 use App\Students;
 use App\Works;
 
+date_default_timezone_set('Asia/Manila');
+
 class MainController extends Controller
 {
     public function getIndex() {
@@ -28,6 +30,12 @@ class MainController extends Controller
         $data['reservations'] = Reservations::where('Account_Username', session()->get('username'))->where('Reservation_Status', 'active')->get();
 
         return view('main.opac', $data);
+    }
+
+    public function getLogout() {
+        session()->flush();
+
+        return redirect()->route('main.getIndex');
     }
 
     public function postLogin(Request $request) {
@@ -76,9 +84,22 @@ class MainController extends Controller
         return redirect()->route('main.getIndex');
     }
 
-    public function getLogout() {
-        session()->flush();
+    public function getReserve($what) {
+        $query = Reservations::insert(array(
+            'Material_ID' => $what,
+            'Account_Username' => session()->get('username'),
+            'Reservation_Date_Stamp' => date('Y-m-d'),
+            'Reservation_Time_Stamp' => date('H:i:s')
+        ));
 
-        return redirect()->route('main.getIndex');
+        if($query) {
+            session()->flash('global_status', 'Success');
+            session()->flash('global_message', 'Material has been reserved.');
+        } else {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Failed to reserve material.');
+        }
+
+        return redirect()->route('main.getOpac');
     }
 }

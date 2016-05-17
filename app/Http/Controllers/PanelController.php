@@ -7,10 +7,13 @@ use App\Http\Requests;
 use App\Accounts;
 use App\Authors;
 use App\Faculties;
+use App\Librarians;
 use App\Publishers;
 use App\Reservations;
 use App\Students;
 use App\Works;
+
+date_default_timezone_set('Asia/Manila');
 
 class PanelController extends Controller
 {
@@ -29,7 +32,10 @@ class PanelController extends Controller
     }
 
     public function getReserved() {
-        $data['works_reservations'] = Reservations::join('materials', 'reservations.Material_ID', '=', 'materials.Material_ID')->get();
+        $data['works_reservations'] = Reservations::join('materials', 'reservations.Material_ID', '=', 'materials.Material_ID')->join('accounts', 'reservations.Account_Username', '=', 'accounts.Account_Username')->get();
+        $data['faculty_accounts'] = Faculties::get();
+        $data['librarian_accounts'] = Librarians::get();
+        $data['student_accounts'] = Students::get();
         $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
         $data['works_materials'] = Works::join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->groupBy('works.Material_ID')->get();
 
