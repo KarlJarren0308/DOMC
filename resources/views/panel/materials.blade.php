@@ -29,6 +29,9 @@
             <div class="three columns">
                 <ul class="list-group">
                     <li class="list-group-item"><a href="{{ route('panel.getIndex') }}">Home</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getLoan') }}">Loan Material(s)</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getReserved') }}">Reserved Material(s)</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getReceive') }}">Receive Material(s)</a></li>
                     <li class="list-group-item active"><a href="{{ route('panel.getManage', 'materials') }}">Manage Materials</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'authors') }}">Manage Authors</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'publishers') }}">Manage Publishers</a></li>
@@ -70,7 +73,7 @@
                                             @endif
                                         @endforeach
                                     </td>
-                                    <td>
+                                    <td class="text-center">
                                         @if(strlen(session()->has('username')))
                                             <a href="{{ route('panel.getEdit', array($what, $material->Material_ID)) }}" class="btn btn-green btn-sm">Edit</a>
                                             <a href="{{ route('panel.getDelete', array($what, $material->Material_ID)) }}" class="btn btn-red btn-sm">Delete</a>

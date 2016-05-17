@@ -16,6 +16,9 @@ Route::get('login', array('as' => 'main.getLogin', 'uses' => 'MainController@get
 Route::get('logout', array('as' => 'main.getLogout', 'uses' => 'MainController@getLogout'));
 Route::get('opac', array('as' => 'main.getOpac', 'uses' => 'MainController@getOpac'));
 Route::get('panel', array('as' => 'panel.getIndex', 'uses' => 'PanelController@getIndex'));
+Route::get('panel/loan', array('as' => 'panel.getLoan', 'uses' => 'PanelController@getLoan'));
+Route::get('panel/reserved', array('as' => 'panel.getReserved', 'uses' => 'PanelController@getReserved'));
+Route::get('panel/receive', array('as' => 'panel.getReceive', 'uses' => 'PanelController@getReceive'));
 Route::get('panel/manage/{what}', array('as' => 'panel.getManage', 'uses' => 'PanelController@getManage'));
 Route::get('panel/manage/{what}/add', array('as' => 'panel.getAdd', 'uses' => 'PanelController@getAdd'));
 Route::get('panel/manage/{what}/edit/{id}', array('as' => 'panel.getEdit', 'uses' => 'PanelController@getEdit'));
@@ -23,4 +26,5 @@ Route::get('panel/manage/{what}/delete/{id}', array('as' => 'panel.getDelete', '
 
 Route::post('login', array('as' => 'main.postLogin', 'uses' => 'MainController@postLogin'));
 Route::post('opac/reserve/{what}', array('as' => 'main.postReserve', 'uses' => 'MainController@postReserve'));
+Route::post('panel/loan/{what}', array('as' => 'panel.postLoan', 'uses' => 'PanelController@postLoan'));
 Route::post('panel/manage/{what}/add', array('as' => 'panel.postAdd', 'uses' => 'PanelController@postAdd'));

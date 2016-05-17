@@ -8,6 +8,7 @@ use App\Accounts;
 use App\Authors;
 use App\Faculties;
 use App\Publishers;
+use App\Reservations;
 use App\Students;
 use App\Works;
 
@@ -21,6 +22,22 @@ class PanelController extends Controller
         }
 
         return redirect()->route('main.getIndex');
+    }
+
+    public function getLoan() {
+        return view('errors.503');
+    }
+
+    public function getReserved() {
+        $data['works_reservations'] = Reservations::join('materials', 'reservations.Material_ID', '=', 'materials.Material_ID')->get();
+        $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
+        $data['works_materials'] = Works::join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->groupBy('works.Material_ID')->get();
+
+        return view('panel.reserved', $data);
+    }
+
+    public function getReceive() {
+        return view('errors.503');
     }
 
     public function getManage($what) {
@@ -59,7 +76,7 @@ class PanelController extends Controller
 
                 break;
             case 'settings':
-                return view('panel.settings', $data);
+                return view('errors.503');
 
                 break;
             default:
@@ -107,6 +124,94 @@ class PanelController extends Controller
 
                 break;
         }
+    }
+
+    public function getEdit($what, $status = null) {
+        $data['what'] = $what;
+        $data['status'] = $status;
+
+        /*
+        switch($what) {
+            case 'materials':
+                return view('panel.materials_add', $data);
+
+                break;
+            case 'authors':
+                $data['authors'] = Authors::get();
+
+                return view('panel.authors_add', $data);
+
+                break;
+            case 'publishers':
+                $data['publishers'] = Publishers::get();
+
+                return view('panel.publishers_add', $data);
+
+                break;
+            case 'students':
+                $data['students'] = Students::get();
+
+                return view('panel.students_add', $data);
+
+                break;
+            case 'faculties':
+                $data['faculties'] = Faculties::get();
+
+                return view('panel.faculties_add', $data);
+
+                break;
+            default:
+                return view('errors.404');
+
+                break;
+        }
+        */
+
+        return view('errors.503');
+    }
+
+    public function getDelete($what, $status = null) {
+        $data['what'] = $what;
+        $data['status'] = $status;
+
+        /*
+        switch($what) {
+            case 'materials':
+                return view('panel.materials_add', $data);
+
+                break;
+            case 'authors':
+                $data['authors'] = Authors::get();
+
+                return view('panel.authors_add', $data);
+
+                break;
+            case 'publishers':
+                $data['publishers'] = Publishers::get();
+
+                return view('panel.publishers_add', $data);
+
+                break;
+            case 'students':
+                $data['students'] = Students::get();
+
+                return view('panel.students_add', $data);
+
+                break;
+            case 'faculties':
+                $data['faculties'] = Faculties::get();
+
+                return view('panel.faculties_add', $data);
+
+                break;
+            default:
+                return view('errors.404');
+
+                break;
+        }
+        */
+
+        return view('errors.503');
     }
 
     public function postAdd($what, Request $request) {
