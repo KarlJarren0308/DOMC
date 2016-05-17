@@ -10,6 +10,16 @@ hr {
     margin-bottom: 15px;
 }
 
+.alert {
+    background: #eeeeee;
+    padding: 10px 15px;
+    margin-bottom: 25px;
+}
+
+.alert.danger {
+    background: #dd1e2e;
+}
+
 .banner {
     background: #2c8700;
     border-bottom: 4px solid #0a6500;
