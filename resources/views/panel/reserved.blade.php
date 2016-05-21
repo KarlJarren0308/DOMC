@@ -42,6 +42,17 @@
             </div>
             <div class="nine columns">
                 <div class="banner">Reserved Material(s)</div>
+                @if(session()->has('global_status'))
+                    @if(session()->get('global_status') == 'Success')
+                        <?php $class = ' success'; ?>
+                    @elseif(session()->get('global_status') == 'Warning')
+                        <?php $class = ' warning'; ?>
+                    @else
+                        <?php $class = ' danger'; ?>
+                    @endif
+
+                    <div class="alert{{ $class }}">{{ session()->get('global_message') }}</div>
+                @endif
                 <table id="reserved-table" class="u-full-width">
                     <thead>
                         <tr>
@@ -117,7 +128,11 @@
                                             </td>
                                             <td class="text-center">
                                                 @if(strlen(session()->has('username')))
-                                                    <a href="{{ route('panel.postLoan', $material->Material_ID) }}" class="btn btn-green btn-sm">Loan</a>
+                                                    {!! Form::open(array('route' => 'panel.postLoan', 'class' => 'no-margin')) !!}
+                                                        {!! Form::hidden('arg0', 'bcfaa2f57da331c29c0bab9f99543451') !!}
+                                                        {!! Form::hidden('arg1', $reservation->Reservation_ID) !!}
+                                                        {!! Form::submit('Loan', array('class' => 'btn btn-green btn-sm')) !!}
+                                                    {!! Form::close() !!}
                                                 @endif
                                             </td>
                                         </tr>

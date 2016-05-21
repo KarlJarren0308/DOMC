@@ -38,6 +38,25 @@ class MainController extends Controller
         return redirect()->route('main.getIndex');
     }
 
+    public function getReserve($what) {
+        $query = Reservations::insert(array(
+            'Material_ID' => $what,
+            'Account_Username' => session()->get('username'),
+            'Reservation_Date_Stamp' => date('Y-m-d'),
+            'Reservation_Time_Stamp' => date('H:i:s')
+        ));
+
+        if($query) {
+            session()->flash('global_status', 'Success');
+            session()->flash('global_message', 'Material has been reserved.');
+        } else {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Failed to reserve material.');
+        }
+
+        return redirect()->route('main.getOpac');
+    }
+
     public function postLogin(Request $request) {
         $account = Accounts::where('Account_Username', $request->input('username'))->where('Account_Password', md5($request->input('password')))->first();
 
@@ -81,25 +100,9 @@ class MainController extends Controller
             }
         }
 
-        return redirect()->route('main.getIndex');
-    }
+        session()->flash('global_status', 'Failed');
+        session()->flash('global_message', 'Invalid username and/or password.');
 
-    public function getReserve($what) {
-        $query = Reservations::insert(array(
-            'Material_ID' => $what,
-            'Account_Username' => session()->get('username'),
-            'Reservation_Date_Stamp' => date('Y-m-d'),
-            'Reservation_Time_Stamp' => date('H:i:s')
-        ));
-
-        if($query) {
-            session()->flash('global_status', 'Success');
-            session()->flash('global_message', 'Material has been reserved.');
-        } else {
-            session()->flash('global_status', 'Failed');
-            session()->flash('global_message', 'Failed to reserve material.');
-        }
-
-        return redirect()->route('main.getOpac');
+        return redirect()->route('main.getLogin');
     }
 }

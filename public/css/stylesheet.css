@@ -12,20 +12,24 @@ hr {
 
 .alert {
     background: #eeeeee;
+    color: #222;
     padding: 10px 15px;
     margin-bottom: 25px;
 }
 
 .alert.danger {
     background: #dd1e2e;
+    color: white;
 }
 
 .alert.success {
     background: #2c8700;
+    color: white;
 }
 
 .alert.warning {
     background: #d2cc20;
+    color: white;
 }
 
 .banner {
@@ -73,15 +77,19 @@ hr {
     background: white;
     border-radius: 4px;
     display: inline-block;
+    font-family: 'Raleway';
     text-align: center;
-    height: 46px;
+    height: 46px !important;
     min-width: 75px;
 }
 
 .btn-sm {
-    font-size: 0.75em;
-    line-height: 8px;
-    height: 30px;
+    font-size: 0.75em !important;
+    font-weight: normal !important;
+    letter-spacing: normal !important;
+    text-transform: none !important;
+    line-height: 8px !important;
+    height: 30px !important;
 }
 
 .btn-green {

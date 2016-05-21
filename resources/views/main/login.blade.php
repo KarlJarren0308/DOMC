@@ -21,26 +21,34 @@
         </div>
     </div>
     <div id="main-container" class="container">
+        <div class="banner">Login</div>
         <div class="row">
             <div class="three columns">&nbsp;</div>
             <div class="six columns">
-                <div class="bg-green block fg-white shadow">
-                    <h2 class="no-margin">Login</h2>
-                    <hr>
-                    {!! Form::open(array('route' => 'main.postLogin')) !!}
-                        <div class="input-block">
-                            {!! Form::label('username', 'Username:') !!}
-                            {!! Form::text('username', null, array('class' => 'u-full-width', 'placeholder' => 'Enter Username Here', 'required' => 'required', 'autofocus' => 'autofocus')) !!}
-                        </div>
-                        <div class="input-block">
-                            {!! Form::label('password', 'Password:') !!}
-                            {!! Form::password('password', array('class' => 'u-full-width', 'placeholder' => 'Enter Password Here', 'required' => 'required')) !!}
-                        </div>
-                        <div class="input-block text-right">
-                            {!! Form::submit('Login', array('class' => 'btn btn-orange')) !!}
-                        </div>
-                    {!! Form::close() !!}
-                </div>
+                @if(session()->has('global_status'))
+                    @if(session()->get('global_status') == 'Success')
+                        <?php $class = ' success'; ?>
+                    @elseif(session()->get('global_status') == 'Warning')
+                        <?php $class = ' warning'; ?>
+                    @else
+                        <?php $class = ' danger'; ?>
+                    @endif
+
+                    <div class="alert{{ $class }}">{{ session()->get('global_message') }}</div>
+                @endif
+                {!! Form::open(array('route' => 'main.postLogin')) !!}
+                    <div class="input-block">
+                        {!! Form::label('username', 'Username:') !!}
+                        {!! Form::text('username', null, array('class' => 'u-full-width', 'placeholder' => 'Enter Username Here', 'required' => 'required', 'autofocus' => 'autofocus')) !!}
+                    </div>
+                    <div class="input-block">
+                        {!! Form::label('password', 'Password:') !!}
+                        {!! Form::password('password', array('class' => 'u-full-width', 'placeholder' => 'Enter Password Here', 'required' => 'required')) !!}
+                    </div>
+                    <div class="input-block text-right">
+                        {!! Form::submit('Login', array('class' => 'btn btn-orange')) !!}
+                    </div>
+                {!! Form::close() !!}
             </div>
             <div class="three columns">&nbsp;</div>
         </div>
