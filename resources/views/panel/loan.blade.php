@@ -53,7 +53,7 @@
 
                     <div class="alert{{ $class }}">{{ session()->get('global_message') }}</div>
                 @endif
-                <table id="reserved-table" class="u-full-width">
+                <table id="loan-table" class="u-full-width">
                     <thead>
                         <tr>
                             <th>Call Number</th>
@@ -88,7 +88,7 @@
                                     </td>
                                     <td class="text-center">
                                         @if(strlen(session()->has('username')))
-                                            <a data-button="loan-button" data-var-id="{{ $material->Material_ID }}" class="btn btn-orange btn-sm">Loan</a>
+                                            <a data-button="loan-button" data-var-id="{{ $material->Material_ID }}" data-var-title="{{ $material->Material_Title }}" class="btn btn-orange btn-sm">Loan</a>
                                         @endif
                                     </td>
                                 </tr>
@@ -96,6 +96,54 @@
                         </tbody>
                     </thead>
                 </table>
+            </div>
+        </div>
+    </div>
+    <div class="modal">
+        <div class="modal-container">
+            <div class="modal-header">Loan Material(s)</div>
+            <div class="modal-body">
+                {!! Form::open(array('route' => 'panel.postLoan', 'class' => 'no-margin')) !!}
+                    {!! Form::hidden('arg0', 'f6614d9e3adf79e5eecc16a5405e8461') !!}
+                    {!! Form::hidden('arg1', '') !!}
+                    <div class="input-block">
+                        {!! Form::label('', 'Material to Borrow:') !!}
+                        <div id="input-material-title" class="content"></div>
+                    </div>
+                    <div class="input-block">
+                        {!! Form::label('authorFirstName', 'Borrower\'s Name:') !!}
+                        <select name="arg2" class="u-full-width" required>
+                            <option value="" selected disabled>Select a borrower...</option>
+                            @foreach($accounts as $account)
+                                @if($account->Account_Type == 'Faculty')
+                                    <?php $facultyAccount = $faculty_accounts::where('Faculty_ID', $account->Account_Owner)->first(); ?>
+                                    @if(strlen($facultyAccount->Faculty_Middle_Name) > 1)
+                                        <option value="{{ $account->Account_Username }}">{{ $facultyAccount->Faculty_First_Name . ' ' . substr($facultyAccount->Faculty_Middle_Name, 0, 1) . '. ' . $facultyAccount->Faculty_Last_Name }}</option>
+                                    @else
+                                        <option value="{{ $account->Account_Username }}">{{ $facultyAccount->Faculty_First_Name . ' ' . $facultyAccount->Faculty_Last_Name }}</option>
+                                    @endif
+                                @elseif($account->Account_Type == 'Librarian')
+                                    <?php $librarianAccount = $librarian_accounts::where('Librarian_ID', $account->Account_Owner)->first(); ?>
+                                    @if(strlen($librarianAccount->Librarian_Middle_Name) > 1)
+                                        <option value="{{ $account->Account_Username }}">{{ $librarianAccount->Librarian_First_Name . ' ' . substr($librarianAccount->Librarian_Middle_Name, 0, 1) . '. ' . $librarianAccount->Librarian_Last_Name }}</option>
+                                    @else
+                                        <option value="{{ $account->Account_Username }}">{{ $librarianAccount->Librarian_First_Name . ' ' . $librarianAccount->Librarian_Last_Name }}</option>
+                                    @endif
+                                @elseif($account->Account_Type == 'Student')
+                                    <?php $studentAccount = $student_accounts::where('Student_ID', $account->Account_Owner)->first(); ?>
+                                    @if(strlen($studentAccount->Student_Middle_Name) > 1)
+                                        <option value="{{ $account->Account_Username }}">{{ $studentAccount->Student_First_Name . ' ' . substr($studentAccount->Student_Middle_Name, 0, 1) . '. ' . $studentAccount->Student_Last_Name }}</option>
+                                    @else
+                                        <option value="{{ $account->Account_Username }}">{{ $studentAccount->Student_First_Name . ' ' . $studentAccount->Student_Last_Name }}</option>
+                                    @endif
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="input-block text-right">
+                        {!! Form::submit('Loan', array('class' => 'btn btn-orange btn-sm')) !!}
+                    </div>
+                {!! Form::close() !!}
             </div>
         </div>
     </div>

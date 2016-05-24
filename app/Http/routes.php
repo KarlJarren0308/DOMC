@@ -28,4 +28,5 @@ Route::get('panel/manage/{what}/delete/{id}', array('as' => 'panel.getDelete', '
 Route::post('login', array('as' => 'main.postLogin', 'uses' => 'MainController@postLogin'));
 Route::post('panel/loan/', array('as' => 'panel.postLoan', 'uses' => 'PanelController@postLoan'));
 Route::post('panel/receive/', array('as' => 'panel.postReceive', 'uses' => 'PanelController@postReceive'));
+Route::post('panel/test/', array('as' => 'panel.postTest', 'uses' => 'PanelController@postTest'));
 Route::post('panel/manage/{what}/add', array('as' => 'panel.postAdd', 'uses' => 'PanelController@postAdd'));

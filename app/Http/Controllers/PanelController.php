@@ -9,6 +9,7 @@ use App\Authors;
 use App\Faculties;
 use App\Librarians;
 use App\Loans;
+use App\Materials;
 use App\Publishers;
 use App\Receives;
 use App\Reservations;
@@ -52,9 +53,10 @@ class PanelController extends Controller
             }
         }
 
-        $data['faculty_accounts'] = Faculties::get();
-        $data['librarian_accounts'] = Librarians::get();
-        $data['student_accounts'] = Students::get();
+        $data['accounts'] = Accounts::orderBy('Account_Type', 'asc')->get();
+        $data['faculty_accounts'] = new Faculties;
+        $data['librarian_accounts'] = new Librarians;
+        $data['student_accounts'] = new Students;
         $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
         $data['works_materials'] = Works::join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->groupBy('works.Material_ID')->get();
 
@@ -171,7 +173,7 @@ class PanelController extends Controller
         }
     }
 
-    public function getAdd($what, $status = null) {
+    public function getAdd($what) {
         if(!session()->has('username')) {
             session()->flash('global_status', 'Failed');
             session()->flash('global_message', 'Oops! Please login first.');
@@ -187,34 +189,28 @@ class PanelController extends Controller
         }
 
         $data['what'] = $what;
-        $data['status'] = $status;
 
         switch($what) {
             case 'materials':
+                $data['publishers'] = Publishers::get();
+                $data['authors'] = Authors::get();
+                
                 return view('panel.materials_add', $data);
 
                 break;
             case 'authors':
-                $data['authors'] = Authors::get();
-
                 return view('panel.authors_add', $data);
 
                 break;
             case 'publishers':
-                $data['publishers'] = Publishers::get();
-
                 return view('panel.publishers_add', $data);
 
                 break;
             case 'students':
-                $data['students'] = Students::get();
-
                 return view('panel.students_add', $data);
 
                 break;
             case 'faculties':
-                $data['faculties'] = Faculties::get();
-
                 return view('panel.faculties_add', $data);
 
                 break;
@@ -225,7 +221,7 @@ class PanelController extends Controller
         }
     }
 
-    public function getEdit($what, $status = null) {
+    public function getEdit($what) {
         if(!session()->has('username')) {
             session()->flash('global_status', 'Failed');
             session()->flash('global_message', 'Oops! Please login first.');
@@ -241,7 +237,6 @@ class PanelController extends Controller
         }
 
         $data['what'] = $what;
-        $data['status'] = $status;
 
         /*
         switch($what) {
@@ -283,7 +278,7 @@ class PanelController extends Controller
         return view('errors.503');
     }
 
-    public function getDelete($what, $status = null) {
+    public function getDelete($what, $id) {
         if(!session()->has('username')) {
             session()->flash('global_status', 'Failed');
             session()->flash('global_message', 'Oops! Please login first.');
@@ -299,36 +294,82 @@ class PanelController extends Controller
         }
 
         $data['what'] = $what;
-        $data['status'] = $status;
 
-        /*
         switch($what) {
             case 'materials':
-                return view('panel.materials_add', $data);
+                $query = Materials::where('Material_ID', $id)->delete();
+
+                if($query) {
+                    $query = Works::where('Material_ID', $id)->delete();
+                    
+                    session()->flash('global_status', 'Success');
+                    session()->flash('global_message', 'Material has been deleted.');
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Failed to delete material.');
+                }
+
+                return redirect()->route('panel.getManage', 'materials');
 
                 break;
             case 'authors':
-                $data['authors'] = Authors::get();
+                $query = Authors::where('Author_ID', $id)->delete();
 
-                return view('panel.authors_add', $data);
+                if($query) {
+                    session()->flash('global_status', 'Success');
+                    session()->flash('global_message', 'Author has been deleted.');
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Failed to delete author.');
+                }
+
+                return redirect()->route('panel.getManage', 'authors');
 
                 break;
             case 'publishers':
-                $data['publishers'] = Publishers::get();
+                $query = Publishers::where('Publisher_ID', $id)->delete();
 
-                return view('panel.publishers_add', $data);
+                if($query) {
+                    session()->flash('global_status', 'Success');
+                    session()->flash('global_message', 'Publisher has been deleted.');
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Failed to delete publisher.');
+                }
+
+                return redirect()->route('panel.getManage', 'publishers');
 
                 break;
             case 'students':
-                $data['students'] = Students::get();
+                $query = Students::where('Student_ID', $id)->delete();
 
-                return view('panel.students_add', $data);
+                if($query) {
+                    $query = Accounts::where('Account_Type', 'Student')->where('Account_Owner', $id)->delete();
+
+                    session()->flash('global_status', 'Success');
+                    session()->flash('global_message', 'Student has been deleted.');
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Failed to delete student.');
+                }
+
+                return redirect()->route('panel.getManage', 'students');
 
                 break;
             case 'faculties':
-                $data['faculties'] = Faculties::get();
+                $query = Faculties::where('Faculty_ID', $id)->delete();
 
-                return view('panel.faculties_add', $data);
+                if($query) {
+                    $query = Accounts::where('Account_Type', 'Faculty')->where('Account_Owner', $id)->delete();
+                    
+                    session()->flash('global_status', 'Success');
+                    session()->flash('global_message', 'Faculty has been deleted.');
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Failed to delete faculty.');
+                }
+
+                return redirect()->route('panel.getManage', 'faculties');
 
                 break;
             default:
@@ -336,9 +377,6 @@ class PanelController extends Controller
 
                 break;
         }
-        */
-
-        return view('errors.503');
     }
 
     public function postLoan(Request $request) {
@@ -359,7 +397,21 @@ class PanelController extends Controller
         switch($request->input('arg0')) {
             case 'f6614d9e3adf79e5eecc16a5405e8461':
                 // arg0: loanAvailable
-                return 'arg0: loanAvailable<br>arg1: ' . $request->input('arg1');
+                $materialID = $request->input('arg1');
+                $accountUsername = $request->input('arg2');
+
+                $query = Loans::insert(array('Material_ID' => $materialID, 'Account_Username' => $accountUsername, 'Loan_Date_Stamp' => date('Y-m-d'), 'Loan_Time_Stamp' => date('H:i:s')));
+
+                if($query) {
+                    session()->flash('global_status', 'Success');
+                    session()->flash('global_message', 'Loan Successful.');
+                } else {
+                    session()->flash('global_status', 'Warning');
+                    session()->flash('global_message', 'Oops! Failed to loan material to the borrower.');
+                }
+
+                return redirect()->route('panel.getLoan');
+
                 break;
             case 'bcfaa2f57da331c29c0bab9f99543451':
                 // arg0: loanReserved
@@ -468,7 +520,44 @@ class PanelController extends Controller
 
         switch($what) {
             case 'materials':
-                return view('panel.materials_add', $data);
+                $materialID = Materials::insertGetId(array(
+                    'Material_Title' => $request->input('materialTitle'),
+                    'Material_Collection_Type' => $request->input('materialCollectionType'),
+                    'Material_ISBN' => $request->input('materialISBN'),
+                    'Material_Call_Number' => $request->input('materialCallNumber'),
+                    'Material_Location' => $request->input('materialLocation'),
+                    'Material_Date_Published' => $request->input('materialDatePublished'),
+                    'Material_Copies' => $request->input('materialCopies'),
+                    'Publisher_ID' => $request->input('publisher')
+                ));
+
+                if($materialID) {
+                    $ctr = 0;
+
+                    foreach($request->input('authors') as $authorID) {
+                        $query = Works::insert(array(
+                            'Material_ID' => $materialID,
+                            'Author_ID' => $authorID
+                        ));
+
+                        if($query) {
+                            $ctr++;
+                        }
+                    }
+
+                    if($ctr > 0) {
+                        session()->flash('global_status', 'Success');
+                        session()->flash('global_message', 'Material has been added.');
+                    } else {
+                        session()->flash('global_status', 'Failed');
+                        session()->flash('global_message', 'Failed to associate author(s) to the material.');
+                    }
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Failed to add material.');
+                }
+
+                return redirect()->route('panel.getManage', 'materials');
 
                 break;
             case 'authors':
@@ -573,4 +662,9 @@ class PanelController extends Controller
                 break;
         }
     }
+
+    public function postTest(Request $request) {
+        return $request->all();
+    }
 }
+

@@ -63,7 +63,3 @@
         </div>
     </div>
 @stop
-
-@section('post_ref')
-    <script src="/js/panel.faculties.js"></script>
-@stop

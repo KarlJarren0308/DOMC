@@ -42,6 +42,20 @@
             </div>
             <div class="nine columns">
                 <div class="banner">Manage Materials</div>
+                @if(session()->has('global_status'))
+                    @if(session()->get('global_status') == 'Success')
+                        <?php $class = ' success'; ?>
+                    @elseif(session()->get('global_status') == 'Warning')
+                        <?php $class = ' warning'; ?>
+                    @else
+                        <?php $class = ' danger'; ?>
+                    @endif
+
+                    <div class="alert{{ $class }}">{{ session()->get('global_message') }}</div>
+                @endif
+                <div class="tray text-right">
+                    <a href="{{ route('panel.getAdd', $what) }}" class="btn btn-orange">Add</a>
+                </div>
                 <table id="materials-table" class="u-full-width">
                     <thead>
                         <tr>

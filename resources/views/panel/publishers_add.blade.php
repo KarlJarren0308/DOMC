@@ -44,8 +44,8 @@
                 <div class="banner">Manage Publishers</div>
                 {!! Form::open(array('route' => array('panel.postAdd', $what))) !!}
                     <div class="input-block">
-                        {!! Form::label('publisherName', 'Publisher's Name:') !!}
-                        {!! Form::text('publisherName', null, array('class' => 'u-full-width', 'placeholder' => 'Enter Publisher's Name Here', 'required' => 'required', 'autofocus' => 'autofocus')) !!}
+                        {!! Form::label('publisherName', 'Publisher\'s Name:') !!}
+                        {!! Form::text('publisherName', null, array('class' => 'u-full-width', 'placeholder' => 'Enter Publisher\'s Name Here', 'required' => 'required', 'autofocus' => 'autofocus')) !!}
                     </div>
                     <div class="input-block text-right">
                         {!! Form::submit('Add Publisher', array('class' => 'btn btn-orange')) !!}
@@ -54,8 +54,4 @@
             </div>
         </div>
     </div>
-@stop
-
-@section('post_ref')
-    <script src="/js/panel.faculties.js"></script>
 @stop

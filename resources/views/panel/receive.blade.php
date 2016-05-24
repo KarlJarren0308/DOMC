@@ -131,8 +131,8 @@
                                             <td class="text-center">
                                                 @if(strlen(session()->has('username')))
                                                     @if($loan->Loan_Status == 'active')
-                                                        {!! Form::open(array('route' => 'panel.postReceive', 'class' => 'no-margin')) !!}
-                                                            {!! Form::hidden('arg0', $loan->Loan_ID) !!}
+                                                        {!! Form::open(array('route' => 'panel.postLoan', 'class' => 'no-margin')) !!}
+                                                            {!! Form::hidden('arg0', 'bcfaa2f57da331c29c0bab9f99543451') !!}
                                                             {!! Form::submit('Receive', array('class' => 'btn btn-green btn-sm')) !!}
                                                         {!! Form::close() !!}
                                                     @else
