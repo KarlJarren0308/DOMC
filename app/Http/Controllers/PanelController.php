@@ -7,6 +7,7 @@ use App\Http\Requests;
 use App\Accounts;
 use App\Authors;
 use App\Faculties;
+use App\Holidays;
 use App\Librarians;
 use App\Loans;
 use App\Materials;
@@ -163,8 +164,10 @@ class PanelController extends Controller
                 return view('panel.faculties', $data);
 
                 break;
-            case 'settings':
-                return view('errors.503');
+            case 'holidays':
+                $data['holidays'] = Holidays::get();
+
+                return view('panel.holidays', $data);
 
                 break;
             default:
@@ -213,6 +216,10 @@ class PanelController extends Controller
                 break;
             case 'faculties':
                 return view('panel.faculties_add', $data);
+
+                break;
+            case 'holidays':
+                return view('panel.holidays_add', $data);
 
                 break;
             default:
@@ -375,6 +382,20 @@ class PanelController extends Controller
                 }
 
                 return redirect()->route('panel.getManage', 'faculties');
+
+                break;
+            case 'holidays':
+                $query = Holidays::where('Holiday_ID', $id)->delete();
+
+                if($query) {
+                    session()->flash('global_status', 'Success');
+                    session()->flash('global_message', 'Holiday has been deleted.');
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Failed to delete holiday.');
+                }
+
+                return redirect()->route('panel.getManage', 'holidays');
 
                 break;
             default:
@@ -660,6 +681,23 @@ class PanelController extends Controller
 
                 return redirect()->route('panel.getManage', 'faculties');
 
+                break;
+            case 'holidays':
+                $query = Holidays::insert(array(
+                    'Holiday_Event' => $request->input('holidayEvent'),
+                    'Holiday_Date' => $request->input('holidayDate'),
+                    'Holiday_Type' => $request->input('holidayType')
+                ));
+
+                if($query) {
+                    session()->flash('global_status', 'Success');
+                    session()->flash('global_message', 'Holiday has been added.');
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Failed to add holiday.');
+                }
+
+                return redirect()->route('panel.getManage', 'holidays');
                 break;
             default:
                 return view('errors.404');
