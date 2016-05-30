@@ -41,7 +41,7 @@
                 </ul>
             </div>
             <div class="nine columns">
-                <div class="banner">Manage Materials</div>
+                <div class="banner">Manage Materials - Add</div>
                 {!! Form::open(array('route' => array('panel.postAdd', $what))) !!}
                     <div class="row">
                         <div class="eight columns">
@@ -85,8 +85,8 @@
                                 </div>
                                 <div class="four columns">
                                     <div class="input-block">
-                                        {!! Form::label('materialDatePublished', 'Date Published:') !!}
-                                        {!! Form::text('materialDatePublished', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'required' => 'required')) !!}
+                                        {!! Form::label('materialCopyrightYear', 'Copyright Year:') !!}
+                                        {!! Form::text('materialCopyrightYear', null, array('class' => 'u-full-width', 'placeholder' => 'Enter Copyright Year Here', 'required' => 'required')) !!}
                                     </div>
                                 </div>
                             </div>
@@ -100,8 +100,9 @@
                                 <div class="eight columns">
                                     <div class="input-block">
                                         {!! Form::label('publisher', 'Publisher:') !!}
-                                        <select name="publisher" class="u-full-width" required>
+                                        <select name="publisher" class="u-full-width">
                                             <option value="" selected disabled>Select a publisher...</option>
+                                            <option value="">[None]</option>
                                             @foreach($publishers as $publisher)
                                                 <option value="{{ $publisher->Publisher_ID }}">{{ $publisher->Publisher_Name }}</option>
                                             @endforeach
@@ -115,23 +116,25 @@
                                 <label for="" class="u-pull-left">Author(s):</label>
                                 <button class="btn btn-green btn-sm" data-button="add-author-button">Add Author</button>
                             </div>
-                            <div id="authors-block" class="block">
+                            <div id="authors-block" class="block" style="overflow-y: scroll; max-height: 300px;">
                                 <div class="input-block">
-                                    <select name="authors[]" class="u-full-width" required>
-                                        <option value="" selected disabled>Select an author...</option>
-                                        @foreach($authors as $author)
-                                            @if(strlen($author->Author_Middle_Name) > 1)
-                                                <option value="{{ $author->Author_ID }}">{{ $author->Author_First_Name . ' ' . substr($author->Author_Middle_Name, 0, 1) . '. ' . $author->Author_Last_Name }}</option>
-                                            @else
-                                                <option value="{{ $author->Author_ID }}">{{ $author->Author_First_Name . ' ' . $author->Author_Last_Name }}</option>
-                                            @endif
-                                        @endforeach
-                                    </select>
+                                    <div class="u-three-four-width">
+                                        <select name="authors[]" class="u-full-width" required>
+                                            <option value="" selected disabled>Select an author...</option>
+                                            @foreach($authors as $author)
+                                                @if(strlen($author->Author_Middle_Name) > 1)
+                                                    <option value="{{ $author->Author_ID }}">{{ $author->Author_First_Name . ' ' . substr($author->Author_Middle_Name, 0, 1) . '. ' . $author->Author_Last_Name }}</option>
+                                                @else
+                                                    <option value="{{ $author->Author_ID }}">{{ $author->Author_First_Name . ' ' . $author->Author_Last_Name }}</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="input-block text-right">
+                    <div class="input-block text-right gap-top">
                         {!! Form::submit('Add Student', array('class' => 'btn btn-orange')) !!}
                     </div>
                 {!! Form::close() !!}

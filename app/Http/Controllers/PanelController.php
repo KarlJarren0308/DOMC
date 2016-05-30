@@ -151,6 +151,7 @@ class PanelController extends Controller
 
                 break;
             case 'students':
+                $data['student_accounts'] = Accounts::where('Account_Type', 'Student')->get();
                 $data['students'] = Students::get();
 
                 return view('panel.students', $data);
@@ -221,7 +222,7 @@ class PanelController extends Controller
         }
     }
 
-    public function getEdit($what) {
+    public function getEdit($what, $id) {
         if(!session()->has('username')) {
             session()->flash('global_status', 'Failed');
             session()->flash('global_message', 'Oops! Please login first.');
@@ -237,35 +238,42 @@ class PanelController extends Controller
         }
 
         $data['what'] = $what;
+        $data['id'] = $id;
 
-        /*
         switch($what) {
             case 'materials':
-                return view('panel.materials_add', $data);
+                $data['authors'] = Authors::get();
+                $data['publishers'] = Publishers::get();
+                $data['material'] = Materials::where('Material_ID', $id)->first();
+                $data['work_authors'] = Works::where('Material_ID', $id)->get();
+
+                return view('panel.materials_edit', $data);
 
                 break;
             case 'authors':
-                $data['authors'] = Authors::get();
+                $data['author'] = Authors::where('Author_ID', $id)->first();
 
-                return view('panel.authors_add', $data);
+                return view('panel.authors_edit', $data);
 
                 break;
             case 'publishers':
-                $data['publishers'] = Publishers::get();
+                $data['publisher'] = Publishers::where('Publisher_ID', $id)->first();
 
-                return view('panel.publishers_add', $data);
+                return view('panel.publishers_edit', $data);
 
                 break;
             case 'students':
-                $data['students'] = Students::get();
+                $data['student_account'] = Accounts::where('Account_Type', 'Student')->where('Account_Owner', $id)->first();
+                $data['student'] = Students::where('Student_ID', $id)->first();
 
-                return view('panel.students_add', $data);
+                return view('panel.students_edit', $data);
 
                 break;
             case 'faculties':
-                $data['faculties'] = Faculties::get();
+                $data['faculty_account'] = Accounts::where('Account_Type', 'Faculty')->where('Account_Owner', $id)->first();
+                $data['faculty'] = Faculties::where('Faculty_ID', $id)->first();
 
-                return view('panel.faculties_add', $data);
+                return view('panel.faculties_edit', $data);
 
                 break;
             default:
@@ -273,9 +281,6 @@ class PanelController extends Controller
 
                 break;
         }
-        */
-
-        return view('errors.503');
     }
 
     public function getDelete($what, $id) {
@@ -526,9 +531,9 @@ class PanelController extends Controller
                     'Material_ISBN' => $request->input('materialISBN'),
                     'Material_Call_Number' => $request->input('materialCallNumber'),
                     'Material_Location' => $request->input('materialLocation'),
-                    'Material_Date_Published' => $request->input('materialDatePublished'),
+                    'Material_Copyright_Year' => $request->input('materialCopyrightYear'),
                     'Material_Copies' => $request->input('materialCopies'),
-                    'Publisher_ID' => $request->input('publisher')
+                    'Publisher_ID' => ($request->input('publisher') != '' ? $request->input('publisher') : '-1')
                 ));
 
                 if($materialID) {
@@ -619,7 +624,7 @@ class PanelController extends Controller
                     }
                 } else {
                     session()->flash('global_status', 'Failed');
-                    session()->flash('global_message', 'Failed to add faculty.');
+                    session()->flash('global_message', 'Failed to add student.');
                 }
 
                 return redirect()->route('panel.getManage', 'students');
@@ -636,7 +641,7 @@ class PanelController extends Controller
                 if($id) {
                     $query = Accounts::insert(array(
                         'Account_Username' => $request->input('facultyID'),
-                        'Account_Password' => $request->input('facultyBirthDate'),
+                        'Account_Password' => md5($request->input('facultyBirthDate')),
                         'Account_Type' => 'Faculty',
                         'Account_Owner' => $id
                     ));
@@ -651,6 +656,179 @@ class PanelController extends Controller
                 } else {
                     session()->flash('global_status', 'Failed');
                     session()->flash('global_message', 'Failed to add faculty.');
+                }
+
+                return redirect()->route('panel.getManage', 'faculties');
+
+                break;
+            default:
+                return view('errors.404');
+
+                break;
+        }
+    }
+
+    public function postEdit($what, $id, Request $request) {
+        if(!session()->has('username')) {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Oops! Please login first.');
+
+            return redirect()->route('main.getLogin');
+        } else {
+            if(session()->get('account_type') != 'Librarian') {
+                session()->flash('global_status', 'Failed');
+                session()->flash('global_message', 'Oops! You are not authorized to access the panel.');
+
+                return redirect()->route('main.getOpac');
+            }
+        }
+
+        $data['what'] = $what;
+        $res = '';
+
+        switch($what) {
+            case 'materials':
+                $query = Works::where('Material_ID', $id)->delete();
+
+                if($query) {
+                    $query = Materials::where('Material_ID', $id)->update(array(
+                        'Material_Title' => $request->input('materialTitle'),
+                        'Material_Collection_Type' => $request->input('materialCollectionType'),
+                        'Material_ISBN' => $request->input('materialISBN'),
+                        'Material_Call_Number' => $request->input('materialCallNumber'),
+                        'Material_Location' => $request->input('materialLocation'),
+                        'Material_Copyright_Year' => $request->input('materialCopyrightYear'),
+                        'Material_Copies' => $request->input('materialCopies'),
+                        'Publisher_ID' => ($request->input('publisher') != '' ? $request->input('publisher') : '-1')
+                    ));
+
+                    $ctr = 0;
+
+                    foreach($request->input('authors') as $authorID) {
+                        $query = Works::where('Material_ID', $id)->where('Author_ID', $authorID)->first();
+
+                        if(!$query) {
+                            $query = Works::insert(array(
+                                'Material_ID' => $id,
+                                'Author_ID' => $authorID
+                            ));
+
+                            if($query) {
+                                $ctr++;
+                            }
+                        }
+                    }
+
+                    if($ctr > 0) {
+                        session()->flash('global_status', 'Success');
+                        session()->flash('global_message', 'Material has been modified.');
+                    } else {
+                        session()->flash('global_status', 'Failed');
+                        session()->flash('global_message', 'Failed to associate author(s) to the material.');
+                    }
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'No changes has been made.1');
+                }
+
+                return redirect()->route('panel.getManage', 'materials');
+
+                break;
+            case 'authors':
+                $query = Authors::where('Author_ID', $id)->update(array(
+                    'Author_First_Name' => $request->input('authorFirstName'),
+                    'Author_Middle_Name' => $request->input('authorMiddleName'),
+                    'Author_Last_Name' => $request->input('authorLastName')
+                ));
+
+                if($query) {
+                    session()->flash('global_status', 'Success');
+                    session()->flash('global_message', 'Author has been modified.');
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'No changes has been made.');
+                }
+
+                return redirect()->route('panel.getManage', 'authors');
+
+                break;
+            case 'publishers':
+                $query = Publishers::where('Publisher_ID', $id)->update(array(
+                    'Publisher_Name' => $request->input('publisherName')
+                ));
+
+                if($query) {
+                    session()->flash('global_status', 'Success');
+                    session()->flash('global_message', 'Publisher has been modified.');
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'No changes has been made.');
+                }
+
+                return redirect()->route('panel.getManage', 'publishers');
+
+                break;
+            case 'students':
+                $id = Students::where('Student_ID', $id)->update(array(
+                    'Student_First_Name' => $request->input('studentFirstName'),
+                    'Student_Middle_Name' => $request->input('studentMiddleName'),
+                    'Student_Last_Name' => $request->input('studentLastName'),
+                    'Student_Birth_Date' => $request->input('studentBirthDate')
+                ));
+
+                if($id) {
+                    $query = Accounts::where('Account_Type', 'Student')->where('Account_Owner', $id)->update(array(
+                        'Account_Username' => $request->input('studentID')
+                    ));
+
+                    /*
+                    if($query) {
+                        session()->flash('global_status', 'Success');
+                        session()->flash('global_message', 'Student has been edited.');
+                    } else {
+                        session()->flash('global_status', 'Warning');
+                        session()->flash('global_message', 'Student has been edited but account was not modified.');
+                    }
+                    */
+
+                    session()->flash('global_status', 'Success');
+                    session()->flash('global_message', 'Student has been modified.');
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'No changes has been made.');
+                }
+
+                return redirect()->route('panel.getManage', 'students');
+
+                break;
+            case 'faculties':
+                $id = Faculties::where('Faculty_ID', $id)->update(array(
+                    'Faculty_First_Name' => $request->input('facultyFirstName'),
+                    'Faculty_Middle_Name' => $request->input('facultyMiddleName'),
+                    'Faculty_Last_Name' => $request->input('facultyLastName'),
+                    'Faculty_Birth_Date' => $request->input('facultyBirthDate')
+                ));
+
+                if($id) {
+                    $query = Accounts::where('Account_Type', 'Faculty')->where('Account_Owner', $id)->update(array(
+                        'Account_Username' => $request->input('facultyID')
+                    ));
+
+                    /*
+                    if($query) {
+                        session()->flash('global_status', 'Success');
+                        session()->flash('global_message', 'Faculty has been edited.');
+                    } else {
+                        session()->flash('global_status', 'Warning');
+                        session()->flash('global_message', 'Faculty has been edited but account was not modified.');
+                    }
+                    */
+
+                    session()->flash('global_status', 'Success');
+                    session()->flash('global_message', 'Faculty has been modified.');
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'No changes has been made.');
                 }
 
                 return redirect()->route('panel.getManage', 'faculties');

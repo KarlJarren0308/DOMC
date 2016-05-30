@@ -30,3 +30,4 @@ Route::post('panel/loan/', array('as' => 'panel.postLoan', 'uses' => 'PanelContr
 Route::post('panel/receive/', array('as' => 'panel.postReceive', 'uses' => 'PanelController@postReceive'));
 Route::post('panel/test/', array('as' => 'panel.postTest', 'uses' => 'PanelController@postTest'));
 Route::post('panel/manage/{what}/add', array('as' => 'panel.postAdd', 'uses' => 'PanelController@postAdd'));
+Route::post('panel/manage/{what}/edit/{id}', array('as' => 'panel.postEdit', 'uses' => 'PanelController@postEdit'));

@@ -10,9 +10,16 @@ hr {
     margin-bottom: 15px;
 }
 
+div.u-one-four-width,
+div.u-three-four-width {
+    display: inline-block;
+}
+
 .alert {
     background: #eeeeee;
     color: #222;
+    opacity: 0.75;
+    text-shadow: #264c6c 1px 1px 0;
     padding: 10px 15px;
     margin-bottom: 25px;
 }
@@ -162,8 +169,17 @@ hr {
     position: relative;
 }
 
+.gap-top {
+    margin-top: 5px;
+}
+
 .input-block {
+    font-size: 0;
     margin-bottom: 1.5rem;
+}
+
+.input-block > * {
+    font-size: 15px;
 }
 
 .input-block > .content {
@@ -181,6 +197,18 @@ hr {
 .input-block-helper {
     font-size: 0.75em;
     font-weight: bold;
+}
+
+.link {
+    cursor: pointer;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+
+.link-sm {
+    font-size: 0.75em;
 }
 
 .list-group {
@@ -373,6 +401,16 @@ hr {
 
 .tray {
     margin-bottom: 25px;
+}
+
+.u-one-four-width {
+    width: 25%;
+    box-sizing: border-box;
+}
+
+.u-three-four-width {
+    width: 75%;
+    box-sizing: border-box;
 }
 
 /* Custom */

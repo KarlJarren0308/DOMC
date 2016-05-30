@@ -2,6 +2,10 @@ function openModal() {
     $('.modal').fadeIn(250);
 }
 
+function closeModal() {
+    $('.modal').fadeOut(250);
+}
+
 $(document).ready(function() {
     $('html').click(function() {
         $('.dropdown-menu').removeClass('show');

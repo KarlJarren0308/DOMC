@@ -41,7 +41,7 @@
                 </ul>
             </div>
             <div class="nine columns">
-                <div class="banner">Manage Faculties</div>
+                <div class="banner">Manage Faculties - Add</div>
                 {!! Form::open(array('route' => array('panel.postAdd', $what))) !!}
                     <div class="row">
                         <div class="six columns">

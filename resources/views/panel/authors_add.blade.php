@@ -41,7 +41,7 @@
                 </ul>
             </div>
             <div class="nine columns">
-                <div class="banner">Manage Authors</div>
+                <div class="banner">Manage Authors - Add</div>
                 {!! Form::open(array('route' => array('panel.postAdd', $what))) !!}
                     <div class="input-block">
                         {!! Form::label('authorFirstName', 'First Name:') !!}

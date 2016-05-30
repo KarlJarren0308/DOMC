@@ -59,6 +59,7 @@
                 <table id="students-table" class="u-full-width">
                     <thead>
                         <tr>
+                            <th>Student Number</th>
                             <th>Student's Name</th>
                             <th>Birth Date</th>
                             <th width="25%"></th>
@@ -66,6 +67,13 @@
                         <tbody>
                             @foreach($students as $student)
                                 <tr>
+                                    <td>
+                                        @foreach($student_accounts as $account)
+                                            @if($account->Account_Owner == $student->Student_ID)
+                                                {{ $account->Account_Username }}
+                                            @endif
+                                        @endforeach
+                                    </td>
                                     <td>
                                         @if(strlen($student->Student_Middle_Name) > 1)
                                             {{ $student->Student_First_Name . ' ' . substr($student->Student_Middle_Name, 0, 1) . '. ' . $student->Student_Last_Name }}
