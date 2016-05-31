@@ -20,6 +20,7 @@
                             @endif
                         </a>
                         <ul class="dropdown-menu">
+                            <li><a href="{{ route('main.getAccountInfo') }}">Account Information</a></li>
                             <li><a href="{{ route('main.getLogout') }}">Logout</a></li>
                         </ul>
                     </div>
@@ -51,51 +52,51 @@
                     <th>Author(s)</th>
                     <th></th>
                 </tr>
-                <tbody>
-                    @foreach($works_materials as $material)
-                        <?php $isFirst = true; ?>
-                        <tr>
-                            <td>{{ $material->Material_Call_Number }}</td>
-                            <td>{{ $material->Material_Title }}</td>
-                            <td>{{ $material->Material_ISBN }}</td>
-                            <td>
-                                @foreach($works_authors as $author)
-                                    @if($author->Material_ID == $material->Material_ID)
-                                        @if($isFirst)
-                                            <?php $isFirst = false; ?>
-                                        @else
-                                            <br>
-                                        @endif
-
-                                        @if(strlen($author->Author_Middle_Name) > 1)
-                                            {{ $author->Author_First_Name . ' ' . substr($author->Author_Middle_Name, 0, 1) . '. ' . $author->Author_Last_Name }}
-                                        @else
-                                            {{ $author->Author_First_Name . ' ' . $author->Author_Last_Name }}
-                                        @endif
-                                    @endif
-                                @endforeach
-                            </td>
-                            <td class="text-center">
-                                @if(strlen(session()->has('username')))
-                                    <?php $isReserved = false; ?>
-                                    @foreach($reservations as $reservation)
-                                        @if($reservation->Material_ID == $material->Material_ID)
-                                            <?php $isReserved = true; ?>
-                                            @break
-                                        @endif
-                                    @endforeach
-
-                                    @if($isReserved)
-                                        <div class="btn btn-red btn-sm">Already Reserved</div>
+            </thead>
+            <tbody>
+                @foreach($works_materials as $material)
+                    <?php $isFirst = true; ?>
+                    <tr>
+                        <td>{{ $material->Material_Call_Number }}</td>
+                        <td>{{ $material->Material_Title }}</td>
+                        <td>{{ $material->Material_ISBN }}</td>
+                        <td>
+                            @foreach($works_authors as $author)
+                                @if($author->Material_ID == $material->Material_ID)
+                                    @if($isFirst)
+                                        <?php $isFirst = false; ?>
                                     @else
-                                        <a href="{{ route('main.getReserve', $material->Material_ID) }}" class="btn btn-orange btn-sm">Reserve</a>
+                                        <br>
+                                    @endif
+
+                                    @if(strlen($author->Author_Middle_Name) > 1)
+                                        {{ $author->Author_First_Name . ' ' . substr($author->Author_Middle_Name, 0, 1) . '. ' . $author->Author_Last_Name }}
+                                    @else
+                                        {{ $author->Author_First_Name . ' ' . $author->Author_Last_Name }}
                                     @endif
                                 @endif
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </thead>
+                            @endforeach
+                        </td>
+                        <td class="text-center">
+                            @if(strlen(session()->has('username')))
+                                <?php $isReserved = false; ?>
+                                @foreach($reservations as $reservation)
+                                    @if($reservation->Material_ID == $material->Material_ID)
+                                        <?php $isReserved = true; ?>
+                                        @break
+                                    @endif
+                                @endforeach
+
+                                @if($isReserved)
+                                    <div class="btn btn-red btn-sm">Already Reserved</div>
+                                @else
+                                    <a href="{{ route('main.getReserve', $material->Material_ID) }}" class="btn btn-orange btn-sm">Reserve</a>
+                                @endif
+                            @endif
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
         </table>
     </div>
 @stop

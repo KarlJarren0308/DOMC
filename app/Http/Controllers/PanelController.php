@@ -449,7 +449,7 @@ class PanelController extends Controller
                     $datetime = date('Y-m-d H:i:s', strtotime($reservation->Reservation_Date_Stamp . ' ' . $reservation->Reservation_Time_Stamp));
 
                     if(strtotime('+1 day', strtotime($datetime)) >= strtotime(date('Y-m-d H:i:s'))) {
-                        $query = Reservations::where('Reservation_ID', $id)->update(array('Reservation_Status' => 'inactive'));
+                        $query = Reservations::where('Reservation_ID', $id)->update(array('Reservation_Status' => 'loaned'));
 
                         if($query) {
                             $query = Loans::insert(array('Material_ID' => $reservation->Material_ID, 'Account_Username' => $reservation->Account_Username, 'Loan_Date_Stamp' => date('Y-m-d'), 'Loan_Time_Stamp' => date('H:i:s'), 'Loan_Reference' => $id));

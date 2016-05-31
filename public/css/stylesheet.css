@@ -68,6 +68,14 @@ div.u-three-four-width {
     background: white;
 }
 
+.bullet-list {
+    margin: 0 0 0 15px;
+}
+
+.bullet-list > li {
+    margin-bottom: 0;
+}
+
 .fg-black {
     color: #222;
 }
@@ -169,8 +177,24 @@ div.u-three-four-width {
     position: relative;
 }
 
+.gap-none {
+    margin: 0;
+}
+
 .gap-top {
     margin-top: 5px;
+}
+
+.gap-bottom {
+    margin-bottom: 5px;
+}
+
+.gap-left {
+    margin-left: 5px;
+}
+
+.gap-right {
+    margin-right: 5px;
 }
 
 .input-block {
@@ -208,6 +232,38 @@ div.u-three-four-width {
 }
 
 .link-sm {
+    font-size: 0.75em;
+}
+
+.list {
+    border: 1px solid #e1e1e1;
+}
+
+.list > .list-item {
+    color: #222;
+    display: inline-block;
+    text-decoration: none;
+    padding: 10px 15px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.list > .list-item:not(:last-child) {
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.list > .list-item > .header {
+    border-bottom: 1px solid #222;
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 0 5px;
+}
+
+.list > .list-item > .body {
+    padding: 5px 5px 10px 5px;
+}
+
+.list > .list-item > .footer {
     font-size: 0.75em;
 }
 
@@ -307,6 +363,7 @@ div.u-three-four-width {
     text-align: center;
     text-decoration: none;
     text-shadow: #264c6c 1px 1px 0;
+    vertical-align: middle;
     padding: 10px;
     line-height: 30px;
     height: 50px;
@@ -352,12 +409,12 @@ div.u-three-four-width {
     background: rgba(44, 135, 0, 0.5);
 }
 
-.navbar-element.active:not(.title) {
+.navbar-element.active:not(.logo):not(.title) {
     background: rgba(25, 40, 35, 0.5);
     border-bottom: 5px solid #e98a2a;
 }
 
-.navbar-element:not(.title):hover {
+.navbar-element:not(.logo):not(.title):hover {
     background: #e98a2a;
     color: white;
 }
@@ -365,6 +422,28 @@ div.u-three-four-width {
 .navbar-element.title {
     text-align: left;
     font-weight: bold;
+}
+
+.navbar-element.logo {
+    position: relative;
+    min-width: 50px;
+}
+
+.navbar-element.logo > img {
+    cursor: default;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 50px;
+    width: 50px;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -moz-user-drag: none;
+    -moz-user-select: none;
+    -ms-user-drag: none;
+    -ms-user-select: none;
+    user-drag: none;
+    user-select: none;
 }
 
 .no-margin {

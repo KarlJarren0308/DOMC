@@ -32,6 +32,24 @@ class MainController extends Controller
         return view('main.opac', $data);
     }
 
+    public function getAccountInfo() {
+        $username = session()->get('username');
+
+        $data['reservations'] = Reservations::where('reservations.Account_Username', $username)->join('materials', 'reservations.Material_ID', '=', 'materials.Material_ID')->join('publishers', 'materials.Publisher_ID', '=', 'publishers.Publisher_ID')->orderBy('reservations.Reservation_Status', 'asc')->get();
+        $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
+        $data['my_account_one'] = Accounts::where('Account_Username', $username)->first();
+        
+        if($data['my_account_one']->Account_Type == 'Faculty') {
+            $data['my_account_two'] = Faculties::where('Faculty_ID', $data['my_account_one']->Account_Owner)->first();
+        } else if($data['my_account_one']->Account_Type == 'Librarian') {
+            $data['my_account_two'] = Librarians::where('Librarian_ID', $data['my_account_one']->Account_Owner)->first();
+        } else if($data['my_account_one']->Account_Type == 'Student') {
+            $data['my_account_two'] = Students::where('Student_ID', $data['my_account_one']->Account_Owner)->first();
+        }
+
+        return view('main.account_information', $data);
+    }
+
     public function getLogout() {
         session()->flush();
 
@@ -55,6 +73,43 @@ class MainController extends Controller
         }
 
         return redirect()->route('main.getOpac');
+    }
+
+    public function postCancelReservation(Request $request) {
+        switch($request->input('arg0')) {
+            case '2705a83a5a0659cce34583972637eda5':
+                // arg0: ajax
+                $query = Reservations::where('Reservation_ID', $request->input('arg1'))->update(array(
+                    'Reservation_Status' => 'inactive'
+                ));
+
+                if($query) {
+                    return json_encode(array('status' => 'Success', 'message' => 'Reservation has been cancelled.'));
+                } else {
+                    return json_encode(array('status' => 'Failed', 'message' => 'Failed to cancel reservation.'));
+                }
+
+                break;
+            case 'a8affc088cbca89fa20dbd98c91362e4':
+                // arg0: click
+                $query = Reservations::where('Reservation_ID', $request->input('arg1'))->update(array(
+                    'Reservation_Status' => 'inactive'
+                ));
+
+                if($query) {
+                    session()->flash('global_status', 'Success');
+                    session()->flash('global_message', 'Reservation has been cancelled.');
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Failed to cancel reservation.');
+                }
+
+                return redirect()->route('main.getAccountInfo');
+
+                break;
+            default:
+                break;
+        }
     }
 
     public function postLogin(Request $request) {
