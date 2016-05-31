@@ -17,6 +17,7 @@
                             @endif
                         </a>
                         <ul class="dropdown-menu">
+                            <li><a href="{{ route('main.getAccountInfo') }}">Account Information</a></li>
                             <li><a href="{{ route('main.getLogout') }}">Logout</a></li>
                         </ul>
                     </div>
