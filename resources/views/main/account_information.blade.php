@@ -99,16 +99,16 @@
                         <div class="list-item">
                             <div class="header">{{ $reservation->Material_Title }}</div>
                             <div class="body">
-                                <div class="text-justify">Published by: {{ $reservation->Publisher_Name }}</div>
+                                <div class="text-justify">Published by: <em>{{ $reservation->Publisher_Name }}</em></div>
                                 <div>
                                     Author(s):
                                     <ul class="bullet-list">
                                         @foreach($works_authors as $workAuthor)
                                             @if($workAuthor->Material_ID == $reservation->Material_ID)
                                                 @if(strlen($workAuthor->Author_Middle_Name) > 1)
-                                                    <li>{{ $workAuthor->Author_First_Name . ' ' . substr($workAuthor->Author_Middle_Name, 0, 1) . '. ' . $workAuthor->Author_Last_Name }}</li>
+                                                    <li><em>{{ $workAuthor->Author_First_Name . ' ' . substr($workAuthor->Author_Middle_Name, 0, 1) . '. ' . $workAuthor->Author_Last_Name }}</em></li>
                                                 @else
-                                                    <li>{{ $workAuthor->Author_First_Name . ' ' . $workAuthor->Author_Last_Name }}</li>
+                                                    <li><em>{{ $workAuthor->Author_First_Name . ' ' . $workAuthor->Author_Last_Name }}</em></li>
                                                 @endif
                                             @endif
                                         @endforeach
@@ -117,7 +117,7 @@
                             </div>
                             <div class="footer">
                                 @if($reservation->Reservation_Status == 'active')
-                                    <div class="gap-bottom gap-left gap-right">Expires in <span class="countdown" data-var-id="{{ $reservation->Reservation_ID }}" data-var-start="{{ strtotime('+1 day', strtotime($reservation->Reservation_Date_Stamp . ' ' . $reservation->Reservation_Time_Stamp)) }}" data-var-end="{{ strtotime(date('Y-m-d H:i:s')) }}"></span></div>
+                                    <div class="gap-bottom gap-left gap-right">Expires in <strong><em><span class="countdown" data-var-id="{{ $reservation->Reservation_ID }}" data-var-start="{{ strtotime('+1 day', strtotime($reservation->Reservation_Date_Stamp . ' ' . $reservation->Reservation_Time_Stamp)) }}" data-var-end="{{ strtotime(date('Y-m-d H:i:s')) }}"></span></em></strong></div>
                                     {!! Form::open(array('route' => array('main.postCancelReservation'))) !!}
                                     {!! Form::hidden('arg0', 'a8affc088cbca89fa20dbd98c91362e4') !!}
                                     {!! Form::hidden('arg1', $reservation->Reservation_ID) !!}

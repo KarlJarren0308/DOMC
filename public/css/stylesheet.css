@@ -236,14 +236,15 @@ div.u-three-four-width {
 }
 
 .list {
-    border: 1px solid #e1e1e1;
 }
 
 .list > .list-item {
+    border: 1px solid #e1e1e1;
     color: #222;
     display: inline-block;
     text-decoration: none;
     padding: 10px 15px;
+    margin-bottom: 2px;
     width: 100%;
     box-sizing: border-box;
 }
@@ -253,7 +254,7 @@ div.u-three-four-width {
 }
 
 .list > .list-item > .header {
-    border-bottom: 1px solid #222;
+    border-bottom: 1px solid #e1e1e1;
     font-size: 1.5em;
     font-weight: bold;
     padding: 0 5px;
