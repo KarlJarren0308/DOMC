@@ -165,6 +165,13 @@ class PanelController extends Controller
                 return view('panel.faculties', $data);
 
                 break;
+            case 'librarians':
+                $data['librarian_accounts'] = Accounts::where('Account_Type', 'Librarian')->get();
+                $data['librarians'] = Librarians::get();
+
+                return view('panel.librarians', $data);
+
+                break;
             case 'holidays':
                 $data['holidays'] = Holidays::get();
 
@@ -217,6 +224,10 @@ class PanelController extends Controller
                 break;
             case 'faculties':
                 return view('panel.faculties_add', $data);
+
+                break;
+            case 'librarians':
+                return view('panel.librarians_add', $data);
 
                 break;
             case 'holidays':
@@ -282,6 +293,13 @@ class PanelController extends Controller
                 $data['faculty'] = Faculties::where('Faculty_ID', $id)->first();
 
                 return view('panel.faculties_edit', $data);
+
+                break;
+            case 'librarians':
+                $data['librarian_account'] = Accounts::where('Account_Type', 'Librarian')->where('Account_Owner', $id)->first();
+                $data['librarian'] = Librarians::where('Librarian_ID', $id)->first();
+
+                return view('panel.librarians_edit', $data);
 
                 break;
             default:
@@ -383,6 +401,22 @@ class PanelController extends Controller
                 }
 
                 return redirect()->route('panel.getManage', 'faculties');
+
+                break;
+            case 'librarians':
+                $query = Librarians::where('Librarian_ID', $id)->delete();
+
+                if($query) {
+                    $query = Accounts::where('Account_Type', 'Librarian')->where('Account_Owner', $id)->delete();
+                    
+                    session()->flash('global_status', 'Success');
+                    session()->flash('global_message', 'Librarian has been deleted.');
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Failed to delete librarian.');
+                }
+
+                return redirect()->route('panel.getManage', 'librarians');
 
                 break;
             case 'holidays':
@@ -731,6 +765,37 @@ class PanelController extends Controller
                 return redirect()->route('panel.getManage', 'faculties');
 
                 break;
+            case 'librarians':
+                $id = Librarians::insertGetId(array(
+                    'Librarian_First_Name' => $request->input('librarianFirstName'),
+                    'Librarian_Middle_Name' => $request->input('librarianMiddleName'),
+                    'Librarian_Last_Name' => $request->input('librarianLastName'),
+                    'Librarian_Birth_Date' => $request->input('librarianBirthDate')
+                ));
+
+                if($id) {
+                    $query = Accounts::insert(array(
+                        'Account_Username' => $request->input('librarianID'),
+                        'Account_Password' => md5($request->input('librarianBirthDate')),
+                        'Account_Type' => 'Librarian',
+                        'Account_Owner' => $id
+                    ));
+
+                    if($query) {
+                        session()->flash('global_status', 'Success');
+                        session()->flash('global_message', 'Librarian has been added.');
+                    } else {
+                        session()->flash('global_status', 'Warning');
+                        session()->flash('global_message', 'Librarian has been added but account was not created.');
+                    }
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Failed to add librarian.');
+                }
+
+                return redirect()->route('panel.getManage', 'librarians');
+
+                break;
             case 'holidays':
                 $query = Holidays::insert(array(
                     'Holiday_Event' => $request->input('holidayEvent'),
@@ -856,28 +921,28 @@ class PanelController extends Controller
 
                 break;
             case 'students':
-                $id = Students::where('Student_ID', $id)->update(array(
+                $ctr = 0;
+                
+                $query = Students::where('Student_ID', $id)->update(array(
                     'Student_First_Name' => $request->input('studentFirstName'),
                     'Student_Middle_Name' => $request->input('studentMiddleName'),
                     'Student_Last_Name' => $request->input('studentLastName'),
                     'Student_Birth_Date' => $request->input('studentBirthDate')
                 ));
 
-                if($id) {
-                    $query = Accounts::where('Account_Type', 'Student')->where('Account_Owner', $id)->update(array(
-                        'Account_Username' => $request->input('studentID')
-                    ));
+                if($query) {
+                    $ctr++;
+                }
 
-                    /*
-                    if($query) {
-                        session()->flash('global_status', 'Success');
-                        session()->flash('global_message', 'Student has been edited.');
-                    } else {
-                        session()->flash('global_status', 'Warning');
-                        session()->flash('global_message', 'Student has been edited but account was not modified.');
-                    }
-                    */
+                $query = Accounts::where('Account_Type', 'Student')->where('Account_Owner', $id)->update(array(
+                    'Account_Username' => $request->input('studentID')
+                ));
 
+                if($query) {
+                    $ctr++;
+                }
+
+                if($ctr > 0) {
                     session()->flash('global_status', 'Success');
                     session()->flash('global_message', 'Student has been modified.');
                 } else {
@@ -889,28 +954,28 @@ class PanelController extends Controller
 
                 break;
             case 'faculties':
-                $id = Faculties::where('Faculty_ID', $id)->update(array(
+                $ctr = 0;
+
+                $query = Faculties::where('Faculty_ID', $id)->update(array(
                     'Faculty_First_Name' => $request->input('facultyFirstName'),
                     'Faculty_Middle_Name' => $request->input('facultyMiddleName'),
                     'Faculty_Last_Name' => $request->input('facultyLastName'),
                     'Faculty_Birth_Date' => $request->input('facultyBirthDate')
                 ));
 
-                if($id) {
-                    $query = Accounts::where('Account_Type', 'Faculty')->where('Account_Owner', $id)->update(array(
-                        'Account_Username' => $request->input('facultyID')
-                    ));
+                if($query) {
+                    $ctr++;
+                }
 
-                    /*
-                    if($query) {
-                        session()->flash('global_status', 'Success');
-                        session()->flash('global_message', 'Faculty has been edited.');
-                    } else {
-                        session()->flash('global_status', 'Warning');
-                        session()->flash('global_message', 'Faculty has been edited but account was not modified.');
-                    }
-                    */
+                $query = Accounts::where('Account_Type', 'Faculty')->where('Account_Owner', $id)->update(array(
+                    'Account_Username' => $request->input('facultyID')
+                ));
 
+                if($query) {
+                    $ctr++;
+                }
+
+                if($ctr > 0) {
                     session()->flash('global_status', 'Success');
                     session()->flash('global_message', 'Faculty has been modified.');
                 } else {
@@ -919,6 +984,39 @@ class PanelController extends Controller
                 }
 
                 return redirect()->route('panel.getManage', 'faculties');
+
+                break;
+            case 'librarians':
+                $ctr = 0;
+
+                $query = Librarians::where('Librarian_ID', $id)->update(array(
+                    'Librarian_First_Name' => $request->input('librarianFirstName'),
+                    'Librarian_Middle_Name' => $request->input('librarianMiddleName'),
+                    'Librarian_Last_Name' => $request->input('librarianLastName'),
+                    'Librarian_Birth_Date' => $request->input('librarianBirthDate')
+                ));
+
+                if($query) {
+                    $ctr++;
+                }
+
+                $query = Accounts::where('Account_Type', 'Librarian')->where('Account_Owner', $id)->update(array(
+                    'Account_Username' => $request->input('librarianID')
+                ));
+
+                if($query) {
+                    $ctr++;
+                }
+
+                if($ctr > 0) {
+                    session()->flash('global_status', 'Success');
+                    session()->flash('global_message', 'Librarian has been modified.');
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'No changes has been made.');
+                }
+
+                return redirect()->route('panel.getManage', 'librarians');
 
                 break;
             default:

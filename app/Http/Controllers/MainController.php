@@ -214,6 +214,7 @@ class MainController extends Controller
                     session()->put('middle_name', $librarian->Librarian_Middle_Name);
                     session()->put('last_name', $librarian->Librarian_Last_Name);
                     session()->put('account_type', $account->Account_Type);
+                    session()->put('account_owner', $account->Account_Owner);
 
                     return redirect()->route('panel.getIndex');
                 }
