@@ -159,6 +159,7 @@ class PanelController extends Controller
 
                 break;
             case 'faculties':
+                $data['faculty_accounts'] = Accounts::where('Account_Type', 'Faculty')->get();
                 $data['faculties'] = Faculties::get();
 
                 return view('panel.faculties', $data);
@@ -396,6 +397,54 @@ class PanelController extends Controller
                 }
 
                 return redirect()->route('panel.getManage', 'holidays');
+
+                break;
+            default:
+                return view('errors.404');
+
+                break;
+        }
+    }
+
+    public function getChangePassword($what, $id) {
+        if(!session()->has('username')) {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Oops! Please login first.');
+
+            return redirect()->route('main.getLogin');
+        } else {
+            if(session()->get('account_type') != 'Librarian') {
+                session()->flash('global_status', 'Failed');
+                session()->flash('global_message', 'Oops! You are not authorized to access the panel.');
+
+                return redirect()->route('main.getOpac');
+            }
+        }
+
+        $data['what'] = $what;
+        $data['id'] = $id;
+
+        switch($what) {
+            case 'students':
+                $query = Students::where('Student_ID', $id)->first();
+                $data['who'] = array(
+                    'First_Name' => $query->Student_First_Name,
+                    'Middle_Name' => $query->Student_Middle_Name,
+                    'Last_Name' => $query->Student_Last_Name
+                );
+
+                return view('panel.change_password', $data);
+
+                break;
+            case 'faculties':
+                $query = Faculties::where('Faculty_ID', $id)->first();
+                $data['who'] = array(
+                    'First_Name' => $query->Faculty_First_Name,
+                    'Middle_Name' => $query->Faculty_Middle_Name,
+                    'Last_Name' => $query->Faculty_Last_Name
+                );
+
+                return view('panel.change_password', $data);
 
                 break;
             default:
@@ -875,6 +924,86 @@ class PanelController extends Controller
             default:
                 return view('errors.404');
 
+                break;
+        }
+    }
+
+    public function postChangePassword($what, $id, Request $request) {
+        if(!session()->has('username')) {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Oops! Please login first.');
+
+            return redirect()->route('main.getLogin');
+        } else {
+            if(session()->get('account_type') != 'Librarian') {
+                session()->flash('global_status', 'Failed');
+                session()->flash('global_message', 'Oops! You are not authorized to access the panel.');
+
+                return redirect()->route('main.getOpac');
+            }
+        }
+
+        $data['what'] = $what;
+
+        switch($what) {
+            case 'students':
+                if($request->input('newPassword') == $request->input('confirmPassword')) {
+                    $query = Accounts::where('Account_Owner', $id)->where('Account_Type', 'Student')->first();
+
+                    if($query) {
+                        $query = Accounts::where('Account_Owner', $id)->where('Account_Type', 'Student')->update(array(
+                            'Account_Password' => md5($request->input('newPassword'))
+                        ));
+
+                        if($query) {
+                            session()->flash('global_status', 'Success');
+                            session()->flash('global_message', 'Password has been changed.');
+                        } else {
+                            session()->flash('global_status', 'Failed');
+                            session()->flash('global_message', 'Failed to change password.');
+                        }
+                    } else {
+                        session()->flash('global_status', 'Failed');
+                        session()->flash('global_message', 'Student not found.');
+                    }
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Oops! Password doesn\'t match.');
+                }
+
+                return redirect()->route('panel.getManage', $what);
+
+                break;
+            case 'faculties':
+                if($request->input('newPassword') == $request->input('confirmPassword')) {
+                    $query = Accounts::where('Account_Owner', $id)->where('Account_Type', 'Faculty')->first();
+
+                    if($query) {
+                        $query = Accounts::where('Account_Owner', $id)->where('Account_Type', 'Faculty')->update(array(
+                            'Account_Password' => md5($request->input('newPassword'))
+                        ));
+
+                        if($query) {
+                            session()->flash('global_status', 'Success');
+                            session()->flash('global_message', 'Password has been changed.');
+                        } else {
+                            session()->flash('global_status', 'Failed');
+                            session()->flash('global_message', 'Failed to change password.');
+                        }
+                    } else {
+                        session()->flash('global_status', 'Failed');
+                        session()->flash('global_message', 'Faculty not found.');
+                    }
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Oops! Password doesn\'t match.');
+                }
+
+                return redirect()->route('panel.getManage', $what);
+
+                break;
+            default:
+                return view('errors.404');
                 break;
         }
     }

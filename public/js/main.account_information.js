@@ -32,7 +32,20 @@ $(document).ready(function() {
                 }
             }, 1000);
         } else {
-            thisCountdown.parent().parent().html('<div class="text-right">Reservation Cancelled.</div>');
+            $.ajax({
+                url: url,
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': token },
+                data: { arg0: '2705a83a5a0659cce34583972637eda5', arg1: thisCountdown.data('var-id') },
+                dataType: 'json',
+                success: function(response) {
+                    if(response['status'] == 'Success') {
+                        thisCountdown.parent().parent().html('<div class="text-right">Reservation Cancelled.</div>');
+                    }
+                }
+            });
+
+            return false;
         }
     });
 });

@@ -7,7 +7,9 @@ use App\Http\Requests;
 use App\Accounts;
 use App\Authors;
 use App\Faculties;
+use App\Holidays;
 use App\Librarians;
+use App\Loans;
 use App\Reservations;
 use App\Students;
 use App\Works;
@@ -16,6 +18,9 @@ date_default_timezone_set('Asia/Manila');
 
 class MainController extends Controller
 {
+    private $perDayPenalty = 5;
+    private $startPenaltyAfter = 1;
+
     public function getIndex() {
         return view('main.index');
     }
@@ -33,11 +38,23 @@ class MainController extends Controller
     }
 
     public function getAccountInfo() {
+        if(!session()->has('username')) {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Oops! Please login first.');
+
+            return redirect()->route('main.getLogin');
+        }
+
         $username = session()->get('username');
 
+        $data['per_day_penalty'] = $this->perDayPenalty;
+        $data['start_penalty_after'] = $this->startPenaltyAfter;
+        $data['holidays'] = Holidays::get();
+        $data['loans'] = Loans::where('loans.Account_Username', $username)->join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')->join('publishers', 'materials.Publisher_ID', '=', 'publishers.Publisher_ID')->orderBy('loans.Loan_Status', 'asc')->get();
         $data['reservations'] = Reservations::where('reservations.Account_Username', $username)->join('materials', 'reservations.Material_ID', '=', 'materials.Material_ID')->join('publishers', 'materials.Publisher_ID', '=', 'publishers.Publisher_ID')->orderBy('reservations.Reservation_Status', 'asc')->get();
         $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
         $data['my_account_one'] = Accounts::where('Account_Username', $username)->first();
+        $data['on_hand'] = count(Loans::where('Loan_Status', 'active')->where('Account_Username', $username)->get());
         
         if($data['my_account_one']->Account_Type == 'Faculty') {
             $data['my_account_two'] = Faculties::where('Faculty_ID', $data['my_account_one']->Account_Owner)->first();
@@ -50,6 +67,17 @@ class MainController extends Controller
         return view('main.account_information', $data);
     }
 
+    public function getChangePassword() {
+        if(!session()->has('username')) {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Oops! Please login first.');
+
+            return redirect()->route('main.getLogin');
+        }
+
+        return view('main.change_password');
+    }
+
     public function getLogout() {
         session()->flush();
 
@@ -57,6 +85,13 @@ class MainController extends Controller
     }
 
     public function getReserve($what) {
+        if(!session()->has('username')) {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Oops! Please login first.');
+
+            return redirect()->route('main.getLogin');
+        }
+
         $query = Reservations::insert(array(
             'Material_ID' => $what,
             'Account_Username' => session()->get('username'),
@@ -75,7 +110,49 @@ class MainController extends Controller
         return redirect()->route('main.getOpac');
     }
 
+    public function postChangePassword(Request $request) {
+        if(!session()->has('username')) {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Oops! Please login first.');
+
+            return redirect()->route('main.getLogin');
+        }
+
+        if($request->input('newPassword') == $request->input('confirmPassword')) {
+            $query = Accounts::where('Account_Username', session()->get('username'))->where('Account_Password', md5($request->input('oldPassword')))->first();
+
+            if($query) {
+                $query = Accounts::where('Account_Username', session()->get('username'))->update(array(
+                    'Account_Password' => md5($request->input('newPassword'))
+                ));
+
+                if($query) {
+                    session()->flash('global_status', 'Success');
+                    session()->flash('global_message', 'Password has been changed.');
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Failed to change password.');
+                }
+            } else {
+                session()->flash('global_status', 'Failed');
+                session()->flash('global_message', 'Invalid old password.');
+            }
+        } else {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Oops! Password doesn\'t match.');
+        }
+
+        return redirect()->route('main.getChangePassword');
+    }
+
     public function postCancelReservation(Request $request) {
+        if(!session()->has('username')) {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Oops! Please login first.');
+
+            return redirect()->route('main.getLogin');
+        }
+
         switch($request->input('arg0')) {
             case '2705a83a5a0659cce34583972637eda5':
                 // arg0: ajax

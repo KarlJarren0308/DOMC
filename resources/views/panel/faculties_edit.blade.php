@@ -43,6 +43,7 @@
             </div>
             <div class="nine columns">
                 <div class="banner">Manage Faculties - Edit</div>
+                <p class="text-justify"><strong>Note</strong>: Changing the faculty' birth date won't change its default password. To change faculty' password, please use the "Change Password" module.</p>
                 {!! Form::open(array('route' => array('panel.postEdit', $what, $id))) !!}
                     <div class="row">
                         <div class="six columns">

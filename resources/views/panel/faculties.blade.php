@@ -60,13 +60,21 @@
                 <table id="faculties-table" class="u-full-width">
                     <thead>
                         <tr>
+                            <th>Faculty Number</th>
                             <th>Faculty' Name</th>
                             <th>Birth Date</th>
-                            <th width="25%"></th>
+                            <th width="40%"></th>
                         </tr>
                         <tbody>
                             @foreach($faculties as $faculty)
                                 <tr>
+                                    <td>
+                                        @foreach($faculty_accounts as $account)
+                                            @if($account->Account_Owner == $faculty->Faculty_ID)
+                                                {{ $account->Account_Username }}
+                                            @endif
+                                        @endforeach
+                                    </td>
                                     <td>
                                         @if(strlen($faculty->Faculty_Middle_Name) > 1)
                                             {{ $faculty->Faculty_First_Name . ' ' . substr($faculty->Faculty_Middle_Name, 0, 1) . '. ' . $faculty->Faculty_Last_Name }}
@@ -77,6 +85,7 @@
                                     <td>{{ date('F d, Y', strtotime($faculty->Faculty_Birth_Date)) }}</td>
                                     <td class="text-center">
                                         @if(strlen(session()->has('username')))
+                                            <a href="{{ route('panel.getChangePassword', array($what, $faculty->Faculty_ID)) }}" class="btn btn-orange btn-sm">Change Password</a>
                                             <a href="{{ route('panel.getEdit', array($what, $faculty->Faculty_ID)) }}" class="btn btn-green btn-sm">Edit</a>
                                             <a href="{{ route('panel.getDelete', array($what, $faculty->Faculty_ID)) }}" class="btn btn-red btn-sm">Delete</a>
                                         @endif

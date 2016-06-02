@@ -58,6 +58,7 @@
                             <option value="" selected disabled>Select a type...</option>
                             <option value="Regular">Regular Holiday</option>
                             <option value="Special">Special Holiday</option>
+                            <option value="Suspension">Suspension</option>
                         </select>
                     </div>
                     <div class="input-block text-right">

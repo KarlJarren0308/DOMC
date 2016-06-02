@@ -43,6 +43,7 @@
             </div>
             <div class="nine columns">
                 <div class="banner">Manage Students - Add</div>
+                <p class="text-justify"><strong>Note</strong>: Student's default password is their birth date in <em>yyyy-mm-dd</em> format.</p>
                 {!! Form::open(array('route' => array('panel.postAdd', $what))) !!}
                     <div class="row">
                         <div class="six columns">

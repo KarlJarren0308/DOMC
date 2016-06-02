@@ -84,6 +84,10 @@ div.u-three-four-width {
     color: #2c8700;
 }
 
+.fg-red {
+    color: #dd1e2e;
+}
+
 .fg-white {
     color: white;
 }
@@ -216,6 +220,13 @@ div.u-three-four-width {
     line-height: 25px;
     height: 38px;
     box-sizing: border-box;
+}
+
+.input-block > .input-block-helper {
+    color: #777;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
 }
 
 .input-block-helper {
