@@ -42,6 +42,7 @@
     ?>
     <div class="navbar fixed-top shadow">
         <div class="navbar-content">
+            <div class="navbar-element logo"><img src="/img/logo.png"></div>
             <div class="navbar-element title">De Ocampo Memorial College</div>
             <div class="u-pull-right">
                 <a href="{{ route('main.getOpac') }}" class="navbar-element">OPAC</a>
