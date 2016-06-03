@@ -536,11 +536,11 @@ class PanelController extends Controller
                         session()->flash('global_message', 'Loan Successful.');
                     } else {
                         session()->flash('global_status', 'Warning');
-                        session()->flash('global_message', 'Oops! Failed to loan material to the borrower.');
+                        session()->flash('global_message', 'Oops! Failed to loan book to the borrower.');
                     }
                 } else {
                     session()->flash('global_status', 'Failed');
-                    session()->flash('global_message', 'Oops! Borrower has already loan a copy of this material.');
+                    session()->flash('global_message', 'Oops! Borrower has already loan a copy of this book.');
                 }
 
                 return redirect()->route('panel.getLoan');
@@ -569,11 +569,11 @@ class PanelController extends Controller
                                     session()->flash('global_message', 'Loan Successful.');
                                 } else {
                                     session()->flash('global_status', 'Warning');
-                                    session()->flash('global_message', 'Oops! Failed to loan material to the borrower. Borrower\'s reservation has been cancelled by the system.');
+                                    session()->flash('global_message', 'Oops! Failed to loan book to the borrower. Borrower\'s reservation has been cancelled by the system.');
                                 }
                             } else {
                                 session()->flash('global_status', 'Warning');
-                                session()->flash('global_message', 'Oops! Failed to loan material to the borrower. Request has been interrupted.');
+                                session()->flash('global_message', 'Oops! Failed to loan book to the borrower. Request has been interrupted.');
                             }
                         } else {
                             session()->flash('global_status', 'Failed');
@@ -581,7 +581,7 @@ class PanelController extends Controller
                         }
                     } else {
                         session()->flash('global_status', 'Failed');
-                        session()->flash('global_message', 'Oops! Borrower has already loan a copy of this material.');
+                        session()->flash('global_message', 'Oops! Borrower has already loan a copy of this book.');
                     }
                 } else {
                     session()->flash('global_status', 'Failed');

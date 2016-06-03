@@ -101,10 +101,10 @@ class MainController extends Controller
 
         if($query) {
             session()->flash('global_status', 'Success');
-            session()->flash('global_message', 'Material has been reserved.');
+            session()->flash('global_message', 'Book has been reserved.');
         } else {
             session()->flash('global_status', 'Failed');
-            session()->flash('global_message', 'Failed to reserve material.');
+            session()->flash('global_message', 'Failed to reserve book.');
         }
 
         return redirect()->route('main.getOpac');
