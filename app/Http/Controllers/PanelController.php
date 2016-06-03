@@ -21,6 +21,9 @@ date_default_timezone_set('Asia/Manila');
 
 class PanelController extends Controller
 {
+    private $perDayPenalty = 5;
+    private $startPenaltyAfter = 1;
+
     public function getIndex() {
         if(!session()->has('username')) {
             session()->flash('global_status', 'Failed');
@@ -104,6 +107,9 @@ class PanelController extends Controller
             }
         }
 
+        $data['per_day_penalty'] = $this->perDayPenalty;
+        $data['start_penalty_after'] = $this->startPenaltyAfter;
+        $data['holidays'] = Holidays::get();
         $data['loans'] = Loans::join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')->join('accounts', 'loans.Account_Username', '=', 'accounts.Account_Username')->get();
         $data['faculty_accounts'] = Faculties::get();
         $data['librarian_accounts'] = Librarians::get();

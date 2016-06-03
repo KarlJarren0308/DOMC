@@ -145,8 +145,8 @@
                     @foreach($reservations as $reservation)
                         <div class="list-item">
                             <div class="header">{{ $reservation->Material_Title }}</div>
-                            <div class="body">
-                                <div class="text-justify">Published by: <em>{{ $reservation->Publisher_Name }}</em></div>
+                            <div class="body">  
+                                <div class="text-justify">Published by: <em>{{ ($reservation->Publisher_Name != '' ? $reservation->Publisher_Name : '[None]') }}</em></div>
                                 <div>
                                     Author(s):
                                     <ul class="bullet-list">
@@ -187,7 +187,7 @@
                         <div class="list-item">
                             <div class="header">{{ $loan->Material_Title }}</div>
                             <div class="body">
-                                <div class="text-justify">Published by: <em>{{ $loan->Publisher_Name }}</em></div>
+                                <div class="text-justify">Published by: <em>{{ ($loan->Publisher_Name != '' ? $loan->Publisher_Name : '[None]') }}</em></div>
                                 <div>
                                     Author(s):
                                     <ul class="bullet-list">
@@ -251,7 +251,7 @@
                             ?>
                             <div class="footer">
                                 @if($loan->Loan_Status == 'active')
-                                    <div class="u-pull-left">Penalty: <strong>&#8369;{{ $totalPenalty }}.00</strong></div>
+                                    <div class="u-pull-left">Penalty: <strong>&#8369;{{ ($totalPenalty > 0 ? $totalPenalty : 0) }}.00</strong></div>
                                     <div class="text-right">Not yet returned</div>
                                 @else
                                     <div class="text-right">Material Returned</div>

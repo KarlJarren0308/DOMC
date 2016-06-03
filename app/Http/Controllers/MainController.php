@@ -50,8 +50,8 @@ class MainController extends Controller
         $data['per_day_penalty'] = $this->perDayPenalty;
         $data['start_penalty_after'] = $this->startPenaltyAfter;
         $data['holidays'] = Holidays::get();
-        $data['loans'] = Loans::where('loans.Account_Username', $username)->join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')->join('publishers', 'materials.Publisher_ID', '=', 'publishers.Publisher_ID')->orderBy('loans.Loan_Status', 'asc')->get();
-        $data['reservations'] = Reservations::where('reservations.Account_Username', $username)->join('materials', 'reservations.Material_ID', '=', 'materials.Material_ID')->join('publishers', 'materials.Publisher_ID', '=', 'publishers.Publisher_ID')->orderBy('reservations.Reservation_Status', 'asc')->get();
+        $data['loans'] = Loans::where('loans.Account_Username', $username)->join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')->leftJoin('publishers', 'materials.Publisher_ID', '=', 'publishers.Publisher_ID')->orderBy('loans.Loan_Status', 'asc')->get();
+        $data['reservations'] = Reservations::where('reservations.Account_Username', $username)->join('materials', 'reservations.Material_ID', '=', 'materials.Material_ID')->leftJoin('publishers', 'materials.Publisher_ID', '=', 'publishers.Publisher_ID')->orderBy('reservations.Reservation_Status', 'asc')->get();
         $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
         $data['my_account_one'] = Accounts::where('Account_Username', $username)->first();
         $data['on_hand'] = count(Loans::where('Loan_Status', 'active')->where('Account_Username', $username)->get());

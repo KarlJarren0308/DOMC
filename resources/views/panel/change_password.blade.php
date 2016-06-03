@@ -74,7 +74,7 @@
                         {!! Form::open(array('route' => array('panel.postChangePassword', $what, $id))) !!}
                             <div class="input-block">
                                 {!! Form::label('newPassword', 'New Password:') !!}
-                                {!! Form::password('newPassword', array('class' => 'u-full-width', 'placeholder' => 'Enter New Password Here', 'required' => 'required')) !!}
+                                {!! Form::password('newPassword', array('class' => 'u-full-width', 'placeholder' => 'Enter New Password Here', 'required' => 'required', 'autofocus' => 'autofocus')) !!}
                             </div>
                             <div class="input-block">
                                 {!! Form::label('confirmPassword', 'Confirm Password:') !!}

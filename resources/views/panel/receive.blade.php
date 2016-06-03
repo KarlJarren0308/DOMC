@@ -1,6 +1,45 @@
 @extends('template')
 
 @section('content')
+    <?php
+        function isHoliday($date, $holidays) {
+            $date = date('Y-m-d', strtotime($date));
+
+            if(count($holidays) > 0) {
+                foreach($holidays as $holiday) {
+                    if($holiday->Holiday_Type == 'Suspension') {
+                        if($date == date('Y-m-d', strtotime($holiday->Holiday_Date))) {
+                            return true;
+                        }
+                    } else if($holiday->Holiday_Type == 'Regular') {
+                        if(date('m-d', strtotime($date)) == date('m-d', strtotime($holiday->Holiday_Type))) {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            } else {
+                return false;
+            }
+        }
+
+        function isWeekend($date) {
+            $date = date('l', strtotime($date));
+
+            if($date == 'Sunday') {
+                return true;
+            } else if($date == 'Saturday') {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        function nextDay($date) {
+            return date('Y-m-d', strtotime('+1 day', strtotime($date)));
+        }
+    ?>
     <div class="navbar fixed-top shadow">
         <div class="navbar-content">
             <div class="navbar-element logo"><img src="/img/logo.png"></div>
@@ -130,12 +169,58 @@
                                                     @endforeach
                                                 @endif
                                             </td>
-                                            <td>Not yet available</td>
+                                            <?php
+                                                // Penalty Computation
+                                                $dateLoaned = $loan->Loan_Date_Stamp . ' ' . $loan->Loan_Time_Stamp;
+                                                $dayEnd = date('Y-m-d H:i:s', strtotime('+' . $start_penalty_after . ' days', strtotime($dateLoaned)));
+                                                $dayStart = strtotime($dateLoaned);
+                                                $graceDays = ceil((strtotime($dayEnd) - $dayStart) / 86400);
+                                                $i = 1;
+
+                                                while($i <= $graceDays) {
+                                                    $markedDate = date('Y-m-d H:i:s', strtotime('+' . $i . ' days', strtotime($dateLoaned)));
+
+                                                    if(isWeekend($markedDate)) {
+                                                        $graceDays++;
+                                                        $dayEnd = nextDay($dayEnd);
+                                                    } else {
+                                                        if(isHoliday($markedDate, $holidays)) {
+                                                            $graceDays++;
+                                                            $dayEnd = nextDay($dayEnd);
+                                                        }
+                                                    }
+
+                                                    $i++;
+                                                }
+
+                                                $newDayEnd = $dayEnd;
+                                                $newGraceDays = ceil((strtotime(date('Y-m-d H:i:s')) - strtotime($newDayEnd)) / 86400);
+                                                $j = 1;
+
+                                                while($j <= $newGraceDays) {
+                                                    $markedDate = date('Y-m-d H:i:s', strtotime('+' . $j . ' days', strtotime($newDayEnd)));
+
+                                                    if(isWeekend($markedDate)) {
+                                                        $newGraceDays++;
+                                                        $newDayEnd = nextDay($newDayEnd);
+                                                    } else {
+                                                        if(isHoliday($markedDate, $holidays)) {
+                                                            $newGraceDays++;
+                                                            $newDayEnd = nextDay($newDayEnd);
+                                                        }
+                                                    }
+
+                                                    $j++;
+                                                }
+
+                                                $totalPenalty = floor((strtotime(date('Y-m-d H:i:s')) - strtotime($newDayEnd)) / 86400) * (double) $per_day_penalty;
+                                            ?>
+                                            <td>&#8369;{{ ($totalPenalty > 0 ? $totalPenalty : 0) }}.00</td>
                                             <td class="text-center">
                                                 @if(strlen(session()->has('username')))
                                                     @if($loan->Loan_Status == 'active')
-                                                        {!! Form::open(array('route' => 'panel.postLoan', 'class' => 'no-margin')) !!}
-                                                            {!! Form::hidden('arg0', 'bcfaa2f57da331c29c0bab9f99543451') !!}
+                                                        {!! Form::open(array('route' => 'panel.postReceive', 'class' => 'no-margin')) !!}
+                                                            {!! Form::hidden('arg0', $loan->Loan_ID) !!}
                                                             {!! Form::submit('Receive', array('class' => 'btn btn-green btn-sm')) !!}
                                                         {!! Form::close() !!}
                                                     @else

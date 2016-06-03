@@ -12,7 +12,7 @@ $(document).ready(function() {
 
         for(var i = 0; i < parsedAuthorsList.length; i++) {
             if(parsedAuthorsList[i]['Author_Middle_Name'].length > 1) {
-                name = parsedAuthorsList[i]['Author_First_Name'] + ' ' + substr(parsedAuthorsList[i]['Author_Middle_Name'], 0, 1) + '. ' + parsedAuthorsList[i]['Author_Last_Name'];
+                name = parsedAuthorsList[i]['Author_First_Name'] + ' ' + parsedAuthorsList[i]['Author_Middle_Name'].substr(0, 1) + '. ' + parsedAuthorsList[i]['Author_Last_Name'];
             } else {
                 name = parsedAuthorsList[i]['Author_First_Name'] + ' ' + parsedAuthorsList[i]['Author_Last_Name'];
             }
