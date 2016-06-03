@@ -340,10 +340,10 @@ class PanelController extends Controller
                     $query = Works::where('Material_ID', $id)->delete();
                     
                     session()->flash('global_status', 'Success');
-                    session()->flash('global_message', 'Material has been deleted.');
+                    session()->flash('global_message', 'Book has been deleted.');
                 } else {
                     session()->flash('global_status', 'Failed');
-                    session()->flash('global_message', 'Failed to delete material.');
+                    session()->flash('global_message', 'Failed to delete book.');
                 }
 
                 return redirect()->route('panel.getManage', 'materials');
@@ -626,11 +626,11 @@ class PanelController extends Controller
                     session()->flash('global_message', 'Receive Successful.');
                 } else {
                     session()->flash('global_status', 'Warning');
-                    session()->flash('global_message', 'Oops! Failed to receive material.');
+                    session()->flash('global_message', 'Oops! Failed to receive book.');
                 }
             } else {
                 session()->flash('global_status', 'Warning');
-                session()->flash('global_message', 'Oops! Borrower has already returned this material.');
+                session()->flash('global_message', 'Oops! Borrower has already returned this book.');
             }
         } else {
             session()->flash('global_status', 'Failed');
@@ -687,14 +687,14 @@ class PanelController extends Controller
 
                     if($ctr > 0) {
                         session()->flash('global_status', 'Success');
-                        session()->flash('global_message', 'Material has been added.');
+                        session()->flash('global_message', 'Book has been added.');
                     } else {
                         session()->flash('global_status', 'Failed');
-                        session()->flash('global_message', 'Failed to associate author(s) to the material.');
+                        session()->flash('global_message', 'Failed to associate author(s) to the book.');
                     }
                 } else {
                     session()->flash('global_status', 'Failed');
-                    session()->flash('global_message', 'Failed to add material.');
+                    session()->flash('global_message', 'Failed to add book.');
                 }
 
                 return redirect()->route('panel.getManage', 'materials');
@@ -904,14 +904,14 @@ class PanelController extends Controller
 
                     if($ctr > 0) {
                         session()->flash('global_status', 'Success');
-                        session()->flash('global_message', 'Material has been modified.');
+                        session()->flash('global_message', 'Book has been modified.');
                     } else {
                         session()->flash('global_status', 'Failed');
-                        session()->flash('global_message', 'Failed to associate author(s) to the material.');
+                        session()->flash('global_message', 'Failed to associate author(s) to the book.');
                     }
                 } else {
                     session()->flash('global_status', 'Failed');
-                    session()->flash('global_message', 'No changes has been made.1');
+                    session()->flash('global_message', 'No changes has been made.');
                 }
 
                 return redirect()->route('panel.getManage', 'materials');
