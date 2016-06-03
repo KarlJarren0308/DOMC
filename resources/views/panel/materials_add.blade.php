@@ -138,7 +138,7 @@
                         </div>
                     </div>
                     <div class="input-block text-right gap-top">
-                        {!! Form::submit('Add Student', array('class' => 'btn btn-orange')) !!}
+                        {!! Form::submit('Add Material', array('class' => 'btn btn-orange')) !!}
                     </div>
                 {!! Form::close() !!}
             </div>
