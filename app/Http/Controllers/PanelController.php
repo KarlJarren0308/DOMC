@@ -481,6 +481,17 @@ class PanelController extends Controller
                 return view('panel.change_password', $data);
 
                 break;
+            case 'librarians':
+                $query = Librarians::where('Librarian_ID', $id)->first();
+                $data['who'] = array(
+                    'First_Name' => $query->Librarian_First_Name,
+                    'Middle_Name' => $query->Librarian_Middle_Name,
+                    'Last_Name' => $query->Librarian_Last_Name
+                );
+
+                return view('panel.change_password', $data);
+
+                break;
             default:
                 return view('errors.404');
 
@@ -922,7 +933,7 @@ class PanelController extends Controller
                 break;
             case 'students':
                 $ctr = 0;
-                
+
                 $query = Students::where('Student_ID', $id)->update(array(
                     'Student_First_Name' => $request->input('studentFirstName'),
                     'Student_Middle_Name' => $request->input('studentMiddleName'),
@@ -1091,6 +1102,34 @@ class PanelController extends Controller
                     } else {
                         session()->flash('global_status', 'Failed');
                         session()->flash('global_message', 'Faculty not found.');
+                    }
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Oops! Password doesn\'t match.');
+                }
+
+                return redirect()->route('panel.getManage', $what);
+
+                break;
+            case 'librarians':
+                if($request->input('newPassword') == $request->input('confirmPassword')) {
+                    $query = Accounts::where('Account_Owner', $id)->where('Account_Type', 'Librarian')->first();
+
+                    if($query) {
+                        $query = Accounts::where('Account_Owner', $id)->where('Account_Type', 'Librarian')->update(array(
+                            'Account_Password' => md5($request->input('newPassword'))
+                        ));
+
+                        if($query) {
+                            session()->flash('global_status', 'Success');
+                            session()->flash('global_message', 'Password has been changed.');
+                        } else {
+                            session()->flash('global_status', 'Failed');
+                            session()->flash('global_message', 'Failed to change password.');
+                        }
+                    } else {
+                        session()->flash('global_status', 'Failed');
+                        session()->flash('global_message', 'Librarian not found.');
                     }
                 } else {
                     session()->flash('global_status', 'Failed');
