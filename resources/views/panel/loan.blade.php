@@ -143,7 +143,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="input-block text-right">
+                    <div class="text-right">
                         {!! Form::submit('Loan', array('class' => 'btn btn-orange btn-sm')) !!}
                     </div>
                 {!! Form::close() !!}
