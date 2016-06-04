@@ -63,6 +63,8 @@ class PanelController extends Controller
         $data['student_accounts'] = new Students;
         $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
         $data['works_materials'] = Works::join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->groupBy('works.Material_ID')->get();
+        $data['reserved_materials'] = Reservations::where('Reservation_Status', 'active');
+        $data['loaned_materials'] = Loans::where('Loan_Status', 'active');
 
         return view('panel.loan', $data);
     }
@@ -141,6 +143,8 @@ class PanelController extends Controller
             case 'materials':
                 $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
                 $data['works_materials'] = Works::join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->groupBy('works.Material_ID')->get();
+                $data['reserved_materials'] = Reservations::where('Reservation_Status', 'active');
+                $data['loaned_materials'] = Loans::where('Loan_Status', 'active');
 
                 return view('panel.materials', $data);
 

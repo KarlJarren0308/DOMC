@@ -65,6 +65,7 @@
                             <th>Call Number</th>
                             <th>Title</th>
                             <th>Author(s)</th>
+                            <th>Available Copies</th>
                             <th></th>
                         </tr>
                         <tbody>
@@ -89,6 +90,10 @@
                                                 @endif
                                             @endif
                                         @endforeach
+                                    </td>
+                                    <td class="text-center">
+                                        <?php $newMaterialCount = $material->Material_Copies - count($reserved_materials->where('Material_ID', $material->Material_ID)->get()) - count($loaned_materials->where('Material_ID', $material->Material_ID)->get()); ?>
+                                        {{ ($newMaterialCount > 0 ? $newMaterialCount : 0) }}
                                     </td>
                                     <td class="text-center">
                                         @if(strlen(session()->has('username')))

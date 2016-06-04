@@ -63,6 +63,7 @@
                             <th>Title</th>
                             <th>ISBN</th>
                             <th>Author(s)</th>
+                            <th>Available Copies</th>
                             <th></th>
                         </tr>
                         <tbody>
@@ -90,8 +91,14 @@
                                         @endforeach
                                     </td>
                                     <td class="text-center">
+                                        <?php $newMaterialCount = $material->Material_Copies - count($reserved_materials->where('Material_ID', $material->Material_ID)->get()) - count($loaned_materials->where('Material_ID', $material->Material_ID)->get()); ?>
+                                        {{ ($newMaterialCount > 0 ? $newMaterialCount : 0) }}
+                                    </td>
+                                    <td class="text-center">
                                         @if(strlen(session()->has('username')))
-                                            <a data-button="loan-button" data-var-id="{{ $material->Material_ID }}" data-var-title="{{ $material->Material_Title }}" class="btn btn-orange btn-sm">Loan</a>
+                                            @if($newMaterialCount > 0)
+                                                <a data-button="loan-button" data-var-id="{{ $material->Material_ID }}" data-var-title="{{ $material->Material_Title }}" class="btn btn-orange btn-sm">Loan</a>
+                                            @endif
                                         @endif
                                     </td>
                                 </tr>

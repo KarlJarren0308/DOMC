@@ -51,6 +51,7 @@
                     <th>Title</th>
                     <th>ISBN</th>
                     <th>Author(s)</th>
+                    <th>Available Copies</th>
                     <th></th>
                 </tr>
             </thead>
@@ -79,6 +80,10 @@
                             @endforeach
                         </td>
                         <td class="text-center">
+                            <?php $newMaterialCount = $material->Material_Copies - count($reserved_materials->where('Material_ID', $material->Material_ID)->get()) - count($loaned_materials->where('Material_ID', $material->Material_ID)->get()); ?>
+                            {{ ($newMaterialCount > 0 ? $newMaterialCount : 0) }}
+                        </td>
+                        <td class="text-center">
                             @if(strlen(session()->has('username')))
                                 <?php $isReserved = false; ?>
                                 @foreach($reservations as $reservation)
@@ -91,7 +96,9 @@
                                 @if($isReserved)
                                     <div class="btn btn-red btn-sm">Already Reserved</div>
                                 @else
-                                    <a href="{{ route('main.getReserve', $material->Material_ID) }}" class="btn btn-orange btn-sm">Reserve</a>
+                                    @if($newMaterialCount > 0)
+                                        <a href="{{ route('main.getReserve', $material->Material_ID) }}" class="btn btn-orange btn-sm">Reserve</a>
+                                    @endif
                                 @endif
                             @endif
                         </td>

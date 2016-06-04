@@ -1,7 +1,7 @@
 $(document).ready(function() {
     $('#materials-table').dataTable({
         aoColumnDefs: [
-            { bSearchable: false, bSortable: false, aTargets: [3] }
+            { bSearchable: false, bSortable: false, aTargets: [4] }
         ]
     });
 
