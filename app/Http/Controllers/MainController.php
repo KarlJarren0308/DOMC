@@ -95,11 +95,11 @@ class MainController extends Controller
             return redirect()->route('main.getLogin');
         }
 
-        $reserved_materials = Reservations::where('Reservation_Status', 'active');
-        $loaned_materials = Loans::where('Loan_Status', 'active');
+        $reserved_materials = Reservations::where('Reservation_Status', 'active')->where('Material_ID', $what)->count();
+        $loaned_materials = Loans::where('Loan_Status', 'active')->where('Material_ID', $what)->count();
 
         $materialRow = Materials::where('Material_ID', $what)->first();
-        $newMaterialCount = $materialRow->Material_Copies - count($reserved_materials->where('Material_ID', $what)->get()) - count($loaned_materials->where('Material_ID', $what)->get());
+        $newMaterialCount = $materialRow->Material_Copies - $reserved_materials - $loaned_materials;
 
         if($newMaterialCount > 0) {
             $query = Reservations::insert(array(
