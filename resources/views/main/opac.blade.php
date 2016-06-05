@@ -80,7 +80,18 @@
                             @endforeach
                         </td>
                         <td class="text-center">
-                            <?php $newMaterialCount = $material->Material_Copies - count($reserved_materials->where('Material_ID', $material->Material_ID)->get()) - count($loaned_materials->where('Material_ID', $material->Material_ID)->get()); ?>
+                            <?php $reserved_count = 0; $loaned_count = 0; ?>
+                            @foreach($reserved_materials as $reserved_material)
+                                @if($reserved_material->Material_ID == $material->Material_ID)
+                                    <?php $reserved_count++; ?>
+                                @endif
+                            @endforeach
+                            @foreach($loaned_materials as $loaned_material)
+                                @if($loaned_material->Material_ID == $material->Material_ID)
+                                    <?php $loaned_count++; ?>
+                                @endif
+                            @endforeach
+                            <?php $newMaterialCount = $material->Material_Copies - $reserved_count - $loaned_count; ?>
                             {{ ($newMaterialCount > 0 ? $newMaterialCount : 0) }}
                         </td>
                         <td class="text-center">

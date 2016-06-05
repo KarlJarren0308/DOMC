@@ -63,8 +63,8 @@ class PanelController extends Controller
         $data['student_accounts'] = new Students;
         $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
         $data['works_materials'] = Works::join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->groupBy('works.Material_ID')->get();
-        $data['reserved_materials'] = Reservations::where('Reservation_Status', 'active');
-        $data['loaned_materials'] = Loans::where('Loan_Status', 'active');
+        $data['reserved_materials'] = Reservations::where('Reservation_Status', 'active')->get();
+        $data['loaned_materials'] = Loans::where('Loan_Status', 'active')->get();
 
         return view('panel.loan', $data);
     }
@@ -143,8 +143,8 @@ class PanelController extends Controller
             case 'materials':
                 $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
                 $data['works_materials'] = Works::join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->groupBy('works.Material_ID')->get();
-                $data['reserved_materials'] = Reservations::where('Reservation_Status', 'active');
-                $data['loaned_materials'] = Loans::where('Loan_Status', 'active');
+                $data['reserved_materials'] = Reservations::where('Reservation_Status', 'active')->get();
+                $data['loaned_materials'] = Loans::where('Loan_Status', 'active')->get();
 
                 return view('panel.materials', $data);
 
@@ -524,17 +524,16 @@ class PanelController extends Controller
             }
         }
 
-        $reserved_materials = Reservations::where('Reservation_Status', 'active');
-        $loaned_materials = Loans::where('Loan_Status', 'active');
-
         switch($request->input('arg0')) {
             case 'f6614d9e3adf79e5eecc16a5405e8461':
                 // arg0: loanAvailable
                 $materialID = $request->input('arg1');
                 $accountUsername = $request->input('arg2');
 
+                $reserved_materials = Reservations::where('Reservation_Status', 'active')->where('Material_ID', $materialID)->count();
+                $loaned_materials = Loans::where('Loan_Status', 'active')->where('Material_ID', $materialID)->count();
                 $materialRow = Materials::where('Material_ID', $materialID)->first();
-                $newMaterialCount = $materialRow->Material_Copies - count($reserved_materials->where('Material_ID', $materialID)->get()) - count($loaned_materials->where('Material_ID', $materialID)->get());
+                $newMaterialCount = $materialRow->Material_Copies - $reserved_materials - $loaned_materials;
 
                 if($newMaterialCount > 0) {
                     $query = Loans::where('Material_ID', $materialID)->where('Account_Username', $accountUsername)->where('Loan_Status', 'active')->first();
