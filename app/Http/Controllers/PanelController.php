@@ -524,27 +524,38 @@ class PanelController extends Controller
             }
         }
 
+        $reserved_materials = Reservations::where('Reservation_Status', 'active');
+        $loaned_materials = Loans::where('Loan_Status', 'active');
+
         switch($request->input('arg0')) {
             case 'f6614d9e3adf79e5eecc16a5405e8461':
                 // arg0: loanAvailable
                 $materialID = $request->input('arg1');
                 $accountUsername = $request->input('arg2');
 
-                $query = Loans::where('Material_ID', $materialID)->where('Account_Username', $accountUsername)->where('Loan_Status', 'active')->first();
+                $materialRow = Materials::where('Material_ID', $materialID)->first();
+                $newMaterialCount = $materialRow->Material_Copies - count($reserved_materials->where('Material_ID', $materialID)->get()) - count($loaned_materials->where('Material_ID', $materialID)->get());
 
-                if(!$query) {
-                    $query = Loans::insert(array('Material_ID' => $materialID, 'Account_Username' => $accountUsername, 'Loan_Date_Stamp' => date('Y-m-d'), 'Loan_Time_Stamp' => date('H:i:s')));
+                if($newMaterialCount > 0) {
+                    $query = Loans::where('Material_ID', $materialID)->where('Account_Username', $accountUsername)->where('Loan_Status', 'active')->first();
 
-                    if($query) {
-                        session()->flash('global_status', 'Success');
-                        session()->flash('global_message', 'Loan Successful.');
+                    if(!$query) {
+                        $query = Loans::insert(array('Material_ID' => $materialID, 'Account_Username' => $accountUsername, 'Loan_Date_Stamp' => date('Y-m-d'), 'Loan_Time_Stamp' => date('H:i:s')));
+
+                        if($query) {
+                            session()->flash('global_status', 'Success');
+                            session()->flash('global_message', 'Loan Successful.');
+                        } else {
+                            session()->flash('global_status', 'Warning');
+                            session()->flash('global_message', 'Oops! Failed to loan book to the borrower.');
+                        }
                     } else {
-                        session()->flash('global_status', 'Warning');
-                        session()->flash('global_message', 'Oops! Failed to loan book to the borrower.');
+                        session()->flash('global_status', 'Failed');
+                        session()->flash('global_message', 'Oops! Borrower has already loan a copy of this book.');
                     }
                 } else {
                     session()->flash('global_status', 'Failed');
-                    session()->flash('global_message', 'Oops! Borrower has already loan a copy of this book.');
+                    session()->flash('global_message', 'Oops! No more copies available.');
                 }
 
                 return redirect()->route('panel.getLoan');

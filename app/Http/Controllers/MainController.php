@@ -10,6 +10,7 @@ use App\Faculties;
 use App\Holidays;
 use App\Librarians;
 use App\Loans;
+use App\Materials;
 use App\Reservations;
 use App\Students;
 use App\Works;
@@ -94,19 +95,30 @@ class MainController extends Controller
             return redirect()->route('main.getLogin');
         }
 
-        $query = Reservations::insert(array(
-            'Material_ID' => $what,
-            'Account_Username' => session()->get('username'),
-            'Reservation_Date_Stamp' => date('Y-m-d'),
-            'Reservation_Time_Stamp' => date('H:i:s')
-        ));
+        $reserved_materials = Reservations::where('Reservation_Status', 'active');
+        $loaned_materials = Loans::where('Loan_Status', 'active');
 
-        if($query) {
-            session()->flash('global_status', 'Success');
-            session()->flash('global_message', 'Book has been reserved.');
+        $materialRow = Materials::where('Material_ID', $what)->first();
+        $newMaterialCount = $materialRow->Material_Copies - count($reserved_materials->where('Material_ID', $what)->get()) - count($loaned_materials->where('Material_ID', $what)->get());
+
+        if($newMaterialCount > 0) {
+            $query = Reservations::insert(array(
+                'Material_ID' => $what,
+                'Account_Username' => session()->get('username'),
+                'Reservation_Date_Stamp' => date('Y-m-d'),
+                'Reservation_Time_Stamp' => date('H:i:s')
+            ));
+
+            if($query) {
+                session()->flash('global_status', 'Success');
+                session()->flash('global_message', 'Book has been reserved.');
+            } else {
+                session()->flash('global_status', 'Failed');
+                session()->flash('global_message', 'Failed to reserve book.');
+            }
         } else {
             session()->flash('global_status', 'Failed');
-            session()->flash('global_message', 'Failed to reserve book.');
+            session()->flash('global_message', 'Oops! No more copies available.');
         }
 
         return redirect()->route('main.getOpac');
