@@ -52,7 +52,7 @@
                     <th>ISBN</th>
                     <th>Author(s)</th>
                     <th>Available Copies</th>
-                    <th></th>
+                    <th width="15%"></th>
                 </tr>
             </thead>
             <tbody>
@@ -94,7 +94,7 @@
                                 @endforeach
 
                                 @if($isReserved)
-                                    <div class="btn btn-red btn-sm">Already Reserved</div>
+                                    <a class="btn btn-red btn-sm">Already Reserved</a>
                                 @else
                                     @if($newMaterialCount > 0)
                                         <a href="{{ route('main.getReserve', $material->Material_ID) }}" class="btn btn-orange btn-sm">Reserve</a>
