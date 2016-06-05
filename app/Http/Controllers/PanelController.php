@@ -23,6 +23,8 @@ class PanelController extends Controller
 {
     private $perDayPenalty = 5;
     private $startPenaltyAfter = 1;
+    private $reservationLimit = 3;
+    private $loanLimit = 3;
 
     public function getIndex() {
         if(!session()->has('username')) {
@@ -530,27 +532,33 @@ class PanelController extends Controller
                 $materialID = $request->input('arg1');
                 $accountUsername = $request->input('arg2');
 
+                $on_loan = $loaned_materials = Loans::where('Loan_Status', 'active')->where('Account_Username', $accountUsername)->count();
                 $reserved_materials = Reservations::where('Reservation_Status', 'active')->where('Material_ID', $materialID)->count();
                 $loaned_materials = Loans::where('Loan_Status', 'active')->where('Material_ID', $materialID)->count();
                 $materialRow = Materials::where('Material_ID', $materialID)->first();
                 $newMaterialCount = $materialRow->Material_Copies - $reserved_materials - $loaned_materials;
 
                 if($newMaterialCount > 0) {
-                    $query = Loans::where('Material_ID', $materialID)->where('Account_Username', $accountUsername)->where('Loan_Status', 'active')->first();
+                    if($on_loan < $this->loanLimit) {
+                        $query = Loans::where('Material_ID', $materialID)->where('Account_Username', $accountUsername)->where('Loan_Status', 'active')->first();
 
-                    if(!$query) {
-                        $query = Loans::insert(array('Material_ID' => $materialID, 'Account_Username' => $accountUsername, 'Loan_Date_Stamp' => date('Y-m-d'), 'Loan_Time_Stamp' => date('H:i:s')));
+                        if(!$query) {
+                            $query = Loans::insert(array('Material_ID' => $materialID, 'Account_Username' => $accountUsername, 'Loan_Date_Stamp' => date('Y-m-d'), 'Loan_Time_Stamp' => date('H:i:s')));
 
-                        if($query) {
-                            session()->flash('global_status', 'Success');
-                            session()->flash('global_message', 'Loan Successful.');
+                            if($query) {
+                                session()->flash('global_status', 'Success');
+                                session()->flash('global_message', 'Loan Successful.');
+                            } else {
+                                session()->flash('global_status', 'Warning');
+                                session()->flash('global_message', 'Oops! Failed to loan book to the borrower.');
+                            }
                         } else {
-                            session()->flash('global_status', 'Warning');
-                            session()->flash('global_message', 'Oops! Failed to loan book to the borrower.');
+                            session()->flash('global_status', 'Failed');
+                            session()->flash('global_message', 'Oops! Borrower has already loan a copy of this book.');
                         }
                     } else {
                         session()->flash('global_status', 'Failed');
-                        session()->flash('global_message', 'Oops! Borrower has already loan a copy of this book.');
+                        session()->flash('global_message', 'Oops! You can only loan at most 3 books to this borrower at a time.');
                     }
                 } else {
                     session()->flash('global_status', 'Failed');
@@ -567,35 +575,42 @@ class PanelController extends Controller
                 $reservation = Reservations::where('Reservation_ID', $id)->first();
 
                 if($reservation) {
-                    $query = Loans::where('Material_ID', $reservation->Material_ID)->where('Account_Username', $reservation->Account_Username)->where('Loan_Status', 'active')->first();
+                    $on_loan = $loaned_materials = Loans::where('Loan_Status', 'active')->where('Account_Username', $reservation->Account_Username)->count();
 
-                    if(!$query) {
-                        $datetime = date('Y-m-d H:i:s', strtotime($reservation->Reservation_Date_Stamp . ' ' . $reservation->Reservation_Time_Stamp));
+                    if($on_loan < $this->loanLimit) {
+                        $query = Loans::where('Material_ID', $reservation->Material_ID)->where('Account_Username', $reservation->Account_Username)->where('Loan_Status', 'active')->first();
 
-                        if(strtotime('+1 day', strtotime($datetime)) >= strtotime(date('Y-m-d H:i:s'))) {
-                            $query = Reservations::where('Reservation_ID', $id)->update(array('Reservation_Status' => 'loaned'));
+                        if(!$query) {
+                            $datetime = date('Y-m-d H:i:s', strtotime($reservation->Reservation_Date_Stamp . ' ' . $reservation->Reservation_Time_Stamp));
 
-                            if($query) {
-                                $query = Loans::insert(array('Material_ID' => $reservation->Material_ID, 'Account_Username' => $reservation->Account_Username, 'Loan_Date_Stamp' => date('Y-m-d'), 'Loan_Time_Stamp' => date('H:i:s'), 'Loan_Reference' => $id));
+                            if(strtotime('+1 day', strtotime($datetime)) >= strtotime(date('Y-m-d H:i:s'))) {
+                                $query = Reservations::where('Reservation_ID', $id)->update(array('Reservation_Status' => 'loaned'));
 
                                 if($query) {
-                                    session()->flash('global_status', 'Success');
-                                    session()->flash('global_message', 'Loan Successful.');
+                                    $query = Loans::insert(array('Material_ID' => $reservation->Material_ID, 'Account_Username' => $reservation->Account_Username, 'Loan_Date_Stamp' => date('Y-m-d'), 'Loan_Time_Stamp' => date('H:i:s'), 'Loan_Reference' => $id));
+
+                                    if($query) {
+                                        session()->flash('global_status', 'Success');
+                                        session()->flash('global_message', 'Loan Successful.');
+                                    } else {
+                                        session()->flash('global_status', 'Warning');
+                                        session()->flash('global_message', 'Oops! Failed to loan book to the borrower. Borrower\'s reservation has been cancelled by the system.');
+                                    }
                                 } else {
                                     session()->flash('global_status', 'Warning');
-                                    session()->flash('global_message', 'Oops! Failed to loan book to the borrower. Borrower\'s reservation has been cancelled by the system.');
+                                    session()->flash('global_message', 'Oops! Failed to loan book to the borrower. Request has been interrupted.');
                                 }
                             } else {
-                                session()->flash('global_status', 'Warning');
-                                session()->flash('global_message', 'Oops! Failed to loan book to the borrower. Request has been interrupted.');
+                                session()->flash('global_status', 'Failed');
+                                session()->flash('global_message', 'Oops! This reservation has already expired.');
                             }
                         } else {
                             session()->flash('global_status', 'Failed');
-                            session()->flash('global_message', 'Oops! This reservation has already expired.');
+                            session()->flash('global_message', 'Oops! Borrower has already loan a copy of this book.');
                         }
                     } else {
                         session()->flash('global_status', 'Failed');
-                        session()->flash('global_message', 'Oops! Borrower has already loan a copy of this book.');
+                        session()->flash('global_message', 'Oops! You can only loan at most 3 books to this borrower at a time.');
                     }
                 } else {
                     session()->flash('global_status', 'Failed');

@@ -107,8 +107,10 @@
                                 @if($isReserved)
                                     <a class="btn btn-red btn-sm">Already Reserved</a>
                                 @else
-                                    @if($newMaterialCount > 0)
-                                        <a href="{{ route('main.getReserve', $material->Material_ID) }}" class="btn btn-orange btn-sm">Reserve</a>
+                                    @if($on_reserved < $reservation_limit)
+                                        @if($newMaterialCount > 0)
+                                            <a href="{{ route('main.getReserve', $material->Material_ID) }}" class="btn btn-orange btn-sm">Reserve</a>
+                                        @endif
                                     @endif
                                 @endif
                             @endif

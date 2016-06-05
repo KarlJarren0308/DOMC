@@ -136,6 +136,10 @@
                     <td class="text-right" width="25%">Book(s) on Hand:</td>
                     <td><strong>{{ $my_account_one->Account_On_Hand + $on_hand }}</strong></td>
                 </tr>
+                <tr>
+                    <td class="text-right" width="25%">Book(s) Reserved:</td>
+                    <td><strong>{{ $on_reserved }}</strong></td>
+                </tr>
             </tbody>
         </table>
         <div class="row">
