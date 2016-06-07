@@ -1201,7 +1201,39 @@ class PanelController extends Controller
     }
 
     public function postReports($what, Request $request) {
-        return $what;
+        if(!session()->has('username')) {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Oops! Please login first.');
+
+            return redirect()->route('main.getLogin');
+        } else {
+            if(session()->get('account_type') != 'Librarian') {
+                session()->flash('global_status', 'Failed');
+                session()->flash('global_message', 'Oops! You are not authorized to access the panel.');
+
+                return redirect()->route('main.getOpac');
+            }
+        }
+
+        switch($what) {
+            case 'loan_report':
+                $from = date('Y-m-d', strtotime($request->input('from')));
+                $to = date('Y-m-d', strtotime($request->input('to')));
+
+                $query = Loans::where('Loan_Status', 'active')->whereBetween('Loan_Date_Stamp', array($from, $to))->get();
+
+                if($query) {
+                    // TODO
+                }
+
+                break;
+            case 'reservation_report':
+                break;
+            case 'penalty_report':
+                break;
+            default:
+                break;
+        }
     }
 
     public function postInitialize() {
