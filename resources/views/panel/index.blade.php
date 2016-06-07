@@ -46,7 +46,7 @@
             </div>
             <div class="nine columns">
                 <div class="banner">What's New?</div>
-                <div class="row gap-bottom">
+                <div class="row" style="margin-bottom: 15px;">
                     <div class="four columns">
                         <a href="{{ route('panel.getReserved') }}" class="panel">
                             <div class="panel-header">
@@ -78,9 +78,14 @@
                         </a>
                     </div>
                 </div>
-                <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem nulla suscipit sunt blanditiis temporibus excepturi praesentium. Tempore accusamus ad fugit, maxime consequatur quas incidunt ipsum, vitae consequuntur possimus laboriosam dolores.</p>
-                <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipisicing elit. A explicabo eum impedit delectus laudantium sequi, et debitis ea, alias dignissimos dolor ipsa aut inventore doloribus, ex voluptate voluptatem veritatis ratione!</p>
-                <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus maxime alias laboriosam temporibus tempore facere sit. Quia quisquam amet repellat, maxime. Eum sequi libero recusandae repudiandae aliquid ipsum ad quas?</p>
+                <div class="row">
+                    <div class="six columns">
+                        <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Soluta reiciendis illum possimus et ducimus quia sed, dolorum id cumque rerum, fuga voluptatem fugiat quidem mollitia eos vel nisi voluptatum corrupti.</p>
+                    </div>
+                    <div class="six columns">
+                        <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae vitae quas, praesentium hic pariatur est voluptatibus suscipit vel tempora necessitatibus animi, ratione tempore modi. Veritatis, dignissimos nostrum iste ab non!</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
