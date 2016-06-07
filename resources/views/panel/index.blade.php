@@ -41,14 +41,64 @@
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'faculties') }}">Manage Faculties</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'librarians') }}">Manage Librarians</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'holidays') }}">Manage Holidays</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getReports') }}">Library Reports</a></li>
                 </ul>
             </div>
             <div class="nine columns">
                 <div class="banner">What's New?</div>
+                <div class="row gap-bottom">
+                    <div class="six columns">
+                        <a href="{{ route('panel.getReserved') }}" class="panel">
+                            <div class="panel-header text-right">
+                                <div>
+                                    <h1 id="r-count" class="no-margin">0</h1>
+                                </div>
+                                <div>Reserved Book(s)</div>
+                            </div>
+                            <div class="panel-body text-right">
+                                View Details
+                            </div>
+                        </a>
+                    </div>
+                    <div class="six columns">
+                        <a href="{{ route('panel.getReceive') }}" class="panel">
+                            <div class="panel-header text-right">
+                                <div>
+                                    <h1 id="l-count" class="no-margin">0</h1>
+                                </div>
+                                <div>Loaned Book(s)</div>
+                            </div>
+                            <div class="panel-body text-right">
+                                View Details
+                            </div>
+                        </a>
+                    </div>
+                </div>
                 <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem nulla suscipit sunt blanditiis temporibus excepturi praesentium. Tempore accusamus ad fugit, maxime consequatur quas incidunt ipsum, vitae consequuntur possimus laboriosam dolores.</p>
                 <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipisicing elit. A explicabo eum impedit delectus laudantium sequi, et debitis ea, alias dignissimos dolor ipsa aut inventore doloribus, ex voluptate voluptatem veritatis ratione!</p>
                 <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus maxime alias laboriosam temporibus tempore facere sit. Quia quisquam amet repellat, maxime. Eum sequi libero recusandae repudiandae aliquid ipsum ad quas?</p>
             </div>
         </div>
     </div>
+    <div class="modal">
+        <div class="modal-container">
+            <div class="modal-header"></div>
+            <div class="modal-body">
+                <div class="text-center gap-top gap-bottom">
+                    <span class="fa fa-spinner fa-4x fa-pulse"></span>
+                    <div class="gap-top">
+                        Initializing... Please Wait...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@stop
+
+@section('post_ref')
+    <script>
+        var url = '<?php echo route("panel.postInitialize"); ?>';
+        var token = '<?php echo md5(base64_decode("ZG9tYw==")) . base64_encode(csrf_token()) . md5(base64_decode("bGlicmFyeQ==")); ?>';
+    </script>
+    <script src="/js/panel.index.js"></script>
 @stop

@@ -511,6 +511,10 @@ class PanelController extends Controller
         }
     }
 
+    public function getReports() {
+        return view('panel.reports');
+    }
+
     public function postLoan(Request $request) {
         if(!session()->has('username')) {
             session()->flash('global_status', 'Failed');
@@ -601,6 +605,8 @@ class PanelController extends Controller
                                     session()->flash('global_message', 'Oops! Failed to loan book to the borrower. Request has been interrupted.');
                                 }
                             } else {
+                                $query = Reservations::where('Reservation_ID', $id)->update(array('Reservation_Status' => 'inactive'));
+
                                 session()->flash('global_status', 'Failed');
                                 session()->flash('global_message', 'Oops! This reservation has already expired.');
                             }
@@ -1192,6 +1198,51 @@ class PanelController extends Controller
                 return view('errors.404');
                 break;
         }
+    }
+
+    public function postReports($what, Request $request) {
+        return $what;
+    }
+
+    public function postInitialize() {
+        if(!session()->has('username')) {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Oops! Please login first.');
+
+            return redirect()->route('main.getLogin');
+        } else {
+            if(session()->get('account_type') != 'Librarian') {
+                session()->flash('global_status', 'Failed');
+                session()->flash('global_message', 'Oops! You are not authorized to access the panel.');
+
+                return redirect()->route('main.getOpac');
+            }
+        }
+
+        $reservations = Reservations::where('Reservation_Status', 'active')->get();
+        $lCount = Loans::where('Loan_Status', 'active')->count();
+        $rCount = 0;
+        $eCount = 0;
+
+        foreach($reservations as $reservation) {
+            $datetime = date('Y-m-d H:i:s', strtotime($reservation->Reservation_Date_Stamp . ' ' . $reservation->Reservation_Time_Stamp));
+
+            if(strtotime('+1 day', strtotime($datetime)) >= strtotime(date('Y-m-d H:i:s'))) {
+                $rCount++;
+            } else {
+                Reservations::where('Reservation_ID', $reservation->Reservation_ID)->update(array(
+                    'Reservation_Status' => 'inactive'
+                ));
+
+                if($query) {
+                    $eCount++;
+                } else {
+                    $rCount++;
+                }
+            }
+        }
+
+        return json_encode(array('status' => 'Success', 'message' => 'Initializing Complete.', 'data' => array('reserved' => $rCount, 'expired' => $eCount, 'loaned' => $lCount)));
     }
 
     public function postTest(Request $request) {
