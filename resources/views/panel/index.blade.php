@@ -47,29 +47,33 @@
             <div class="nine columns">
                 <div class="banner">What's New?</div>
                 <div class="row gap-bottom">
-                    <div class="six columns">
+                    <div class="four columns">
                         <a href="{{ route('panel.getReserved') }}" class="panel">
-                            <div class="panel-header text-right">
+                            <div class="panel-header">
                                 <div>
                                     <h1 id="r-count" class="no-margin">0</h1>
                                 </div>
                                 <div>Reserved Book(s)</div>
                             </div>
-                            <div class="panel-body text-right">
-                                View Details
-                            </div>
                         </a>
                     </div>
-                    <div class="six columns">
+                    <div class="four columns">
                         <a href="{{ route('panel.getReceive') }}" class="panel">
-                            <div class="panel-header text-right">
+                            <div class="panel-header">
                                 <div>
                                     <h1 id="l-count" class="no-margin">0</h1>
                                 </div>
                                 <div>Loaned Book(s)</div>
                             </div>
-                            <div class="panel-body text-right">
-                                View Details
+                        </a>
+                    </div>
+                    <div class="four columns">
+                        <a href="{{ route('panel.getReceive') }}" class="panel">
+                            <div class="panel-header">
+                                <div>
+                                    <h1 id="v-count" class="no-margin">0</h1>
+                                </div>
+                                <div>Visitor(s)</div>
                             </div>
                         </a>
                     </div>
