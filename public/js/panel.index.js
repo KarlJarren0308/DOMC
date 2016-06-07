@@ -12,9 +12,6 @@ $(document).ready(function() {
 
                 $('#r-count').text(response['data']['reserved']);
                 $('#l-count').text(response['data']['loaned']);
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.log('Oops! An error has occured.');
             }
         });
 
