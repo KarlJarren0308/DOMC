@@ -17,6 +17,8 @@ use App\Reservations;
 use App\Students;
 use App\Works;
 
+use Barryvdh\DomPDF\Facade as PDF;
+
 date_default_timezone_set('Asia/Manila');
 
 class PanelController extends Controller
@@ -1215,21 +1217,80 @@ class PanelController extends Controller
             }
         }
 
+        $schoolName = 'De Ocampo Memorial College';
+
         switch($what) {
             case 'loan_report':
                 $from = date('Y-m-d', strtotime($request->input('from')));
                 $to = date('Y-m-d', strtotime($request->input('to')));
 
-                $query = Loans::where('Loan_Status', 'active')->whereBetween('Loan_Date_Stamp', array($from, $to))->get();
+                $data['from'] = $from;
+                $data['to'] = $to;
+                $data['loans'] = Loans::whereBetween('loans.Loan_Date_Stamp', array($from, $to))->join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')->leftJoin('receives', 'loans.Loan_ID', '=', 'receives.Receive_Reference')
+                    ->join('accounts', 'loans.Account_Username', '=', 'accounts.Account_Username')
+                    ->leftJoin('faculties', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'faculties.Faculty_ID')->where('accounts.Account_Type', '=', 'Faculty');
+                    })
+                    ->leftJoin('librarians', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'librarians.Librarian_ID')->where('accounts.Account_Type', '=', 'Librarian');
+                    })
+                    ->leftJoin('students', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'students.Student_ID')->where('accounts.Account_Type', '=', 'Student');
+                    })
+                ->get();
 
-                if($query) {
-                    // TODO
-                }
+                $pdf = PDF::loadView('pdf.loan_report', $data);
+
+                return $pdf->stream('domc_loan_report.pdf');
 
                 break;
             case 'reservation_report':
+                $from = date('Y-m-d', strtotime($request->input('from')));
+                $to = date('Y-m-d', strtotime($request->input('to')));
+
+                $data['from'] = $from;
+                $data['to'] = $to;
+                $data['reservations'] = Reservations::whereBetween('reservations.Reservation_Date_Stamp', array($from, $to))->join('materials', 'reservations.Material_ID', '=', 'materials.Material_ID')
+                    ->join('accounts', 'reservations.Account_Username', '=', 'accounts.Account_Username')
+                    ->leftJoin('faculties', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'faculties.Faculty_ID')->where('accounts.Account_Type', '=', 'Faculty');
+                    })
+                    ->leftJoin('librarians', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'librarians.Librarian_ID')->where('accounts.Account_Type', '=', 'Librarian');
+                    })
+                    ->leftJoin('students', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'students.Student_ID')->where('accounts.Account_Type', '=', 'Student');
+                    })
+                ->get();
+
+                $pdf = PDF::loadView('pdf.reservation_report', $data);
+
+                return $pdf->stream('domc_reservation_report.pdf');
+
                 break;
             case 'penalty_report':
+                $from = date('Y-m-d', strtotime($request->input('from')));
+                $to = date('Y-m-d', strtotime($request->input('to')));
+
+                $data['from'] = $from;
+                $data['to'] = $to;
+                $data['penalties'] = Loans::whereBetween('loans.Loan_Date_Stamp', array($from, $to))->join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')->leftJoin('receives', 'loans.Loan_ID', '=', 'receives.Receive_Reference')
+                    ->join('accounts', 'loans.Account_Username', '=', 'accounts.Account_Username')
+                    ->leftJoin('faculties', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'faculties.Faculty_ID')->where('accounts.Account_Type', '=', 'Faculty');
+                    })
+                    ->leftJoin('librarians', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'librarians.Librarian_ID')->where('accounts.Account_Type', '=', 'Librarian');
+                    })
+                    ->leftJoin('students', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'students.Student_ID')->where('accounts.Account_Type', '=', 'Student');
+                    })
+                ->get();
+
+                $pdf = PDF::loadView('pdf.penalty_report', $data);
+
+                return $pdf->stream('domc_loan_report.pdf');
+
                 break;
             default:
                 break;
