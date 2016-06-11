@@ -69,54 +69,54 @@
                             <th>Available Copies</th>
                             <th></th>
                         </tr>
-                        <tbody>
-                            @foreach($works_materials as $material)
-                                <?php $isFirst = true; ?>
-                                <tr>
-                                    <td>{{ $material->Material_Call_Number }}</td>
-                                    <td>{{ $material->Material_Title }}</td>
-                                    <td>
-                                        @foreach($works_authors as $author)
-                                            @if($author->Material_ID == $material->Material_ID)
-                                                @if($isFirst)
-                                                    <?php $isFirst = false; ?>
-                                                @else
-                                                    <br>
-                                                @endif
-
-                                                @if(strlen($author->Author_Middle_Name) > 1)
-                                                    {{ $author->Author_First_Name . ' ' . substr($author->Author_Middle_Name, 0, 1) . '. ' . $author->Author_Last_Name }}
-                                                @else
-                                                    {{ $author->Author_First_Name . ' ' . $author->Author_Last_Name }}
-                                                @endif
-                                            @endif
-                                        @endforeach
-                                    </td>
-                                    <td class="text-center">
-                                        <?php $reserved_count = 0; $loaned_count = 0; ?>
-                                        @foreach($reserved_materials as $reserved_material)
-                                            @if($reserved_material->Material_ID == $material->Material_ID)
-                                                <?php $reserved_count++; ?>
-                                            @endif
-                                        @endforeach
-                                        @foreach($loaned_materials as $loaned_material)
-                                            @if($loaned_material->Material_ID == $material->Material_ID)
-                                                <?php $loaned_count++; ?>
-                                            @endif
-                                        @endforeach
-                                        <?php $newMaterialCount = $material->Material_Copies - $reserved_count - $loaned_count; ?>
-                                        {{ ($newMaterialCount > 0 ? $newMaterialCount : 0) }}
-                                    </td>
-                                    <td class="text-center">
-                                        @if(strlen(session()->has('username')))
-                                            <a href="{{ route('panel.getEdit', array($what, $material->Material_ID)) }}" class="btn btn-green btn-sm">Edit</a>
-                                            <a href="{{ route('panel.getDelete', array($what, $material->Material_ID)) }}" class="btn btn-red btn-sm">Delete</a>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
                     </thead>
+                    <tbody>
+                        @foreach($works_materials as $material)
+                            <?php $isFirst = true; ?>
+                            <tr>
+                                <td>{{ $material->Material_Call_Number }}</td>
+                                <td>{{ $material->Material_Title }}</td>
+                                <td>
+                                    @foreach($works_authors as $author)
+                                        @if($author->Material_ID == $material->Material_ID)
+                                            @if($isFirst)
+                                                <?php $isFirst = false; ?>
+                                            @else
+                                                <br>
+                                            @endif
+
+                                            @if(strlen($author->Author_Middle_Name) > 1)
+                                                {{ $author->Author_First_Name . ' ' . substr($author->Author_Middle_Name, 0, 1) . '. ' . $author->Author_Last_Name }}
+                                            @else
+                                                {{ $author->Author_First_Name . ' ' . $author->Author_Last_Name }}
+                                            @endif
+                                        @endif
+                                    @endforeach
+                                </td>
+                                <td class="text-center">
+                                    <?php $reserved_count = 0; $loaned_count = 0; ?>
+                                    @foreach($reserved_materials as $reserved_material)
+                                        @if($reserved_material->Material_ID == $material->Material_ID)
+                                            <?php $reserved_count++; ?>
+                                        @endif
+                                    @endforeach
+                                    @foreach($loaned_materials as $loaned_material)
+                                        @if($loaned_material->Material_ID == $material->Material_ID)
+                                            <?php $loaned_count++; ?>
+                                        @endif
+                                    @endforeach
+                                    <?php $newMaterialCount = $material->Material_Copies - $reserved_count - $loaned_count; ?>
+                                    {{ ($newMaterialCount > 0 ? $newMaterialCount : 0) }}
+                                </td>
+                                <td class="text-center">
+                                    @if(strlen(session()->has('username')))
+                                        <a href="{{ route('panel.getEdit', array($what, $material->Material_ID)) }}" class="btn btn-green btn-sm">Edit</a>
+                                        <a href="{{ route('panel.getDelete', array($what, $material->Material_ID)) }}" class="btn btn-red btn-sm">Delete</a>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
                 </table>
             </div>
         </div>

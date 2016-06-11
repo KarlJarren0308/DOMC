@@ -103,9 +103,9 @@
                 <div class="row" style="margin-bottom: 15px;">
                     <div class="six columns">
                         <div class="panel">
-                            <div class="panel-header">Generate Penalty Report</div>
+                            <div class="panel-header">Generate Book Report</div>
                             <div class="panel-body">
-                                {!! Form::open(array('route' => array('panel.postReports', 'penalty_report'))) !!}
+                                {!! Form::open(array('route' => array('panel.postReports', 'material_report'))) !!}
                                     <div class="row">
                                         <div class="six columns">
                                             <div class="input-block">
