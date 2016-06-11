@@ -705,6 +705,7 @@ class PanelController extends Controller
                     'Material_Location' => $request->input('materialLocation'),
                     'Material_Copyright_Year' => $request->input('materialCopyrightYear'),
                     'Material_Copies' => $request->input('materialCopies'),
+                    'Date_Added' => date('Y-m-d'),
                     'Publisher_ID' => ($request->input('publisher') != '' ? $request->input('publisher') : '-1')
                 ));
 
@@ -1268,26 +1269,16 @@ class PanelController extends Controller
                 return $pdf->stream('domc_reservation_report.pdf');
 
                 break;
-            case 'penalty_report':
+            case 'material_report':
                 $from = date('Y-m-d', strtotime($request->input('from')));
                 $to = date('Y-m-d', strtotime($request->input('to')));
 
                 $data['from'] = $from;
                 $data['to'] = $to;
-                $data['penalties'] = Loans::whereBetween('loans.Loan_Date_Stamp', array($from, $to))->join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')->leftJoin('receives', 'loans.Loan_ID', '=', 'receives.Receive_Reference')
-                    ->join('accounts', 'loans.Account_Username', '=', 'accounts.Account_Username')
-                    ->leftJoin('faculties', function($join) {
-                        $join->on('accounts.Account_Owner', '=', 'faculties.Faculty_ID')->where('accounts.Account_Type', '=', 'Faculty');
-                    })
-                    ->leftJoin('librarians', function($join) {
-                        $join->on('accounts.Account_Owner', '=', 'librarians.Librarian_ID')->where('accounts.Account_Type', '=', 'Librarian');
-                    })
-                    ->leftJoin('students', function($join) {
-                        $join->on('accounts.Account_Owner', '=', 'students.Student_ID')->where('accounts.Account_Type', '=', 'Student');
-                    })
-                ->get();
+                $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
+                $data['works_materials'] = Works::whereBetween('materials.Date_Added', array($from, $to))->join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->leftJoin('publishers', 'materials.Publisher_ID', '=', 'publishers.Publisher_ID')->groupBy('works.Material_ID')->get();
 
-                $pdf = PDF::loadView('pdf.penalty_report', $data);
+                $pdf = PDF::loadView('pdf.material_report', $data);
 
                 return $pdf->stream('domc_loan_report.pdf');
 
