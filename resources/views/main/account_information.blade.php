@@ -133,8 +133,12 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="text-right" width="25%">Material(s) on Hand:</td>
+                    <td class="text-right" width="25%">Book(s) on Hand:</td>
                     <td><strong>{{ $my_account_one->Account_On_Hand + $on_hand }}</strong></td>
+                </tr>
+                <tr>
+                    <td class="text-right" width="25%">Book(s) Reserved:</td>
+                    <td><strong>{{ $on_reserved }}</strong></td>
                 </tr>
             </tbody>
         </table>
@@ -171,7 +175,7 @@
                                     {!! Form::submit('Cancel Reservation', array('class' => 'btn btn-red btn-sm u-pull-right')) !!}
                                     {!! Form::close() !!}
                                 @elseif($reservation->Reservation_Status == 'loaned')
-                                    <div class="text-right">Material Loaned</div>
+                                    <div class="text-right">Book Loaned</div>
                                 @else
                                     <div class="text-right">Reservation Cancelled</div>
                                 @endif
@@ -181,7 +185,7 @@
                 </div>
             </div>
             <div class="six columns">
-                <div class="banner">Loaned Material(s)</div>
+                <div class="banner">Loaned Book(s)</div>
                 <div class="list" style="overflow-y: scroll; max-height: 500px;">
                     @foreach($loans as $loan)
                         <div class="list-item">
@@ -254,7 +258,7 @@
                                     <div class="u-pull-left">Penalty: <strong>&#8369;{{ ($totalPenalty > 0 ? $totalPenalty : 0) }}.00</strong></div>
                                     <div class="text-right">Not yet returned</div>
                                 @else
-                                    <div class="text-right">Material Returned</div>
+                                    <div class="text-right">Book Returned</div>
                                 @endif
                             </div>
                         </div>

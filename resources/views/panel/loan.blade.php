@@ -31,20 +31,21 @@
             <div class="three columns">
                 <ul class="list-group">
                     <li class="list-group-item"><a href="{{ route('panel.getIndex') }}">Home</a></li>
-                    <li class="list-group-item active"><a href="{{ route('panel.getLoan') }}">Loan Material(s)</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getReserved') }}">Reserved Material(s)</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getReceive') }}">Receive Material(s)</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'materials') }}">Manage Materials</a></li>
+                    <li class="list-group-item active"><a href="{{ route('panel.getLoan') }}">Loan Book(s)</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getReserved') }}">Reserved Book(s)</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getReceive') }}">Receive Book(s)</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'materials') }}">Manage Books</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'authors') }}">Manage Authors</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'publishers') }}">Manage Publishers</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'students') }}">Manage Students</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'faculties') }}">Manage Faculties</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'librarians') }}">Manage Librarians</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'holidays') }}">Manage Holidays</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getReports') }}">Library Reports</a></li>
                 </ul>
             </div>
             <div class="nine columns">
-                <div class="banner">Loan Material(s)</div>
+                <div class="banner">Loan Book(s)</div>
                 @if(session()->has('global_status'))
                     @if(session()->get('global_status') == 'Success')
                         <?php $class = ' success'; ?>
@@ -63,6 +64,7 @@
                             <th>Title</th>
                             <th>ISBN</th>
                             <th>Author(s)</th>
+                            <th>Available Copies</th>
                             <th></th>
                         </tr>
                         <tbody>
@@ -90,8 +92,25 @@
                                         @endforeach
                                     </td>
                                     <td class="text-center">
+                                        <?php $reserved_count = 0; $loaned_count = 0; ?>
+                                        @foreach($reserved_materials as $reserved_material)
+                                            @if($reserved_material->Material_ID == $material->Material_ID)
+                                                <?php $reserved_count++; ?>
+                                            @endif
+                                        @endforeach
+                                        @foreach($loaned_materials as $loaned_material)
+                                            @if($loaned_material->Material_ID == $material->Material_ID)
+                                                <?php $loaned_count++; ?>
+                                            @endif
+                                        @endforeach
+                                        <?php $newMaterialCount = $material->Material_Copies - $reserved_count - $loaned_count; ?>
+                                        {{ ($newMaterialCount > 0 ? $newMaterialCount : 0) }}
+                                    </td>
+                                    <td class="text-center">
                                         @if(strlen(session()->has('username')))
-                                            <a data-button="loan-button" data-var-id="{{ $material->Material_ID }}" data-var-title="{{ $material->Material_Title }}" class="btn btn-orange btn-sm">Loan</a>
+                                            @if($newMaterialCount > 0)
+                                                <a data-button="loan-button" data-var-id="{{ $material->Material_ID }}" data-var-title="{{ $material->Material_Title }}" class="btn btn-orange btn-sm">Loan</a>
+                                            @endif
                                         @endif
                                     </td>
                                 </tr>
@@ -104,13 +123,13 @@
     </div>
     <div class="modal">
         <div class="modal-container">
-            <div class="modal-header">Loan Material(s)</div>
+            <div class="modal-header">Loan Book(s)</div>
             <div class="modal-body">
                 {!! Form::open(array('route' => 'panel.postLoan', 'class' => 'no-margin')) !!}
                     {!! Form::hidden('arg0', 'f6614d9e3adf79e5eecc16a5405e8461') !!}
                     {!! Form::hidden('arg1', '') !!}
                     <div class="input-block">
-                        {!! Form::label('', 'Material to Borrow:') !!}
+                        {!! Form::label('', 'Book to Borrow:') !!}
                         <div id="input-material-title" class="content"></div>
                     </div>
                     <div class="input-block">

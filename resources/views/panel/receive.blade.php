@@ -70,20 +70,21 @@
             <div class="three columns">
                 <ul class="list-group">
                     <li class="list-group-item"><a href="{{ route('panel.getIndex') }}">Home</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getLoan') }}">Loan Material(s)</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getReserved') }}">Reserved Material(s)</a></li>
-                    <li class="list-group-item active"><a href="{{ route('panel.getReceive') }}">Receive Material(s)</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'materials') }}">Manage Materials</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getLoan') }}">Loan Book(s)</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getReserved') }}">Reserved Book(s)</a></li>
+                    <li class="list-group-item active"><a href="{{ route('panel.getReceive') }}">Receive Book(s)</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'materials') }}">Manage Books</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'authors') }}">Manage Authors</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'publishers') }}">Manage Publishers</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'students') }}">Manage Students</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'faculties') }}">Manage Faculties</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'librarians') }}">Manage Librarians</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'holidays') }}">Manage Holidays</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getReports') }}">Library Reports</a></li>
                 </ul>
             </div>
             <div class="nine columns">
-                <div class="banner">Receive Material(s)</div>
+                <div class="banner">Receive Book(s)</div>
                 @if(session()->has('global_status'))
                     @if(session()->get('global_status') == 'Success')
                         <?php $class = ' success'; ?>
@@ -100,36 +101,19 @@
                         <tr>
                             <th>Call Number</th>
                             <th>Title</th>
-                            <th>Author(s)</th>
                             <th>Loaned By</th>
+                            <th>Date Loaned</th>
                             <th>Penalty</th>
                             <th></th>
                         </tr>
                         <tbody>
                             @foreach($loans as $loan)
-                                @foreach($works_materials as $material)
+                                @foreach($materials as $material)
                                     @if($loan->Material_ID == $material->Material_ID)
                                         <?php $isFirst = true; ?>
                                         <tr>
                                             <td>{{ $material->Material_Call_Number }}</td>
                                             <td>{{ $material->Material_Title }}</td>
-                                            <td>
-                                                @foreach($works_authors as $author)
-                                                    @if($author->Material_ID == $material->Material_ID)
-                                                        @if($isFirst)
-                                                            <?php $isFirst = false; ?>
-                                                        @else
-                                                            <br>
-                                                        @endif
-
-                                                        @if(strlen($author->Author_Middle_Name) > 1)
-                                                            {{ $author->Author_First_Name . ' ' . substr($author->Author_Middle_Name, 0, 1) . '. ' . $author->Author_Last_Name }}
-                                                        @else
-                                                            {{ $author->Author_First_Name . ' ' . $author->Author_Last_Name }}
-                                                        @endif
-                                                    @endif
-                                                @endforeach
-                                            </td>
                                             <td>
                                                 @if($loan->Account_Type == 'Faculty')
                                                     @foreach($faculty_accounts as $faculty)
@@ -169,6 +153,7 @@
                                                     @endforeach
                                                 @endif
                                             </td>
+                                            <td>{{ date('F d, Y', strtotime($loan->Loan_Date_Stamp)) }}</td>
                                             <?php
                                                 // Penalty Computation
                                                 $dateLoaned = $loan->Loan_Date_Stamp . ' ' . $loan->Loan_Time_Stamp;
@@ -215,7 +200,17 @@
 
                                                 $totalPenalty = floor((strtotime(date('Y-m-d H:i:s')) - strtotime($newDayEnd)) / 86400) * (double) $per_day_penalty;
                                             ?>
-                                            <td>&#8369;{{ ($totalPenalty > 0 ? $totalPenalty : 0) }}.00</td>
+                                            <td>
+                                                @if($loan->Loan_Status == 'active')
+                                                    &#8369;{{ ($totalPenalty > 0 ? $totalPenalty : 0) }}.00
+                                                @else
+                                                    @foreach($receives as $receive)
+                                                        @if($loan->Loan_ID == $receive->Receive_Reference)
+                                                            {{ $receive->Penalty }}
+                                                        @endif
+                                                    @endforeach
+                                                @endif
+                                            </td>
                                             <td class="text-center">
                                                 @if(strlen(session()->has('username')))
                                                     @if($loan->Loan_Status == 'active')

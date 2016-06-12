@@ -10,6 +10,7 @@ use App\Faculties;
 use App\Holidays;
 use App\Librarians;
 use App\Loans;
+use App\Materials;
 use App\Reservations;
 use App\Students;
 use App\Works;
@@ -20,6 +21,8 @@ class MainController extends Controller
 {
     private $perDayPenalty = 5;
     private $startPenaltyAfter = 1;
+    private $reservationLimit = 3;
+    private $loanLimit = 3;
 
     public function getIndex() {
         return view('main.index');
@@ -33,6 +36,13 @@ class MainController extends Controller
         $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
         $data['works_materials'] = Works::join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->groupBy('works.Material_ID')->get();
         $data['reservations'] = Reservations::where('Account_Username', session()->get('username'))->where('Reservation_Status', 'active')->get();
+        $data['reserved_materials'] = Reservations::where('Reservation_Status', 'active')->get();
+        $data['loaned_materials'] = Loans::where('Loan_Status', 'active')->get();
+
+        if(session()->has('username')) {
+            $data['reservation_limit'] = $this->reservationLimit;
+            $data['on_reserved'] = Reservations::where('Reservation_Status', 'active')->where('Account_Username', session()->get('username'))->count();
+        }
 
         return view('main.opac', $data);
     }
@@ -54,7 +64,8 @@ class MainController extends Controller
         $data['reservations'] = Reservations::where('reservations.Account_Username', $username)->join('materials', 'reservations.Material_ID', '=', 'materials.Material_ID')->leftJoin('publishers', 'materials.Publisher_ID', '=', 'publishers.Publisher_ID')->orderBy('reservations.Reservation_Status', 'asc')->get();
         $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
         $data['my_account_one'] = Accounts::where('Account_Username', $username)->first();
-        $data['on_hand'] = count(Loans::where('Loan_Status', 'active')->where('Account_Username', $username)->get());
+        $data['on_hand'] = Loans::where('Loan_Status', 'active')->where('Account_Username', $username)->count();
+        $data['on_reserved'] = Reservations::where('Reservation_Status', 'active')->where('Account_Username', $username)->count();
         
         if($data['my_account_one']->Account_Type == 'Faculty') {
             $data['my_account_two'] = Faculties::where('Faculty_ID', $data['my_account_one']->Account_Owner)->first();
@@ -92,19 +103,37 @@ class MainController extends Controller
             return redirect()->route('main.getLogin');
         }
 
-        $query = Reservations::insert(array(
-            'Material_ID' => $what,
-            'Account_Username' => session()->get('username'),
-            'Reservation_Date_Stamp' => date('Y-m-d'),
-            'Reservation_Time_Stamp' => date('H:i:s')
-        ));
+        $reserved_materials = Reservations::where('Reservation_Status', 'active')->where('Material_ID', $what)->count();
+        $loaned_materials = Loans::where('Loan_Status', 'active')->where('Material_ID', $what)->count();
 
-        if($query) {
-            session()->flash('global_status', 'Success');
-            session()->flash('global_message', 'Material has been reserved.');
+        $materialRow = Materials::where('Material_ID', $what)->first();
+        $newMaterialCount = $materialRow->Material_Copies - $reserved_materials - $loaned_materials;
+
+        if($newMaterialCount > 0) {
+            $on_reserved = Reservations::where('Reservation_Status', 'active')->where('Account_Username', session()->get('username'))->count();
+
+            if($on_reserved < $this->reservationLimit) {
+                $query = Reservations::insert(array(
+                    'Material_ID' => $what,
+                    'Account_Username' => session()->get('username'),
+                    'Reservation_Date_Stamp' => date('Y-m-d'),
+                    'Reservation_Time_Stamp' => date('H:i:s')
+                ));
+
+                if($query) {
+                    session()->flash('global_status', 'Success');
+                    session()->flash('global_message', 'Book has been reserved.');
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Failed to reserve book.');
+                }
+            } else {
+                session()->flash('global_status', 'Failed');
+                session()->flash('global_message', 'Oops! You can only reserve at most 3 books at a time.');
+            }
         } else {
             session()->flash('global_status', 'Failed');
-            session()->flash('global_message', 'Failed to reserve material.');
+            session()->flash('global_message', 'Oops! No more copies available.');
         }
 
         return redirect()->route('main.getOpac');

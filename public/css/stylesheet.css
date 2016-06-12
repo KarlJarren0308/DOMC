@@ -41,8 +41,9 @@ div.u-three-four-width {
 
 .banner {
     background: #2c8700;
-    border-bottom: 4px solid #0a6500;
+    /* border-bottom: 4px solid #0a6500; */
     border-radius: 4px;
+    box-shadow: 0 4px 0 #0a6500;
     color: white;
     font-size: 1.5em;
     font-weight: bold;
@@ -305,12 +306,15 @@ div.u-three-four-width {
 
 .list-group > li.list-group-item.active > a {
     background: #2c8700;
-    border-bottom: 5px solid #0a6500;
+    /* border-bottom: 5px solid #0a6500; */
     border-radius: 4px;
+    box-shadow: 0 5px 0 #0a6500;
     color: white;
     text-shadow: #264c6c 1px 1px 0;
     padding: 5px 5px 5px 10px;
-    height: 34px;
+    margin-bottom: 5px;
+    line-height: 19px;
+    height: 29px;
 }
 
 .modal {
@@ -464,6 +468,40 @@ div.u-three-four-width {
 
 .no-padding {
     padding: 0;
+}
+
+.panel {
+    border: 1px solid #2c8700;
+    border-radius: 4px;
+    color: #222;
+    display: inline-block;
+    text-decoration: none;
+    width: 100%;
+}
+
+.panel:focus,
+.panel:hover {
+    color: #222;
+}
+
+.panel > .panel-header {
+    background: #2c8700;
+    color: white;
+    display: inline-block;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 10px 15px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.panel > .panel-body {
+    display: inline-block;
+    color: #222;
+    text-decoration: none;
+    padding: 10px 15px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .shadow {

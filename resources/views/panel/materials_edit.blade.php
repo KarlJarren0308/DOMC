@@ -31,28 +31,29 @@
             <div class="three columns">
                 <ul class="list-group">
                     <li class="list-group-item"><a href="{{ route('panel.getIndex') }}">Home</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getLoan') }}">Loan Material(s)</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getReserved') }}">Reserved Material(s)</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getReceive') }}">Receive Material(s)</a></li>
-                    <li class="list-group-item active"><a href="{{ route('panel.getManage', 'materials') }}">Manage Materials</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getLoan') }}">Loan Book(s)</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getReserved') }}">Reserved Book(s)</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getReceive') }}">Receive Book(s)</a></li>
+                    <li class="list-group-item active"><a href="{{ route('panel.getManage', 'materials') }}">Manage Books</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'authors') }}">Manage Authors</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'publishers') }}">Manage Publishers</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'students') }}">Manage Students</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'faculties') }}">Manage Faculties</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'librarians') }}">Manage Librarians</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'holidays') }}">Manage Holidays</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getReports') }}">Library Reports</a></li>
                 </ul>
             </div>
             <div class="nine columns">
-                <div class="banner">Manage Materials - Edit</div>
+                <div class="banner">Manage Books - Edit</div>
                 {!! Form::open(array('route' => array('panel.postEdit', $what, $id))) !!}
                     <div class="row">
                         <div class="eight columns">
                             <div class="row">
                                 <div class="four columns">
                                     <div class="input-block">
-                                        {!! Form::label('materialTitle', 'Material Title:') !!}
-                                        {!! Form::text('materialTitle', $material->Material_Title, array('class' => 'u-full-width', 'placeholder' => 'Enter Material Title Here', 'required' => 'required', 'autofocus' => 'autofocus')) !!}
+                                        {!! Form::label('materialTitle', 'Book Title:') !!}
+                                        {!! Form::text('materialTitle', $material->Material_Title, array('class' => 'u-full-width', 'placeholder' => 'Enter Book Title Here', 'required' => 'required', 'autofocus' => 'autofocus')) !!}
                                     </div>
                                 </div>
                                 <div class="four columns">

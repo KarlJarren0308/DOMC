@@ -17,12 +17,17 @@ use App\Reservations;
 use App\Students;
 use App\Works;
 
+use DB;
+use Barryvdh\DomPDF\Facade as PDF;
+
 date_default_timezone_set('Asia/Manila');
 
 class PanelController extends Controller
 {
     private $perDayPenalty = 5;
     private $startPenaltyAfter = 1;
+    private $reservationLimit = 3;
+    private $loanLimit = 3;
 
     public function getIndex() {
         if(!session()->has('username')) {
@@ -63,6 +68,8 @@ class PanelController extends Controller
         $data['student_accounts'] = new Students;
         $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
         $data['works_materials'] = Works::join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->groupBy('works.Material_ID')->get();
+        $data['reserved_materials'] = Reservations::where('Reservation_Status', 'active')->get();
+        $data['loaned_materials'] = Loans::where('Loan_Status', 'active')->get();
 
         return view('panel.loan', $data);
     }
@@ -111,11 +118,11 @@ class PanelController extends Controller
         $data['start_penalty_after'] = $this->startPenaltyAfter;
         $data['holidays'] = Holidays::get();
         $data['loans'] = Loans::join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')->join('accounts', 'loans.Account_Username', '=', 'accounts.Account_Username')->get();
+        $data['receives'] = Receives::get();
         $data['faculty_accounts'] = Faculties::get();
         $data['librarian_accounts'] = Librarians::get();
         $data['student_accounts'] = Students::get();
-        $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
-        $data['works_materials'] = Works::join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->groupBy('works.Material_ID')->get();
+        $data['materials'] = Materials::get();
 
         return view('panel.receive', $data);
     }
@@ -141,6 +148,8 @@ class PanelController extends Controller
             case 'materials':
                 $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
                 $data['works_materials'] = Works::join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->groupBy('works.Material_ID')->get();
+                $data['reserved_materials'] = Reservations::where('Reservation_Status', 'active')->get();
+                $data['loaned_materials'] = Loans::where('Loan_Status', 'active')->get();
 
                 return view('panel.materials', $data);
 
@@ -340,10 +349,10 @@ class PanelController extends Controller
                     $query = Works::where('Material_ID', $id)->delete();
                     
                     session()->flash('global_status', 'Success');
-                    session()->flash('global_message', 'Material has been deleted.');
+                    session()->flash('global_message', 'Book has been deleted.');
                 } else {
                     session()->flash('global_status', 'Failed');
-                    session()->flash('global_message', 'Failed to delete material.');
+                    session()->flash('global_message', 'Failed to delete book.');
                 }
 
                 return redirect()->route('panel.getManage', 'materials');
@@ -505,6 +514,10 @@ class PanelController extends Controller
         }
     }
 
+    public function getReports() {
+        return view('panel.reports');
+    }
+
     public function postLoan(Request $request) {
         if(!session()->has('username')) {
             session()->flash('global_status', 'Failed');
@@ -526,21 +539,37 @@ class PanelController extends Controller
                 $materialID = $request->input('arg1');
                 $accountUsername = $request->input('arg2');
 
-                $query = Loans::where('Material_ID', $materialID)->where('Account_Username', $accountUsername)->where('Loan_Status', 'active')->first();
+                $on_loan = $loaned_materials = Loans::where('Loan_Status', 'active')->where('Account_Username', $accountUsername)->count();
+                $reserved_materials = Reservations::where('Reservation_Status', 'active')->where('Material_ID', $materialID)->count();
+                $loaned_materials = Loans::where('Loan_Status', 'active')->where('Material_ID', $materialID)->count();
+                $materialRow = Materials::where('Material_ID', $materialID)->first();
+                $newMaterialCount = $materialRow->Material_Copies - $reserved_materials - $loaned_materials;
 
-                if(!$query) {
-                    $query = Loans::insert(array('Material_ID' => $materialID, 'Account_Username' => $accountUsername, 'Loan_Date_Stamp' => date('Y-m-d'), 'Loan_Time_Stamp' => date('H:i:s')));
+                if($newMaterialCount > 0) {
+                    if($on_loan < $this->loanLimit) {
+                        $query = Loans::where('Material_ID', $materialID)->where('Account_Username', $accountUsername)->where('Loan_Status', 'active')->first();
 
-                    if($query) {
-                        session()->flash('global_status', 'Success');
-                        session()->flash('global_message', 'Loan Successful.');
+                        if(!$query) {
+                            $query = Loans::insert(array('Material_ID' => $materialID, 'Account_Username' => $accountUsername, 'Loan_Date_Stamp' => date('Y-m-d'), 'Loan_Time_Stamp' => date('H:i:s')));
+
+                            if($query) {
+                                session()->flash('global_status', 'Success');
+                                session()->flash('global_message', 'Loan Successful.');
+                            } else {
+                                session()->flash('global_status', 'Warning');
+                                session()->flash('global_message', 'Oops! Failed to loan book to the borrower.');
+                            }
+                        } else {
+                            session()->flash('global_status', 'Failed');
+                            session()->flash('global_message', 'Oops! Borrower has already loan a copy of this book.');
+                        }
                     } else {
-                        session()->flash('global_status', 'Warning');
-                        session()->flash('global_message', 'Oops! Failed to loan material to the borrower.');
+                        session()->flash('global_status', 'Failed');
+                        session()->flash('global_message', 'Oops! You can only loan at most 3 books to this borrower at a time.');
                     }
                 } else {
                     session()->flash('global_status', 'Failed');
-                    session()->flash('global_message', 'Oops! Borrower has already loan a copy of this material.');
+                    session()->flash('global_message', 'Oops! No more copies available.');
                 }
 
                 return redirect()->route('panel.getLoan');
@@ -553,35 +582,44 @@ class PanelController extends Controller
                 $reservation = Reservations::where('Reservation_ID', $id)->first();
 
                 if($reservation) {
-                    $query = Loans::where('Material_ID', $reservation->Material_ID)->where('Account_Username', $reservation->Account_Username)->where('Loan_Status', 'active')->first();
+                    $on_loan = $loaned_materials = Loans::where('Loan_Status', 'active')->where('Account_Username', $reservation->Account_Username)->count();
 
-                    if(!$query) {
-                        $datetime = date('Y-m-d H:i:s', strtotime($reservation->Reservation_Date_Stamp . ' ' . $reservation->Reservation_Time_Stamp));
+                    if($on_loan < $this->loanLimit) {
+                        $query = Loans::where('Material_ID', $reservation->Material_ID)->where('Account_Username', $reservation->Account_Username)->where('Loan_Status', 'active')->first();
 
-                        if(strtotime('+1 day', strtotime($datetime)) >= strtotime(date('Y-m-d H:i:s'))) {
-                            $query = Reservations::where('Reservation_ID', $id)->update(array('Reservation_Status' => 'loaned'));
+                        if(!$query) {
+                            $datetime = date('Y-m-d H:i:s', strtotime($reservation->Reservation_Date_Stamp . ' ' . $reservation->Reservation_Time_Stamp));
 
-                            if($query) {
-                                $query = Loans::insert(array('Material_ID' => $reservation->Material_ID, 'Account_Username' => $reservation->Account_Username, 'Loan_Date_Stamp' => date('Y-m-d'), 'Loan_Time_Stamp' => date('H:i:s'), 'Loan_Reference' => $id));
+                            if(strtotime('+1 day', strtotime($datetime)) >= strtotime(date('Y-m-d H:i:s'))) {
+                                $query = Reservations::where('Reservation_ID', $id)->update(array('Reservation_Status' => 'loaned'));
 
                                 if($query) {
-                                    session()->flash('global_status', 'Success');
-                                    session()->flash('global_message', 'Loan Successful.');
+                                    $query = Loans::insert(array('Material_ID' => $reservation->Material_ID, 'Account_Username' => $reservation->Account_Username, 'Loan_Date_Stamp' => date('Y-m-d'), 'Loan_Time_Stamp' => date('H:i:s'), 'Loan_Reference' => $id));
+
+                                    if($query) {
+                                        session()->flash('global_status', 'Success');
+                                        session()->flash('global_message', 'Loan Successful.');
+                                    } else {
+                                        session()->flash('global_status', 'Warning');
+                                        session()->flash('global_message', 'Oops! Failed to loan book to the borrower. Borrower\'s reservation has been cancelled by the system.');
+                                    }
                                 } else {
                                     session()->flash('global_status', 'Warning');
-                                    session()->flash('global_message', 'Oops! Failed to loan material to the borrower. Borrower\'s reservation has been cancelled by the system.');
+                                    session()->flash('global_message', 'Oops! Failed to loan book to the borrower. Request has been interrupted.');
                                 }
                             } else {
-                                session()->flash('global_status', 'Warning');
-                                session()->flash('global_message', 'Oops! Failed to loan material to the borrower. Request has been interrupted.');
+                                $query = Reservations::where('Reservation_ID', $id)->update(array('Reservation_Status' => 'inactive'));
+
+                                session()->flash('global_status', 'Failed');
+                                session()->flash('global_message', 'Oops! This reservation has already expired.');
                             }
                         } else {
                             session()->flash('global_status', 'Failed');
-                            session()->flash('global_message', 'Oops! This reservation has already expired.');
+                            session()->flash('global_message', 'Oops! Borrower has already loan a copy of this book.');
                         }
                     } else {
                         session()->flash('global_status', 'Failed');
-                        session()->flash('global_message', 'Oops! Borrower has already loan a copy of this material.');
+                        session()->flash('global_message', 'Oops! You can only loan at most 3 books to this borrower at a time.');
                     }
                 } else {
                     session()->flash('global_status', 'Failed');
@@ -626,11 +664,11 @@ class PanelController extends Controller
                     session()->flash('global_message', 'Receive Successful.');
                 } else {
                     session()->flash('global_status', 'Warning');
-                    session()->flash('global_message', 'Oops! Failed to receive material.');
+                    session()->flash('global_message', 'Oops! Failed to receive book.');
                 }
             } else {
                 session()->flash('global_status', 'Warning');
-                session()->flash('global_message', 'Oops! Borrower has already returned this material.');
+                session()->flash('global_message', 'Oops! Borrower has already returned this book.');
             }
         } else {
             session()->flash('global_status', 'Failed');
@@ -668,6 +706,7 @@ class PanelController extends Controller
                     'Material_Location' => $request->input('materialLocation'),
                     'Material_Copyright_Year' => $request->input('materialCopyrightYear'),
                     'Material_Copies' => $request->input('materialCopies'),
+                    'Date_Added' => date('Y-m-d'),
                     'Publisher_ID' => ($request->input('publisher') != '' ? $request->input('publisher') : '-1')
                 ));
 
@@ -687,14 +726,14 @@ class PanelController extends Controller
 
                     if($ctr > 0) {
                         session()->flash('global_status', 'Success');
-                        session()->flash('global_message', 'Material has been added.');
+                        session()->flash('global_message', 'Book has been added.');
                     } else {
                         session()->flash('global_status', 'Failed');
-                        session()->flash('global_message', 'Failed to associate author(s) to the material.');
+                        session()->flash('global_message', 'Failed to associate author(s) to the book.');
                     }
                 } else {
                     session()->flash('global_status', 'Failed');
-                    session()->flash('global_message', 'Failed to add material.');
+                    session()->flash('global_message', 'Failed to add book.');
                 }
 
                 return redirect()->route('panel.getManage', 'materials');
@@ -904,14 +943,14 @@ class PanelController extends Controller
 
                     if($ctr > 0) {
                         session()->flash('global_status', 'Success');
-                        session()->flash('global_message', 'Material has been modified.');
+                        session()->flash('global_message', 'Book has been modified.');
                     } else {
                         session()->flash('global_status', 'Failed');
-                        session()->flash('global_message', 'Failed to associate author(s) to the material.');
+                        session()->flash('global_message', 'Failed to associate author(s) to the book.');
                     }
                 } else {
                     session()->flash('global_status', 'Failed');
-                    session()->flash('global_message', 'No changes has been made.1');
+                    session()->flash('global_message', 'No changes has been made.');
                 }
 
                 return redirect()->route('panel.getManage', 'materials');
@@ -1163,6 +1202,159 @@ class PanelController extends Controller
                 return view('errors.404');
                 break;
         }
+    }
+
+    public function postReports($what, Request $request) {
+        if(!session()->has('username')) {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Oops! Please login first.');
+
+            return redirect()->route('main.getLogin');
+        } else {
+            if(session()->get('account_type') != 'Librarian') {
+                session()->flash('global_status', 'Failed');
+                session()->flash('global_message', 'Oops! You are not authorized to access the panel.');
+
+                return redirect()->route('main.getOpac');
+            }
+        }
+
+        $schoolName = 'De Ocampo Memorial College';
+
+        switch($what) {
+            case 'loan_report':
+                $from = date('Y-m-d', strtotime($request->input('from')));
+                $to = date('Y-m-d', strtotime($request->input('to')));
+
+                $data['from'] = $from;
+                $data['to'] = $to;
+                $data['loans'] = Loans::whereBetween('loans.Loan_Date_Stamp', array($from, $to))->join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')->leftJoin('receives', 'loans.Loan_ID', '=', 'receives.Receive_Reference')
+                    ->join('accounts', 'loans.Account_Username', '=', 'accounts.Account_Username')
+                    ->leftJoin('faculties', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'faculties.Faculty_ID')->where('accounts.Account_Type', '=', 'Faculty');
+                    })
+                    ->leftJoin('librarians', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'librarians.Librarian_ID')->where('accounts.Account_Type', '=', 'Librarian');
+                    })
+                    ->leftJoin('students', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'students.Student_ID')->where('accounts.Account_Type', '=', 'Student');
+                    })
+                ->get();
+
+                $pdf = PDF::loadView('pdf.loan_report', $data);
+
+                return $pdf->stream('domc_loan_report.pdf');
+
+                break;
+            case 'reservation_report':
+                $from = date('Y-m-d', strtotime($request->input('from')));
+                $to = date('Y-m-d', strtotime($request->input('to')));
+
+                $data['from'] = $from;
+                $data['to'] = $to;
+                $data['reservations'] = Reservations::whereBetween('reservations.Reservation_Date_Stamp', array($from, $to))->join('materials', 'reservations.Material_ID', '=', 'materials.Material_ID')
+                    ->join('accounts', 'reservations.Account_Username', '=', 'accounts.Account_Username')
+                    ->leftJoin('faculties', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'faculties.Faculty_ID')->where('accounts.Account_Type', '=', 'Faculty');
+                    })
+                    ->leftJoin('librarians', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'librarians.Librarian_ID')->where('accounts.Account_Type', '=', 'Librarian');
+                    })
+                    ->leftJoin('students', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'students.Student_ID')->where('accounts.Account_Type', '=', 'Student');
+                    })
+                ->get();
+
+                $pdf = PDF::loadView('pdf.reservation_report', $data);
+
+                return $pdf->stream('domc_reservation_report.pdf');
+
+                break;
+            case 'material_report':
+                $from = date('Y-m-d', strtotime($request->input('from')));
+                $to = date('Y-m-d', strtotime($request->input('to')));
+
+                $data['from'] = $from;
+                $data['to'] = $to;
+                $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
+                $data['works_materials'] = Works::whereBetween('materials.Date_Added', array($from, $to))->join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->leftJoin('publishers', 'materials.Publisher_ID', '=', 'publishers.Publisher_ID')->groupBy('works.Material_ID')->get();
+
+                $pdf = PDF::loadView('pdf.material_report', $data);
+
+                return $pdf->stream('domc_material_report.pdf');
+
+                break;
+            case 'top_report':
+                $from = date('Y-m-d', strtotime($request->input('from')));
+                $to = date('Y-m-d', strtotime($request->input('to')));
+
+                $data['from'] = $from;
+                $data['to'] = $to;
+                $data['borrowers'] = Loans::whereBetween('loans.Loan_Date_Stamp', array($from, $to))
+                    ->join('accounts', 'loans.Account_Username', '=', 'accounts.Account_Username')
+                    ->leftJoin('faculties', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'faculties.Faculty_ID')->where('accounts.Account_Type', '=', 'Faculty');
+                    })
+                    ->leftJoin('librarians', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'librarians.Librarian_ID')->where('accounts.Account_Type', '=', 'Librarian');
+                    })
+                    ->leftJoin('students', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'students.Student_ID')->where('accounts.Account_Type', '=', 'Student');
+                    })
+                ->groupBy('loans.Account_Username')->orderBy('Row_Count', 'desc')->select('*', DB::raw('count(*) as Row_Count'))->get();
+                $data['materials'] = Loans::whereBetween('loans.Loan_Date_Stamp', array($from, $to))
+                    ->join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')
+                ->groupBy('loans.Material_ID')->orderBy('Row_Count', 'desc')->select('*', DB::raw('count(*) as Row_Count'))->get();
+
+                $pdf = PDF::loadView('pdf.top_report', $data);
+
+                return $pdf->stream('domc_top_report.pdf');
+
+                break;
+            default:
+                break;
+        }
+    }
+
+    public function postInitialize() {
+        if(!session()->has('username')) {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Oops! Please login first.');
+
+            return redirect()->route('main.getLogin');
+        } else {
+            if(session()->get('account_type') != 'Librarian') {
+                session()->flash('global_status', 'Failed');
+                session()->flash('global_message', 'Oops! You are not authorized to access the panel.');
+
+                return redirect()->route('main.getOpac');
+            }
+        }
+
+        $reservations = Reservations::where('Reservation_Status', 'active')->get();
+        $lCount = Loans::where('Loan_Status', 'active')->count();
+        $rCount = 0;
+        $eCount = 0;
+
+        foreach($reservations as $reservation) {
+            $datetime = date('Y-m-d H:i:s', strtotime($reservation->Reservation_Date_Stamp . ' ' . $reservation->Reservation_Time_Stamp));
+
+            if(strtotime('+1 day', strtotime($datetime)) >= strtotime(date('Y-m-d H:i:s'))) {
+                $rCount++;
+            } else {
+                Reservations::where('Reservation_ID', $reservation->Reservation_ID)->update(array(
+                    'Reservation_Status' => 'inactive'
+                ));
+
+                if($query) {
+                    $eCount++;
+                } else {
+                    $rCount++;
+                }
+            }
+        }
+
+        return json_encode(array('status' => 'Success', 'message' => 'Initializing Complete.', 'data' => array('reserved' => $rCount, 'expired' => $eCount, 'loaned' => $lCount)));
     }
 
     public function postTest(Request $request) {

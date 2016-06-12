@@ -1,7 +1,7 @@
 $(document).ready(function() {
     $('#loan-table').dataTable({
         aoColumnDefs: [
-            { bSearchable: false, bSortable: false, aTargets: [4] }
+            { bSearchable: false, bSortable: false, aTargets: [5] }
         ]
     });
 

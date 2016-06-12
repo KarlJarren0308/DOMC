@@ -31,20 +31,21 @@
             <div class="three columns">
                 <ul class="list-group">
                     <li class="list-group-item"><a href="{{ route('panel.getIndex') }}">Home</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getLoan') }}">Loan Material(s)</a></li>
-                    <li class="list-group-item active"><a href="{{ route('panel.getReserved') }}">Reserved Material(s)</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getReceive') }}">Receive Material(s)</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'materials') }}">Manage Materials</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getLoan') }}">Loan Book(s)</a></li>
+                    <li class="list-group-item active"><a href="{{ route('panel.getReserved') }}">Reserved Book(s)</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getReceive') }}">Receive Book(s)</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'materials') }}">Manage Books</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'authors') }}">Manage Authors</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'publishers') }}">Manage Publishers</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'students') }}">Manage Students</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'faculties') }}">Manage Faculties</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'librarians') }}">Manage Librarians</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'holidays') }}">Manage Holidays</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getReports') }}">Library Reports</a></li>
                 </ul>
             </div>
             <div class="nine columns">
-                <div class="banner">Reserved Material(s)</div>
+                <div class="banner">Reserved Book(s)</div>
                 @if(session()->has('global_status'))
                     @if(session()->get('global_status') == 'Success')
                         <?php $class = ' success'; ?>
@@ -67,82 +68,84 @@
                         </tr>
                         <tbody>
                             @foreach($works_reservations as $reservation)
-                                @foreach($works_materials as $material)
-                                    @if($reservation->Material_ID == $material->Material_ID)
-                                        <?php $isFirst = true; ?>
-                                        <tr>
-                                            <td>{{ $material->Material_Call_Number }}</td>
-                                            <td>{{ $material->Material_Title }}</td>
-                                            <td>
-                                                @foreach($works_authors as $author)
-                                                    @if($author->Material_ID == $material->Material_ID)
-                                                        @if($isFirst)
-                                                            <?php $isFirst = false; ?>
-                                                        @else
-                                                            <br>
-                                                        @endif
+                                @if($reservation->Reservation_Status == 'active')
+                                    @foreach($works_materials as $material)
+                                        @if($reservation->Material_ID == $material->Material_ID)
+                                            <?php $isFirst = true; ?>
+                                            <tr>
+                                                <td>{{ $material->Material_Call_Number }}</td>
+                                                <td>{{ $material->Material_Title }}</td>
+                                                <td>
+                                                    @foreach($works_authors as $author)
+                                                        @if($author->Material_ID == $material->Material_ID)
+                                                            @if($isFirst)
+                                                                <?php $isFirst = false; ?>
+                                                            @else
+                                                                <br>
+                                                            @endif
 
-                                                        @if(strlen($author->Author_Middle_Name) > 1)
-                                                            {{ $author->Author_First_Name . ' ' . substr($author->Author_Middle_Name, 0, 1) . '. ' . $author->Author_Last_Name }}
-                                                        @else
-                                                            {{ $author->Author_First_Name . ' ' . $author->Author_Last_Name }}
+                                                            @if(strlen($author->Author_Middle_Name) > 1)
+                                                                {{ $author->Author_First_Name . ' ' . substr($author->Author_Middle_Name, 0, 1) . '. ' . $author->Author_Last_Name }}
+                                                            @else
+                                                                {{ $author->Author_First_Name . ' ' . $author->Author_Last_Name }}
+                                                            @endif
                                                         @endif
+                                                    @endforeach
+                                                </td>
+                                                <td>
+                                                    @if($reservation->Account_Type == 'Faculty')
+                                                        @foreach($faculty_accounts as $faculty)
+                                                            @if($reservation->Account_Owner == $faculty->Faculty_ID)
+                                                                @if(strlen($faculty->Faculty_Middle_Name) > 1)
+                                                                    {{ $faculty->Faculty_First_Name . ' ' . substr($faculty->Faculty_Middle_Name, 0, 1) . '. ' . $faculty->Faculty_Last_Name }}
+                                                                @else
+                                                                    {{ $faculty->Faculty_First_Name . ' ' . $faculty->Faculty_Last_Name }}
+                                                                @endif
+
+                                                                @break
+                                                            @endif
+                                                        @endforeach
+                                                    @elseif($reservation->Account_Type == 'Librarian')
+                                                        @foreach($librarian_accounts as $librarian)
+                                                            @if($reservation->Account_Owner == $librarian->Librarian_ID)
+                                                                @if(strlen($librarian->Librarian_Middle_Name) > 1)
+                                                                    {{ $librarian->Librarian_First_Name . ' ' . substr($librarian->Librarian_Middle_Name, 0, 1) . '. ' . $librarian->Librarian_Last_Name }}
+                                                                @else
+                                                                    {{ $librarian->Librarian_First_Name . ' ' . $librarian->Librarian_Last_Name }}
+                                                                @endif
+
+                                                                @break
+                                                            @endif
+                                                        @endforeach
+                                                    @elseif($reservation->Account_Type == 'Student')
+                                                        @foreach($student_accounts as $student)
+                                                            @if($reservation->Account_Owner == $student->Student_ID)
+                                                                @if(strlen($student->Student_Middle_Name) > 1)
+                                                                    {{ $student->Student_First_Name . ' ' . substr($student->Student_Middle_Name, 0, 1) . '. ' . $student->Student_Last_Name }}
+                                                                @else
+                                                                    {{ $student->Student_First_Name . ' ' . $student->Student_Last_Name }}
+                                                                @endif
+
+                                                                @break
+                                                            @endif
+                                                        @endforeach
                                                     @endif
-                                                @endforeach
-                                            </td>
-                                            <td>
-                                                @if($reservation->Account_Type == 'Faculty')
-                                                    @foreach($faculty_accounts as $faculty)
-                                                        @if($reservation->Account_Owner == $faculty->Faculty_ID)
-                                                            @if(strlen($faculty->Faculty_Middle_Name) > 1)
-                                                                {{ $faculty->Faculty_First_Name . ' ' . substr($faculty->Faculty_Middle_Name, 0, 1) . '. ' . $faculty->Faculty_Last_Name }}
-                                                            @else
-                                                                {{ $faculty->Faculty_First_Name . ' ' . $faculty->Faculty_Last_Name }}
-                                                            @endif
+                                                </td>
+                                                <td class="text-center">
+                                                    @if(strlen(session()->has('username')))
+                                                        {!! Form::open(array('route' => 'panel.postLoan', 'class' => 'no-margin')) !!}
+                                                            {!! Form::hidden('arg0', 'bcfaa2f57da331c29c0bab9f99543451') !!}
+                                                            {!! Form::hidden('arg1', $reservation->Reservation_ID) !!}
+                                                            {!! Form::submit('Loan', array('class' => 'btn btn-green btn-sm')) !!}
+                                                        {!! Form::close() !!}
+                                                    @endif
+                                                </td>
+                                            </tr>
 
-                                                            @break
-                                                        @endif
-                                                    @endforeach
-                                                @elseif($reservation->Account_Type == 'Librarian')
-                                                    @foreach($librarian_accounts as $librarian)
-                                                        @if($reservation->Account_Owner == $librarian->Librarian_ID)
-                                                            @if(strlen($librarian->Librarian_Middle_Name) > 1)
-                                                                {{ $librarian->Librarian_First_Name . ' ' . substr($librarian->Librarian_Middle_Name, 0, 1) . '. ' . $librarian->Librarian_Last_Name }}
-                                                            @else
-                                                                {{ $librarian->Librarian_First_Name . ' ' . $librarian->Librarian_Last_Name }}
-                                                            @endif
-
-                                                            @break
-                                                        @endif
-                                                    @endforeach
-                                                @elseif($reservation->Account_Type == 'Student')
-                                                    @foreach($student_accounts as $student)
-                                                        @if($reservation->Account_Owner == $student->Student_ID)
-                                                            @if(strlen($student->Student_Middle_Name) > 1)
-                                                                {{ $student->Student_First_Name . ' ' . substr($student->Student_Middle_Name, 0, 1) . '. ' . $student->Student_Last_Name }}
-                                                            @else
-                                                                {{ $student->Student_First_Name . ' ' . $student->Student_Last_Name }}
-                                                            @endif
-
-                                                            @break
-                                                        @endif
-                                                    @endforeach
-                                                @endif
-                                            </td>
-                                            <td class="text-center">
-                                                @if(strlen(session()->has('username')))
-                                                    {!! Form::open(array('route' => 'panel.postLoan', 'class' => 'no-margin')) !!}
-                                                        {!! Form::hidden('arg0', 'bcfaa2f57da331c29c0bab9f99543451') !!}
-                                                        {!! Form::hidden('arg1', $reservation->Reservation_ID) !!}
-                                                        {!! Form::submit('Loan', array('class' => 'btn btn-green btn-sm')) !!}
-                                                    {!! Form::close() !!}
-                                                @endif
-                                            </td>
-                                        </tr>
-
-                                        @break
-                                    @endif
-                                @endforeach
+                                            @break
+                                        @endif
+                                    @endforeach
+                                @endif
                             @endforeach
                         </tbody>
                     </thead>

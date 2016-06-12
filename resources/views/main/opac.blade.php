@@ -51,7 +51,8 @@
                     <th>Title</th>
                     <th>ISBN</th>
                     <th>Author(s)</th>
-                    <th></th>
+                    <th>Available Copies</th>
+                    <th width="15%"></th>
                 </tr>
             </thead>
             <tbody>
@@ -79,6 +80,21 @@
                             @endforeach
                         </td>
                         <td class="text-center">
+                            <?php $reserved_count = 0; $loaned_count = 0; ?>
+                            @foreach($reserved_materials as $reserved_material)
+                                @if($reserved_material->Material_ID == $material->Material_ID)
+                                    <?php $reserved_count++; ?>
+                                @endif
+                            @endforeach
+                            @foreach($loaned_materials as $loaned_material)
+                                @if($loaned_material->Material_ID == $material->Material_ID)
+                                    <?php $loaned_count++; ?>
+                                @endif
+                            @endforeach
+                            <?php $newMaterialCount = $material->Material_Copies - $reserved_count - $loaned_count; ?>
+                            {{ ($newMaterialCount > 0 ? $newMaterialCount : 0) }}
+                        </td>
+                        <td class="text-center">
                             @if(strlen(session()->has('username')))
                                 <?php $isReserved = false; ?>
                                 @foreach($reservations as $reservation)
@@ -89,9 +105,13 @@
                                 @endforeach
 
                                 @if($isReserved)
-                                    <div class="btn btn-red btn-sm">Already Reserved</div>
+                                    <a class="btn btn-red btn-sm">Already Reserved</a>
                                 @else
-                                    <a href="{{ route('main.getReserve', $material->Material_ID) }}" class="btn btn-orange btn-sm">Reserve</a>
+                                    @if($on_reserved < $reservation_limit)
+                                        @if($newMaterialCount > 0)
+                                            <a href="{{ route('main.getReserve', $material->Material_ID) }}" class="btn btn-orange btn-sm">Reserve</a>
+                                        @endif
+                                    @endif
                                 @endif
                             @endif
                         </td>
