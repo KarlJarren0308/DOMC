@@ -17,6 +17,7 @@ use App\Reservations;
 use App\Students;
 use App\Works;
 
+use DB;
 use Barryvdh\DomPDF\Facade as PDF;
 
 date_default_timezone_set('Asia/Manila');
@@ -1280,7 +1281,34 @@ class PanelController extends Controller
 
                 $pdf = PDF::loadView('pdf.material_report', $data);
 
-                return $pdf->stream('domc_loan_report.pdf');
+                return $pdf->stream('domc_material_report.pdf');
+
+                break;
+            case 'top_report':
+                $from = date('Y-m-d', strtotime($request->input('from')));
+                $to = date('Y-m-d', strtotime($request->input('to')));
+
+                $data['from'] = $from;
+                $data['to'] = $to;
+                $data['borrowers'] = Loans::whereBetween('loans.Loan_Date_Stamp', array($from, $to))
+                    ->join('accounts', 'loans.Account_Username', '=', 'accounts.Account_Username')
+                    ->leftJoin('faculties', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'faculties.Faculty_ID')->where('accounts.Account_Type', '=', 'Faculty');
+                    })
+                    ->leftJoin('librarians', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'librarians.Librarian_ID')->where('accounts.Account_Type', '=', 'Librarian');
+                    })
+                    ->leftJoin('students', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'students.Student_ID')->where('accounts.Account_Type', '=', 'Student');
+                    })
+                ->groupBy('loans.Account_Username')->orderBy('Row_Count', 'desc')->select('*', DB::raw('count(*) as Row_Count'))->get();
+                $data['materials'] = Loans::whereBetween('loans.Loan_Date_Stamp', array($from, $to))
+                    ->join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')
+                ->groupBy('loans.Material_ID')->orderBy('Row_Count', 'desc')->select('*', DB::raw('count(*) as Row_Count'))->get();
+
+                $pdf = PDF::loadView('pdf.top_report', $data);
+
+                return $pdf->stream('domc_top_report.pdf');
 
                 break;
             default:
