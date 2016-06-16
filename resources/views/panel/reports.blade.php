@@ -56,13 +56,13 @@
                                         <div class="six columns">
                                             <div class="input-block">
                                                 {!! Form::label('from', 'From:') !!}
-                                                {!! Form::text('from', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'required' => 'required')) !!}
+                                                {!! Form::text('from', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'onkeyup' => 'isDate(this)', 'required' => 'required')) !!}
                                             </div>
                                         </div>
                                         <div class="six columns">
                                             <div class="input-block">
                                                 {!! Form::label('to', 'To:') !!}
-                                                {!! Form::text('to', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'required' => 'required')) !!}
+                                                {!! Form::text('to', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'onkeyup' => 'isDate(this)', 'required' => 'required')) !!}
                                             </div>
                                         </div>
                                     </div>
@@ -82,13 +82,13 @@
                                         <div class="six columns">
                                             <div class="input-block">
                                                 {!! Form::label('from', 'From:') !!}
-                                                {!! Form::text('from', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'required' => 'required')) !!}
+                                                {!! Form::text('from', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'onkeyup' => 'isDate(this)', 'required' => 'required')) !!}
                                             </div>
                                         </div>
                                         <div class="six columns">
                                             <div class="input-block">
                                                 {!! Form::label('to', 'To:') !!}
-                                                {!! Form::text('to', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'required' => 'required')) !!}
+                                                {!! Form::text('to', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'onkeyup' => 'isDate(this)', 'required' => 'required')) !!}
                                             </div>
                                         </div>
                                     </div>
@@ -110,13 +110,13 @@
                                         <div class="six columns">
                                             <div class="input-block">
                                                 {!! Form::label('from', 'From:') !!}
-                                                {!! Form::text('from', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'required' => 'required')) !!}
+                                                {!! Form::text('from', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'onkeyup' => 'isDate(this)', 'required' => 'required')) !!}
                                             </div>
                                         </div>
                                         <div class="six columns">
                                             <div class="input-block">
                                                 {!! Form::label('to', 'To:') !!}
-                                                {!! Form::text('to', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'required' => 'required')) !!}
+                                                {!! Form::text('to', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'onkeyup' => 'isDate(this)', 'required' => 'required')) !!}
                                             </div>
                                         </div>
                                     </div>
@@ -136,13 +136,13 @@
                                         <div class="six columns">
                                             <div class="input-block">
                                                 {!! Form::label('from', 'From:') !!}
-                                                {!! Form::text('from', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'required' => 'required')) !!}
+                                                {!! Form::text('from', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'onkeyup' => 'isDate(this)', 'required' => 'required')) !!}
                                             </div>
                                         </div>
                                         <div class="six columns">
                                             <div class="input-block">
                                                 {!! Form::label('to', 'To:') !!}
-                                                {!! Form::text('to', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'required' => 'required')) !!}
+                                                {!! Form::text('to', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'onkeyup' => 'isDate(this)', 'required' => 'required')) !!}
                                             </div>
                                         </div>
                                     </div>
