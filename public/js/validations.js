@@ -1,4 +1,4 @@
-var sweetAlertPrompt = true;
+var sweetAlertPrompt = false;
 
 function isAlpha(selector) {
     var regex = /[^a-zA-Z\s]+/i;
