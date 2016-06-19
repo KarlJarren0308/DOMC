@@ -70,7 +70,7 @@
                                 <div class="four columns">
                                     <div class="input-block">
                                         {!! Form::label('materialISBN', 'ISBN:') !!}
-                                        {!! Form::text('materialISBN', $material->Material_ISBN, array('class' => 'u-full-width', 'placeholder' => 'Enter ISBN Here', 'required' => 'required')) !!}
+                                        {!! Form::text('materialISBN', $material->Material_ISBN, array('class' => 'u-full-width', 'placeholder' => 'Enter ISBN Here', 'onkeyup' => 'isISBN(this)', 'required' => 'required')) !!}
                                     </div>
                                 </div>
                             </div>
@@ -90,7 +90,7 @@
                                 <div class="four columns">
                                     <div class="input-block">
                                         {!! Form::label('materialCopyrightYear', 'Copyright Year:') !!}
-                                        {!! Form::text('materialCopyrightYear', $material->Material_Copyright_Year, array('class' => 'u-full-width', 'placeholder' => 'Enter Copyright Year Here', 'required' => 'required')) !!}
+                                        {!! Form::text('materialCopyrightYear', $material->Material_Copyright_Year, array('class' => 'u-full-width', 'placeholder' => 'Enter Copyright Year Here', 'maxlength' => '4', 'onkeyup' => 'isNumeric(this)', 'required' => 'required')) !!}
                                     </div>
                                 </div>
                             </div>
