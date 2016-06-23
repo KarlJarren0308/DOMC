@@ -462,6 +462,20 @@ div.u-three-four-width {
     user-select: none;
 }
 
+.navbar-element-brand {
+    font-size: 0;
+    text-decoration: none;
+}
+
+.navbar-element-brand > .navbar-element {
+    font-size: 15px;
+}
+
+.navbar-element-brand:hover > .navbar-element {
+    background: #e98a2a;
+    color: white;
+}
+
 .no-margin {
     margin: 0;
 }

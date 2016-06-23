@@ -3,9 +3,12 @@
 @section('content')
     <div class="navbar fixed-top shadow">
         <div class="navbar-content">
-            <div class="navbar-element logo"><img src="/img/logo.png"></div>
-            <div class="navbar-element title">De Ocampo Memorial College</div>
+            <a href="{{ route('main.getIndex') }}" class="navbar-element-brand">
+                <div class="navbar-element logo"><img src="/img/logo.png"></div>
+                <div class="navbar-element title">De Ocampo Memorial College</div>
+            </a>
             <div class="u-pull-right">
+                <a href="{{ route('main.getAbout') }}" class="navbar-element">About Us</a>
                 <a href="{{ route('main.getOpac') }}" class="navbar-element">OPAC</a>
                 @if(session()->has('username'))
                     @if(session()->get('account_type') == 'Librarian')

@@ -12,6 +12,7 @@
 */
 
 Route::get('/', array('as' => 'main.getIndex', 'uses' => 'MainController@getIndex'));
+Route::get('about', array('as' => 'main.getAbout', 'uses' => 'MainController@getAbout'));
 Route::get('login', array('as' => 'main.getLogin', 'uses' => 'MainController@getLogin'));
 Route::get('logout', array('as' => 'main.getLogout', 'uses' => 'MainController@getLogout'));
 Route::get('opac', array('as' => 'main.getOpac', 'uses' => 'MainController@getOpac'));
