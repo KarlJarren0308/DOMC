@@ -34,6 +34,7 @@ Route::get('panel/system_configuration', array('as' => 'panel.getConfiguration',
 Route::post('login', array('as' => 'main.postLogin', 'uses' => 'MainController@postLogin'));
 Route::post('account_information/change_password', array('as' => 'main.postChangePassword', 'uses' => 'MainController@postChangePassword'));
 Route::post('cancel_reservation', array('as' => 'main.postCancelReservation', 'uses' => 'MainController@postCancelReservation'));
+Route::post('search_opac', array('as' => 'main.postSearchOpac', 'uses' => 'MainController@postSearchOpac'));
 Route::post('panel/loan/', array('as' => 'panel.postLoan', 'uses' => 'PanelController@postLoan'));
 Route::post('panel/receive/', array('as' => 'panel.postReceive', 'uses' => 'PanelController@postReceive'));
 Route::post('panel/test/', array('as' => 'panel.postTest', 'uses' => 'PanelController@postTest'));

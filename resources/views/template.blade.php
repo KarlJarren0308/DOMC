@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>De Ocampo Memorial College</title>
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Raleway:400,300,600">
     <link rel="stylesheet" href="/css/jquery.dataTables.min.css">

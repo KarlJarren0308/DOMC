@@ -16,6 +16,7 @@ use App\Students;
 use App\Works;
 
 use DB;
+use Storage;
 
 date_default_timezone_set('Asia/Manila');
 
@@ -25,6 +26,12 @@ class MainController extends Controller
     private $startPenaltyAfter = 1;
     private $reservationLimit = 3;
     private $loanLimit = 3;
+
+    private function checkConfigurationFile() {
+        if(!Storage::has('configuration.xml')) {
+            Storage::put('configuration.xml', '<?xml version="1.0" encoding="UTF-8"?><settings><setting name="reservation" value="Show" /></settings>');
+        }
+    }
 
     public function getIndex() {
         $data['material'] = Materials::orderBy('Date_Added', 'desc')->first();
@@ -64,7 +71,24 @@ class MainController extends Controller
             $data['on_reserved'] = Reservations::where('Reservation_Status', 'active')->where('Account_Username', session()->get('username'))->count();
         }
 
-        return view('main.opac', $data);
+        $this->checkConfigurationFile();
+
+        $configs = simplexml_load_file(storage_path('app') . '/configuration.xml');
+        $opacVersion = false;
+
+        foreach($configs as $config) {
+            if($config['name'] == 'opac') {
+                $opacVersion = $config['value'];
+
+                break;
+            }
+        }
+
+        if($opacVersion != false) {
+            return view('main.opac_' . $opacVersion, $data);
+        } else {
+            return view('main.opac_1', $data);
+        }
     }
 
     public function getAccountInfo() {
@@ -286,5 +310,20 @@ class MainController extends Controller
         session()->flash('global_message', 'Invalid username and/or password.');
 
         return redirect()->route('main.getLogin');
+    }
+
+    public function postSearchOpac(Request $request) {
+        $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
+        $data['works_materials'] = Works::where('materials.Material_Title', 'like', '%' . $request->input('searchKeyword') . '%')->join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->groupBy('works.Material_ID')->get();
+        $data['reservations'] = Reservations::where('Account_Username', session()->get('username'))->where('Reservation_Status', 'active')->get();
+        $data['reserved_materials'] = Reservations::where('Reservation_Status', 'active')->get();
+        $data['loaned_materials'] = Loans::where('Loan_Status', 'active')->get();
+
+        if(session()->has('username')) {
+            $data['reservation_limit'] = $this->reservationLimit;
+            $data['on_reserved'] = Reservations::where('Reservation_Status', 'active')->where('Account_Username', session()->get('username'))->count();
+        }
+
+        return json_encode(array('status' => 'Success', 'message' => 'Request Successful.', 'data' => $data));
     }
 }
