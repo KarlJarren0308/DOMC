@@ -145,6 +145,9 @@ class PanelController extends Controller
             }
         }
 
+        $this->checkConfigurationFile();
+
+        $data['configs'] = simplexml_load_file(storage_path('app') . '/configuration.xml');
         $data['per_day_penalty'] = $this->perDayPenalty;
         $data['start_penalty_after'] = $this->startPenaltyAfter;
         $data['holidays'] = Holidays::get();
@@ -173,6 +176,9 @@ class PanelController extends Controller
             }
         }
 
+        $this->checkConfigurationFile();
+
+        $data['configs'] = simplexml_load_file(storage_path('app') . '/configuration.xml');
         $data['what'] = $what;
 
         switch($what) {
@@ -246,6 +252,9 @@ class PanelController extends Controller
             }
         }
 
+        $this->checkConfigurationFile();
+
+        $data['configs'] = simplexml_load_file(storage_path('app') . '/configuration.xml');
         $data['what'] = $what;
 
         switch($what) {
@@ -302,6 +311,9 @@ class PanelController extends Controller
             }
         }
 
+        $this->checkConfigurationFile();
+
+        $data['configs'] = simplexml_load_file(storage_path('app') . '/configuration.xml');
         $data['what'] = $what;
         $data['id'] = $id;
 
@@ -370,6 +382,9 @@ class PanelController extends Controller
             }
         }
 
+        $this->checkConfigurationFile();
+
+        $data['configs'] = simplexml_load_file(storage_path('app') . '/configuration.xml');
         $data['what'] = $what;
 
         switch($what) {
@@ -546,7 +561,25 @@ class PanelController extends Controller
     }
 
     public function getReports() {
-        return view('panel.reports');
+        if(!session()->has('username')) {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Oops! Please login first.');
+
+            return redirect()->route('main.getLogin');
+        } else {
+            if(session()->get('account_type') != 'Librarian') {
+                session()->flash('global_status', 'Failed');
+                session()->flash('global_message', 'Oops! You are not authorized to access the panel.');
+
+                return redirect()->route('main.getOpac');
+            }
+        }
+        
+        $this->checkConfigurationFile();
+
+        $data['configs'] = simplexml_load_file(storage_path('app') . '/configuration.xml');
+
+        return view('panel.reports', $data);
     }
 
     public function getConfiguration() {
