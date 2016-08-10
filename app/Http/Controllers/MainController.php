@@ -15,6 +15,8 @@ use App\Reservations;
 use App\Students;
 use App\Works;
 
+use DB;
+
 date_default_timezone_set('Asia/Manila');
 
 class MainController extends Controller
@@ -25,7 +27,21 @@ class MainController extends Controller
     private $loanLimit = 3;
 
     public function getIndex() {
-        return view('main.index');
+        $data['material'] = Materials::orderBy('Date_Added', 'desc')->first();
+        $data['borrower'] = Loans::join('accounts', 'loans.Account_Username', '=', 'accounts.Account_Username')
+            ->leftJoin('faculties', function($join) {
+                $join->on('accounts.Account_Owner', '=', 'faculties.Faculty_ID')->where('accounts.Account_Type', '=', 'Faculty');
+            })
+            ->leftJoin('librarians', function($join) {
+                $join->on('accounts.Account_Owner', '=', 'librarians.Librarian_ID')->where('accounts.Account_Type', '=', 'Librarian');
+            })
+            ->leftJoin('students', function($join) {
+                $join->on('accounts.Account_Owner', '=', 'students.Student_ID')->where('accounts.Account_Type', '=', 'Student');
+            })
+        ->groupBy('loans.Account_Username')->orderBy('Row_Count', 'desc')->select('*', DB::raw('count(*) as Row_Count'))->first();
+        $data['most_borrowed_material'] = Loans::join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')->groupBy('loans.Material_ID')->orderBy('Row_Count', 'desc')->select('*', DB::raw('count(*) as Row_Count'))->first();
+
+        return view('main.index', $data);
     }
 
     public function getLogin() {

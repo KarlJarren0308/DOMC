@@ -45,6 +45,7 @@
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'librarians') }}">Manage Librarians</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'holidays') }}">Manage Holidays</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getReports') }}">Library Reports</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getConfiguration') }}">System Configuration</a></li>
                 </ul>
             </div>
             <div class="nine columns">

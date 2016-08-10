@@ -15,6 +15,14 @@ div.u-three-four-width {
     display: inline-block;
 }
 
+p {
+    line-height: 1.25em;
+}
+
+p:last-child {
+    margin-bottom: 0;
+}
+
 .alert {
     background: #eeeeee;
     color: #222;
@@ -170,6 +178,12 @@ div.u-three-four-width {
 
 .btn-red:active {
     background-color: #cc0d1d !important;
+}
+
+.carousel {
+    background: rgba(44, 135, 0, 0.5);
+    height: 350px;
+    width: 100%;
 }
 
 .container-fluid {
@@ -540,6 +554,45 @@ div.u-three-four-width {
 
 .text-right {
     text-align: right;
+}
+
+.sticky-note {
+    background: #eee;
+    box-shadow: 0 2px 2px rgba(25, 40, 35, 0.5);
+    display: block;
+    padding: 10px 15px;
+    margin-bottom: 5px;
+}
+
+.sticky-note > .sticky-note-header {
+    border-bottom: 1px solid #222;
+    font-size: 1.5em;
+    padding: 0 5px;
+    margin-bottom: 5px;
+}
+
+.sticky-note > .sticky-note-body {
+    font-size: 1.125em;
+    padding: 0 5px 5px 5px;
+    text-align: justify;
+}
+
+.sticky-note > .sticky-note-footer {
+    color: #777;
+    font-size: 0.75em;
+    text-align: right;
+}
+
+.sticky-note.green {
+    background: #9bff9b;
+}
+
+.sticky-note.red {
+    background: #ff9b9b;
+}
+
+.sticky-note.yellow {
+    background: #ffff9b;
 }
 
 .tray {

@@ -29,6 +29,7 @@ Route::get('panel/manage/{what}/edit/{id}', array('as' => 'panel.getEdit', 'uses
 Route::get('panel/manage/{what}/delete/{id}', array('as' => 'panel.getDelete', 'uses' => 'PanelController@getDelete'));
 Route::get('panel/manage/{what}/change_password/{id}', array('as' => 'panel.getChangePassword', 'uses' => 'PanelController@getChangePassword'));
 Route::get('panel/reports', array('as' => 'panel.getReports', 'uses' => 'PanelController@getReports'));
+Route::get('panel/system_configuration', array('as' => 'panel.getConfiguration', 'uses' => 'PanelController@getConfiguration'));
 
 Route::post('login', array('as' => 'main.postLogin', 'uses' => 'MainController@postLogin'));
 Route::post('account_information/change_password', array('as' => 'main.postChangePassword', 'uses' => 'MainController@postChangePassword'));
@@ -40,4 +41,5 @@ Route::post('panel/manage/{what}/add', array('as' => 'panel.postAdd', 'uses' => 
 Route::post('panel/manage/{what}/edit/{id}', array('as' => 'panel.postEdit', 'uses' => 'PanelController@postEdit'));
 Route::post('panel/manage/{what}/change_password/{id}', array('as' => 'panel.postChangePassword', 'uses' => 'PanelController@postChangePassword'));
 Route::post('panel/reports/{what}', array('as' => 'panel.postReports', 'uses' => 'PanelController@postReports'));
+Route::post('panel/system_configuration/{what}', array('as' => 'panel.postConfiguration', 'uses' => 'PanelController@postConfiguration'));
 Route::post('panel/initialize', array('as' => 'panel.postInitialize', 'uses' => 'PanelController@postInitialize'));

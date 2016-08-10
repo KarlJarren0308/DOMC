@@ -173,7 +173,7 @@
             </tbody>
         </table>
         <br>
-        <h3 class="no-margin text-center gap-bottom">Most Borrowed Books{{ (count($materials) > 1 ? 's' : '') }}</h3>
+        <h3 class="no-margin text-center gap-bottom">Most Borrowed Book{{ (count($materials) > 1 ? 's' : '') }}</h3>
         <table class="table full-width gap-bottom">
             <thead>
                 <tr>

@@ -19,6 +19,9 @@ function setModalContent(headerContent, bodyContent) {
     $('.modal > .modal-container > .modal-body').text(bodyContent);
 }
 
+function initializeCarousel() {
+}
+
 $(document).ready(function() {
     $('html').click(function() {
         $('.dropdown-menu').removeClass('show');

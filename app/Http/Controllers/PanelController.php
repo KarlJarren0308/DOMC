@@ -18,6 +18,7 @@ use App\Students;
 use App\Works;
 
 use DB;
+use Storage;
 use Barryvdh\DomPDF\Facade as PDF;
 
 date_default_timezone_set('Asia/Manila');
@@ -28,6 +29,12 @@ class PanelController extends Controller
     private $startPenaltyAfter = 1;
     private $reservationLimit = 3;
     private $loanLimit = 3;
+
+    private function checkConfigurationFile() {
+        if(!Storage::has('configuration.xml')) {
+            Storage::put('configuration.xml', '<?xml version="1.0" encoding="UTF-8"?><settings><setting name="reservation" value="Show" /></settings>');
+        }
+    }
 
     public function getIndex() {
         if(!session()->has('username')) {
@@ -44,7 +51,11 @@ class PanelController extends Controller
             }
         }
 
-        return view('panel.index');
+        $this->checkConfigurationFile();
+
+        $data['configs'] = simplexml_load_file(storage_path('app') . '/configuration.xml');
+
+        return view('panel.index', $data);
     }
 
     public function getLoan() {
@@ -62,6 +73,9 @@ class PanelController extends Controller
             }
         }
 
+        $this->checkConfigurationFile();
+
+        $data['configs'] = simplexml_load_file(storage_path('app') . '/configuration.xml');
         $data['accounts'] = Accounts::orderBy('Account_Type', 'asc')->get();
         $data['faculty_accounts'] = new Faculties;
         $data['librarian_accounts'] = new Librarians;
@@ -89,14 +103,31 @@ class PanelController extends Controller
             }
         }
 
-        $data['works_reservations'] = Reservations::where('reservations.Reservation_Status', 'active')->join('materials', 'reservations.Material_ID', '=', 'materials.Material_ID')->join('accounts', 'reservations.Account_Username', '=', 'accounts.Account_Username')->get();
-        $data['faculty_accounts'] = Faculties::get();
-        $data['librarian_accounts'] = Librarians::get();
-        $data['student_accounts'] = Students::get();
-        $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
-        $data['works_materials'] = Works::join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->groupBy('works.Material_ID')->get();
+        $this->checkConfigurationFile();
 
-        return view('panel.reserved', $data);
+        $configs = simplexml_load_file(storage_path('app') . '/configuration.xml');
+        $configReservation = 'Hide';
+
+        foreach($configs as $config) {
+            if($config['name'] == 'reservation') {
+                $configReservation = $config['value'];
+
+                break;
+            }
+        }
+
+        if($configReservation == 'Show') {
+            $data['works_reservations'] = Reservations::where('reservations.Reservation_Status', 'active')->join('materials', 'reservations.Material_ID', '=', 'materials.Material_ID')->join('accounts', 'reservations.Account_Username', '=', 'accounts.Account_Username')->get();
+            $data['faculty_accounts'] = Faculties::get();
+            $data['librarian_accounts'] = Librarians::get();
+            $data['student_accounts'] = Students::get();
+            $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
+            $data['works_materials'] = Works::join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->groupBy('works.Material_ID')->get();
+
+            return view('panel.reserved', $data);
+        } else {
+            return redirect()->route('panel.getIndex');
+        }
     }
 
     public function getReceive() {
@@ -516,6 +547,28 @@ class PanelController extends Controller
 
     public function getReports() {
         return view('panel.reports');
+    }
+
+    public function getConfiguration() {
+        if(!session()->has('username')) {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Oops! Please login first.');
+
+            return redirect()->route('main.getLogin');
+        } else {
+            if(session()->get('account_type') != 'Librarian') {
+                session()->flash('global_status', 'Failed');
+                session()->flash('global_message', 'Oops! You are not authorized to access the panel.');
+
+                return redirect()->route('main.getOpac');
+            }
+        }
+
+        $this->checkConfigurationFile();
+
+        $data['configs'] = simplexml_load_file(storage_path('app') . '/configuration.xml');
+
+        return view('panel.configuration', $data);
     }
 
     public function postLoan(Request $request) {
@@ -1355,6 +1408,41 @@ class PanelController extends Controller
         }
 
         return json_encode(array('status' => 'Success', 'message' => 'Initializing Complete.', 'data' => array('reserved' => $rCount, 'expired' => $eCount, 'loaned' => $lCount)));
+    }
+
+    public function postConfiguration($what, Request $request) {
+        if(!session()->has('username')) {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Oops! Please login first.');
+
+            return redirect()->route('main.getLogin');
+        } else {
+            if(session()->get('account_type') != 'Librarian') {
+                session()->flash('global_status', 'Failed');
+                session()->flash('global_message', 'Oops! You are not authorized to access the panel.');
+
+                return redirect()->route('main.getOpac');
+            }
+        }
+
+        $xmlFile = storage_path('app') . '/configuration.xml';
+        $configs = simplexml_load_file($xmlFile);
+
+        foreach($configs as $config) {
+            if($config['name'] == $what) {
+                $config['value'] = $request->input('settingValue');
+            }
+        }
+
+        if($configs->asXML($xmlFile)) {
+            session()->flash('global_status', 'Success');
+            session()->flash('global_message', 'Saved Changes.');
+        } else {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Oops! No changes has been made.');
+        }
+
+        return redirect()->route('panel.getConfiguration');
     }
 
     public function postTest(Request $request) {

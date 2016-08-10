@@ -1,6 +1,18 @@
 @extends('template')
 
 @section('content')
+    @foreach($configs as $config)
+        <?php
+            switch($config['name']) {
+                case 'reservation':
+                    $reservation = $config['value'];
+
+                    break;
+                default:
+                    break;
+            }
+        ?>
+    @endforeach
     <div class="navbar fixed-top shadow">
         <div class="navbar-content">
             <a href="{{ route('main.getIndex') }}" class="navbar-element-brand">
@@ -35,7 +47,9 @@
                 <ul class="list-group">
                     <li class="list-group-item"><a href="{{ route('panel.getIndex') }}">Home</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getLoan') }}">Loan Book(s)</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getReserved') }}">Reserved Book(s)</a></li>
+                    @if(isset($reservation) && $reservation == 'Show')
+                        <li class="list-group-item"><a href="{{ route('panel.getReserved') }}">Reserved Book(s)</a></li>
+                    @endif
                     <li class="list-group-item"><a href="{{ route('panel.getReceive') }}">Receive Book(s)</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'materials') }}">Manage Books</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'authors') }}">Manage Authors</a></li>
@@ -45,6 +59,7 @@
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'librarians') }}">Manage Librarians</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'holidays') }}">Manage Holidays</a></li>
                     <li class="list-group-item active"><a href="{{ route('panel.getReports') }}">Library Reports</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getConfiguration') }}">System Configuration</a></li>
                 </ul>
             </div>
             <div class="nine columns">
