@@ -1,22 +1,31 @@
 var isModalDismissableByClick = true;
 
-function openModal(isDismissableByClick) {
+function openModal(isDismissableByClick, id) {
     if(isDismissableByClick != null) {
         if(typeof isDismissableByClick === 'boolean') {
             isModalDismissableByClick = isDismissableByClick;
         }
     }
 
-    $('.modal').fadeIn(250);
+    if(id != null) {
+        $('.modal#' + id).fadeIn(250);
+    } else {
+        $('.modal').fadeIn(250);
+    }
 }
 
 function closeModal() {
     $('.modal').fadeOut(250);
 }
 
-function setModalContent(headerContent, bodyContent) {
-    $('.modal > .modal-container > .modal-header').text(headerContent);
-    $('.modal > .modal-container > .modal-body').text(bodyContent);
+function setModalContent(headerContent, bodyContent, id) {
+    if(id != null) {
+        $('.modal#' + id + ' > .modal-container > .modal-header').html(headerContent);
+        $('.modal#' + id + ' > .modal-container > .modal-body').html(bodyContent);
+    } else {
+        $('.modal > .modal-container > .modal-header').html(headerContent);
+        $('.modal > .modal-container > .modal-body').html(bodyContent);
+    }
 }
 
 function initializeCarousel() {

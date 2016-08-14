@@ -313,11 +313,25 @@ class MainController extends Controller
     }
 
     public function postSearchOpac(Request $request) {
+        $this->checkConfigurationFile();
+
         $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
         $data['works_materials'] = Works::where('materials.Material_Title', 'like', '%' . $request->input('searchKeyword') . '%')->join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->groupBy('works.Material_ID')->get();
+        $data['materials_publishers'] = Materials::join('publishers', 'materials.Publisher_ID', '=', 'publishers.Publisher_ID')->get();
         $data['reservations'] = Reservations::where('Account_Username', session()->get('username'))->where('Reservation_Status', 'active')->get();
         $data['reserved_materials'] = Reservations::where('Reservation_Status', 'active')->get();
         $data['loaned_materials'] = Loans::where('Loan_Status', 'active')->get();
+        $data['toggle_reservation'] = 'Hide';
+
+        $configs = simplexml_load_file(storage_path('app') . '/configuration.xml');
+
+        foreach($configs as $config) {
+            if($config['name'] == 'reservation') {
+                $data['toggle_reservation'] = (string) $config['value'];
+
+                break;
+            }
+        }
 
         if(session()->has('username')) {
             $data['reservation_limit'] = $this->reservationLimit;

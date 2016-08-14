@@ -57,6 +57,12 @@
         <div id="materials-table-block">
         </div>
     </div>
+    <div id="book-info-modal" class="modal">
+        <div class="modal-container">
+            <div class="modal-header">Book Information</div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
     <div class="modal">
         <div class="modal-container">
             <div class="modal-header"></div>
