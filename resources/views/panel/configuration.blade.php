@@ -76,7 +76,7 @@
                     <div class="alert{{ $class }}">{{ session()->get('global_message') }}</div>
                 @endif
                 <div class="row" style="margin-bottom: 15px;">
-                    <div class="four columns">
+                    <!-- <div class="four columns">
                         <div class="panel">
                             <div class="panel-header">Toggle Reservation</div>
                             <div class="panel-body">
@@ -103,7 +103,7 @@
                                 {!! Form::close() !!}
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="four columns">
                         <div class="panel">
                             <div class="panel-header">Toggle OPAC Display</div>
