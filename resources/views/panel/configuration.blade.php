@@ -91,7 +91,7 @@
                                     ?>
                                     <div class="input-block">
                                         {!! Form::label('settingValue', 'What to do:') !!}
-                                        <select name="settingValue" id="settingValue" class="u-full-width">
+                                        <select name="settingValue" id="settingValue" class="u-full-width" required>
                                             <option value="" selected disabled>Select an option...</option>
                                             <option value="Show"{{ ($reservation == 'Show' ? ' selected' : '') }}>Show Reservation</option>
                                             <option value="Hide"{{ ($reservation == 'Hide' ? ' selected' : '') }}>Hide Reservation</option>
@@ -119,11 +119,41 @@
                                     ?>
                                     <div class="input-block">
                                         {!! Form::label('settingValue', 'What to do:') !!}
-                                        <select name="settingValue" id="settingValue" class="u-full-width">
+                                        <select name="settingValue" id="settingValue" class="u-full-width" required>
                                             <option value="" selected disabled>Select an option...</option>
                                             <option value="1"{{ ($opac == '1' ? ' selected' : '') }}>Display all books</option>
                                             <option value="2"{{ ($opac == '2' ? ' selected' : '') }}>Display only the book(s) related to the keyword.</option>
                                         </select>
+                                    </div>
+                                    <div class="input-block text-right">
+                                        {!! Form::submit('Save Changes', array('class' => 'btn btn-orange')) !!}
+                                    </div>
+                                {!! Form::close() !!}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="four columns">
+                        <div class="panel">
+                            <div class="panel-header">Manage Penalty</div>
+                            <div class="panel-body">
+                                <p>Change the penalty days and penalty amount per day.</p>
+                                {!! Form::open(array('route' => array('panel.postConfiguration', 'penalty'))) !!}
+                                    <?php
+                                        foreach($configs as $config) {
+                                            if($config['name'] == 'penaltyDays') {
+                                                $penaltyDays = $config['value'];
+                                            } else if($config['name'] == 'penaltyAmount') {
+                                                $penaltyAmount = $config['value'];
+                                            }
+                                        }
+                                    ?>
+                                    <div class="input-block">
+                                        {!! Form::label('days', 'Penalty Days:') !!}
+                                        {!! Form::number('days', $penaltyDays, array('class' => 'u-full-width', 'min' => '1', 'required' => 'required')) !!}
+                                    </div>
+                                    <div class="input-block">
+                                        {!! Form::label('amount', 'Penalty Amount per day:') !!}
+                                        {!! Form::number('amount', $penaltyAmount, array('class' => 'u-full-width', 'min' => '1', 'required' => 'required')) !!}
                                     </div>
                                     <div class="input-block text-right">
                                         {!! Form::submit('Save Changes', array('class' => 'btn btn-orange')) !!}

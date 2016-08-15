@@ -35,9 +35,9 @@ Route::post('login', array('as' => 'main.postLogin', 'uses' => 'MainController@p
 Route::post('account_information/change_password', array('as' => 'main.postChangePassword', 'uses' => 'MainController@postChangePassword'));
 Route::post('cancel_reservation', array('as' => 'main.postCancelReservation', 'uses' => 'MainController@postCancelReservation'));
 Route::post('search_opac', array('as' => 'main.postSearchOpac', 'uses' => 'MainController@postSearchOpac'));
-Route::post('panel/loan/', array('as' => 'panel.postLoan', 'uses' => 'PanelController@postLoan'));
-Route::post('panel/receive/', array('as' => 'panel.postReceive', 'uses' => 'PanelController@postReceive'));
-Route::post('panel/test/', array('as' => 'panel.postTest', 'uses' => 'PanelController@postTest'));
+Route::post('panel/loan', array('as' => 'panel.postLoan', 'uses' => 'PanelController@postLoan'));
+Route::post('panel/receive', array('as' => 'panel.postReceive', 'uses' => 'PanelController@postReceive'));
+Route::post('panel/test', array('as' => 'panel.postTest', 'uses' => 'PanelController@postTest'));
 Route::post('panel/manage/{what}/add', array('as' => 'panel.postAdd', 'uses' => 'PanelController@postAdd'));
 Route::post('panel/manage/{what}/edit/{id}', array('as' => 'panel.postEdit', 'uses' => 'PanelController@postEdit'));
 Route::post('panel/manage/{what}/change_password/{id}', array('as' => 'panel.postChangePassword', 'uses' => 'PanelController@postChangePassword'));

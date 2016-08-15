@@ -22,8 +22,6 @@ date_default_timezone_set('Asia/Manila');
 
 class MainController extends Controller
 {
-    private $perDayPenalty = 5;
-    private $startPenaltyAfter = 1;
     private $reservationLimit = 3;
     private $loanLimit = 3;
 
@@ -99,10 +97,21 @@ class MainController extends Controller
             return redirect()->route('main.getLogin');
         }
 
+        $this->checkConfigurationFile();
+
+        $configs = simplexml_load_file(storage_path('app') . '/configuration.xml');
         $username = session()->get('username');
 
-        $data['per_day_penalty'] = $this->perDayPenalty;
-        $data['start_penalty_after'] = $this->startPenaltyAfter;
+        foreach($configs as $config) {
+            if($config['name'] == 'penaltyAmount') {
+                $perDayPenalty = $config['value'];
+            } else if($config['name'] == 'penaltyDays') {
+                $startPenaltyAfter = $config['value'];
+            }
+        }
+
+        $data['per_day_penalty'] = $perDayPenalty;
+        $data['start_penalty_after'] = $startPenaltyAfter;
         $data['holidays'] = Holidays::get();
         $data['loans'] = Loans::where('loans.Account_Username', $username)->join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')->leftJoin('publishers', 'materials.Publisher_ID', '=', 'publishers.Publisher_ID')->orderBy('loans.Loan_Status', 'asc')->get();
         $data['reservations'] = Reservations::where('reservations.Account_Username', $username)->join('materials', 'reservations.Material_ID', '=', 'materials.Material_ID')->leftJoin('publishers', 'materials.Publisher_ID', '=', 'publishers.Publisher_ID')->orderBy('reservations.Reservation_Status', 'asc')->get();

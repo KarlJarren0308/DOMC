@@ -224,7 +224,7 @@
                                                 @else
                                                     @foreach($receives as $receive)
                                                         @if($loan->Loan_ID == $receive->Receive_Reference)
-                                                            {{ $receive->Penalty }}
+                                                            &#8369;{{ $receive->Penalty }}
                                                         @endif
                                                     @endforeach
                                                 @endif
@@ -234,6 +234,7 @@
                                                     @if($loan->Loan_Status == 'active')
                                                         {!! Form::open(array('route' => 'panel.postReceive', 'class' => 'no-margin')) !!}
                                                             {!! Form::hidden('arg0', $loan->Loan_ID) !!}
+                                                            {!! Form::hidden('arg1', $totalPenalty) !!}
                                                             {!! Form::submit('Receive', array('class' => 'btn btn-green btn-sm')) !!}
                                                         {!! Form::close() !!}
                                                     @else

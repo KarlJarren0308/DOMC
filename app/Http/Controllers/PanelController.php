@@ -25,8 +25,6 @@ date_default_timezone_set('Asia/Manila');
 
 class PanelController extends Controller
 {
-    private $perDayPenalty = 5;
-    private $startPenaltyAfter = 1;
     private $reservationLimit = 3;
     private $loanLimit = 3;
 
@@ -148,8 +146,17 @@ class PanelController extends Controller
         $this->checkConfigurationFile();
 
         $data['configs'] = simplexml_load_file(storage_path('app') . '/configuration.xml');
-        $data['per_day_penalty'] = $this->perDayPenalty;
-        $data['start_penalty_after'] = $this->startPenaltyAfter;
+
+        foreach($data['configs'] as $config) {
+            if($config['name'] == 'penaltyAmount') {
+                $perDayPenalty = $config['value'];
+            } else if($config['name'] == 'penaltyDays') {
+                $startPenaltyAfter = $config['value'];
+            }
+        }
+
+        $data['per_day_penalty'] = $perDayPenalty;
+        $data['start_penalty_after'] = $startPenaltyAfter;
         $data['holidays'] = Holidays::get();
         $data['loans'] = Loans::join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')->join('accounts', 'loans.Account_Username', '=', 'accounts.Account_Username')->get();
         $data['receives'] = Receives::get();
@@ -516,6 +523,9 @@ class PanelController extends Controller
             }
         }
 
+        $this->checkConfigurationFile();
+
+        $data['configs'] = simplexml_load_file(storage_path('app') . '/configuration.xml');
         $data['what'] = $what;
         $data['id'] = $id;
 
@@ -741,7 +751,7 @@ class PanelController extends Controller
 
         if($loan) {
             if($loan->Loan_Status == 'active') {
-                $query = Receives::insert(array('Material_ID' => $loan->Material_ID, 'Account_Username' => $loan->Account_Username, 'Receive_Date_Stamp' => date('Y-m-d'), 'Receive_Time_Stamp' => date('H:i:s'), 'Receive_Reference' => $id));
+                $query = Receives::insert(array('Material_ID' => $loan->Material_ID, 'Account_Username' => $loan->Account_Username, 'Receive_Date_Stamp' => date('Y-m-d'), 'Receive_Time_Stamp' => date('H:i:s'), 'Receive_Reference' => $id, 'Penalty' => $request->input('arg1')));
 
                 if($query) {
                     $query = Loans::where('Loan_ID', $id)->update(array('Loan_Status' => 'inactive'));
@@ -1461,18 +1471,36 @@ class PanelController extends Controller
         $xmlFile = storage_path('app') . '/configuration.xml';
         $configs = simplexml_load_file($xmlFile);
 
-        foreach($configs as $config) {
-            if($config['name'] == $what) {
-                $config['value'] = $request->input('settingValue');
+        if($what == 'penalty') {
+            foreach($configs as $config) {
+                if($config['name'] == 'penaltyDays') {
+                    $config['value'] = $request->input('days');
+                } else if($config['name'] == 'penaltyAmount') {
+                    $config['value'] = $request->input('amount');
+                }
             }
-        }
 
-        if($configs->asXML($xmlFile)) {
-            session()->flash('global_status', 'Success');
-            session()->flash('global_message', 'Saved Changes.');
+            if($configs->asXML($xmlFile)) {
+                session()->flash('global_status', 'Success');
+                session()->flash('global_message', 'Saved Changes.');
+            } else {
+                session()->flash('global_status', 'Failed');
+                session()->flash('global_message', 'Oops! No changes has been made.');
+            }
         } else {
-            session()->flash('global_status', 'Failed');
-            session()->flash('global_message', 'Oops! No changes has been made.');
+            foreach($configs as $config) {
+                if($config['name'] == $what) {
+                    $config['value'] = $request->input('settingValue');
+                }
+            }
+
+            if($configs->asXML($xmlFile)) {
+                session()->flash('global_status', 'Success');
+                session()->flash('global_message', 'Saved Changes.');
+            } else {
+                session()->flash('global_status', 'Failed');
+                session()->flash('global_message', 'Oops! No changes has been made.');
+            }
         }
 
         return redirect()->route('panel.getConfiguration');
