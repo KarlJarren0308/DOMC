@@ -27,7 +27,7 @@ class MainController extends Controller
 
     private function checkConfigurationFile() {
         if(!Storage::has('configuration.xml')) {
-            Storage::put('configuration.xml', '<?xml version="1.0" encoding="UTF-8"?><settings><setting name="reservation" value="Show" /></settings>');
+            Storage::put('configuration.xml', '<?xml version="1.0" encoding="UTF-8"?><settings><setting name="opac" value="2"/><setting name="reservation" value="Hide"/><setting name="penaltyDays" value="1"/><setting name="penaltyAmount" value="5"/></settings>');
         }
     }
 
