@@ -25,8 +25,8 @@ Route::get('panel/reserved', array('as' => 'panel.getReserved', 'uses' => 'Panel
 Route::get('panel/receive', array('as' => 'panel.getReceive', 'uses' => 'PanelController@getReceive'));
 Route::get('panel/manage/{what}', array('as' => 'panel.getManage', 'uses' => 'PanelController@getManage'));
 Route::get('panel/manage/{what}/add', array('as' => 'panel.getAdd', 'uses' => 'PanelController@getAdd'));
-Route::get('panel/manage/{what}/edit/{id}', array('as' => 'panel.getEdit', 'uses' => 'PanelController@getEdit'));
-Route::get('panel/manage/{what}/delete/{id}', array('as' => 'panel.getDelete', 'uses' => 'PanelController@getDelete'));
+Route::get('panel/manage/{what}/edit/{id}/{type?}', array('as' => 'panel.getEdit', 'uses' => 'PanelController@getEdit'));
+Route::get('panel/manage/{what}/delete/{id}/{type?}', array('as' => 'panel.getDelete', 'uses' => 'PanelController@getDelete'));
 Route::get('panel/manage/{what}/change_password/{id}', array('as' => 'panel.getChangePassword', 'uses' => 'PanelController@getChangePassword'));
 Route::get('panel/reports', array('as' => 'panel.getReports', 'uses' => 'PanelController@getReports'));
 Route::get('panel/system_configuration', array('as' => 'panel.getConfiguration', 'uses' => 'PanelController@getConfiguration'));

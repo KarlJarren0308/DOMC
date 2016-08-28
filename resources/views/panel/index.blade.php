@@ -54,16 +54,15 @@
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'materials') }}">Manage Books</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'authors') }}">Manage Authors</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'publishers') }}">Manage Publishers</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'students') }}">Manage Students</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'faculties') }}">Manage Faculties</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'librarians') }}">Manage Librarians</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'holidays') }}">Manage Holidays</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'users') }}">Manage Users</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'librarians') }}">Edit Accounts</a></li>
+                    <!-- <li class="list-group-item"><a href="{{ route('panel.getManage', 'holidays') }}">Manage Holidays</a></li> -->
                     <li class="list-group-item"><a href="{{ route('panel.getReports') }}">Library Reports</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getConfiguration') }}">System Configuration</a></li>
                 </ul>
             </div>
             <div class="nine columns">
-                <div class="banner">What's New?</div>
+                <!-- <div class="banner">What's New?</div>
                 <div class="row" style="margin-bottom: 15px;">
                     <div class="four columns">
                         <a href="{{ route('panel.getReserved') }}" class="panel">
@@ -103,6 +102,129 @@
                     <div class="six columns">
                         <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae vitae quas, praesentium hic pariatur est voluptatibus suscipit vel tempora necessitatibus animi, ratione tempore modi. Veritatis, dignissimos nostrum iste ab non!</p>
                     </div>
+                </div> -->
+                <div class="row">
+                    <div class="four columns">
+                        <a href="{{ route('panel.getLoan') }}" class="sticky-note centralize yellow" title="This module allows you, the librarian, to lend a book to a borrower.">
+                            <div class="sticky-note-body">
+                                <div id="hoverables-1">
+                                    <span class="fa-stack fa-lg">
+                                        <span class="fa fa-book fa-stack-2x"></span>
+                                        <span class="fa fa-share fa-stack-1x fa-inverse"></span>
+                                    </span>
+                                </div>
+                                <!-- <div id="hoverables-2">
+                                    <p>This module allows you, the librarian, to lend a book to a borrower.</p>
+                                </div> -->
+                            </div>
+                            <div class="sticky-note-footer">Loan Book(s)</div>
+                        </a>
+                        <a href="{{ route('panel.getManage', 'authors') }}" class="sticky-note centralize green" title="This module allows you, the librarian, to manage author information.">
+                            <div class="sticky-note-body">
+                                <div id="hoverables-1">
+                                    <span class="fa-stack fa-lg">
+                                        <span class="fa fa-users fa-stack-2x"></span>
+                                        <span class="fa fa-pencil fa-stack-1x fa-inverse"></span>
+                                    </span>
+                                </div>
+                                <!-- <div id="hoverables-2">
+                                    <p>This module allows you, the librarian, to manage author information.</p>
+                                </div> -->
+                            </div>
+                            <div class="sticky-note-footer">Manage Authors</div>
+                        </a>
+                        <a href="{{ route('panel.getManage', 'librarians') }}" class="sticky-note centralize red" title="This module allows you, the librarian, to manage librarian information.">
+                            <div class="sticky-note-body">
+                                <div id="hoverables-1">
+                                    <span class="fa-stack fa-lg">
+                                        <span class="fa fa-university fa-stack-2x"></span>
+                                        <span class="fa fa-pencil fa-stack-1x fa-inverse"></span>
+                                    </span>
+                                </div>
+                                <!-- <div id="hoverables-2">
+                                    <p>This module allows you, the librarian, to manage librarian information.</p>
+                                </div> -->
+                            </div>
+                            <div class="sticky-note-footer">Edit Accounts</div>
+                        </a>
+                    </div>
+                    <div class="four columns">
+                        <a href="{{ route('panel.getReceive') }}" class="sticky-note centralize green" title="This module records all the books returned by the borrowers.">
+                            <div class="sticky-note-body">
+                                <div id="hoverables-1">
+                                    <span class="fa-stack fa-lg">
+                                        <span class="fa fa-book fa-stack-2x"></span>
+                                        <span class="fa fa-reply fa-stack-1x fa-inverse"></span>
+                                    </span>
+                                </div>
+                                <!-- <div id="hoverables-2">
+                                    <p>This module records all the books returned by the borrowers.</p>
+                                </div> -->
+                            </div>
+                            <div class="sticky-note-footer">Receive Book(s)</div>
+                        </a>
+                        <a href="{{ route('panel.getManage', 'publishers') }}" class="sticky-note centralize red" title="This module allows you, the librarian, to manage publisher information.">
+                            <div class="sticky-note-body">
+                                <div id="hoverables-1">
+                                    <span class="fa-stack fa-lg">
+                                        <span class="fa fa-print fa-stack-2x"></span>
+                                        <span class="fa fa-pencil fa-stack-1x fa-inverse"></span>
+                                    </span>
+                                </div>
+                                <!-- <div id="hoverables-2">
+                                    <p>This module allows you, the librarian, to manage publisher information.</p>
+                                </div> -->
+                            </div>
+                            <div class="sticky-note-footer">Manage Publishers</div>
+                        </a>
+                        <a href="{{ route('panel.getReports') }}" class="sticky-note centralize yellow" title="This module allows you, the librarian, to generate library reports.">
+                            <div class="sticky-note-body">
+                                <div id="hoverables-1">
+                                    <span class="fa fa-print fa-3x"></span>
+                                </div>
+                                <!-- <div id="hoverables-2">
+                                    <p>This module allows you, the librarian, to generate library reports.</p>
+                                </div> -->
+                            </div>
+                            <div class="sticky-note-footer">Library Reports</div>
+                        </a>
+                    </div>
+                    <div class="four columns">
+                        <a href="{{ route('panel.getManage', 'materials') }}" class="sticky-note centralize red" title="This module allows you, the librarian, to manage book information.">
+                            <div class="sticky-note-body">
+                                <div id="hoverables-1">
+                                    <span class="fa fa-book fa-2x"></span>
+                                </div>
+                                <!-- <div id="hoverables-2">
+                                    <p>This module allows you, the librarian, to manage book information.</p>
+                                </div> -->
+                            </div>
+                            <div class="sticky-note-footer">Manage Books</div>
+                        </a>
+                        <a href="{{ route('panel.getManage', 'users') }}" class="sticky-note centralize yellow" title="This module allows you, the librarian, to manage borrower information.">
+                            <div class="sticky-note-body">
+                                <div id="hoverables-1">
+                                    <span class="fa fa-users fa-3x"></span>
+                                </div>
+                                <!-- <div id="hoverables-2">
+                                    <p>This module allows you, the librarian, to manage borrower information.</p>
+                                </div> -->
+                            </div>
+                            <div class="sticky-note-footer">Manage Users</div>
+                        </a>
+                        <a href="{{ route('panel.getConfiguration') }}" class="sticky-note centralize green" title="This module allows you to configure the some system functions.">
+                            <div class="sticky-note-body">
+                                <div id="hoverables-1">
+                                    <span class="fa fa-cogs fa-3x"></span>
+                                </div>
+                                <div id="hoverables-2"><!-- 
+                                    <p>This module allows you to configure the some system functions.</p>
+                                 --></div>
+                            </div>
+                            <div class="sticky-note-footer">System Configuration</div>
+                        </a>
+                    </div>
+                </div>
                 </div>
             </div>
         </div>

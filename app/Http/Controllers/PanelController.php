@@ -210,7 +210,20 @@ class PanelController extends Controller
                 return view('panel.publishers', $data);
 
                 break;
-            case 'students':
+            case 'users':
+                $data['users'] = Accounts::where('accounts.Account_Type', 'Student')->orWhere('accounts.Account_Type', 'Faculty')
+                    ->leftJoin('students', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'students.Student_ID')->where('accounts.Account_Type', '=', 'Student');
+                    })
+                    ->leftJoin('faculties', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'faculties.Faculty_ID')->where('accounts.Account_Type', '=', 'Faculty');
+                    })
+                ->get();
+
+                return view('panel.users', $data);
+
+                break;
+            /*case 'students':
                 $data['student_accounts'] = Accounts::where('Account_Type', 'Student')->get();
                 $data['students'] = Students::get();
 
@@ -223,7 +236,7 @@ class PanelController extends Controller
 
                 return view('panel.faculties', $data);
 
-                break;
+                break;*/
             case 'librarians':
                 $data['librarian_accounts'] = Accounts::where('Account_Type', 'Librarian')->get();
                 $data['librarians'] = Librarians::get();
@@ -231,12 +244,12 @@ class PanelController extends Controller
                 return view('panel.librarians', $data);
 
                 break;
-            case 'holidays':
+            /*case 'holidays':
                 $data['holidays'] = Holidays::get();
 
                 return view('panel.holidays', $data);
 
-                break;
+                break;*/
             default:
                 return view('errors.404');
 
@@ -280,22 +293,26 @@ class PanelController extends Controller
                 return view('panel.publishers_add', $data);
 
                 break;
-            case 'students':
+            case 'users':
+                return view('panel.users_add', $data);
+
+                break;
+            /*case 'students':
                 return view('panel.students_add', $data);
 
                 break;
             case 'faculties':
                 return view('panel.faculties_add', $data);
 
-                break;
+                break;*/
             case 'librarians':
                 return view('panel.librarians_add', $data);
 
                 break;
-            case 'holidays':
+            /*case 'holidays':
                 return view('panel.holidays_add', $data);
 
-                break;
+                break;*/
             default:
                 return view('errors.404');
 
@@ -303,7 +320,7 @@ class PanelController extends Controller
         }
     }
 
-    public function getEdit($what, $id) {
+    public function getEdit($what, $id, $type = null) {
         if(!session()->has('username')) {
             session()->flash('global_status', 'Failed');
             session()->flash('global_message', 'Oops! Please login first.');
@@ -346,7 +363,24 @@ class PanelController extends Controller
                 return view('panel.publishers_edit', $data);
 
                 break;
-            case 'students':
+            case 'users':
+                if($type == 'Student') {
+                    $data['user_account'] = Accounts::where('Account_Type', 'Student')->where('Account_Owner', $id)->first();
+                    $data['user'] = Students::where('Student_ID', $id)->first();
+                } else if($type == 'Faculty') {
+                    $data['user_account'] = Accounts::where('Account_Type', 'Faculty')->where('Account_Owner', $id)->first();
+                    $data['user'] = Faculties::where('Faculty_ID', $id)->first();
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Oops! Invalid user type.');
+
+                    return redirect()->route('panel.getManage', $what);
+                }
+
+                return view('panel.users_edit', $data);
+
+                break;
+            /*case 'students':
                 $data['student_account'] = Accounts::where('Account_Type', 'Student')->where('Account_Owner', $id)->first();
                 $data['student'] = Students::where('Student_ID', $id)->first();
 
@@ -359,7 +393,7 @@ class PanelController extends Controller
 
                 return view('panel.faculties_edit', $data);
 
-                break;
+                break;*/
             case 'librarians':
                 $data['librarian_account'] = Accounts::where('Account_Type', 'Librarian')->where('Account_Owner', $id)->first();
                 $data['librarian'] = Librarians::where('Librarian_ID', $id)->first();
@@ -374,7 +408,7 @@ class PanelController extends Controller
         }
     }
 
-    public function getDelete($what, $id) {
+    public function getDelete($what, $id, $type = null) {
         if(!session()->has('username')) {
             session()->flash('global_status', 'Failed');
             session()->flash('global_message', 'Oops! Please login first.');
@@ -439,7 +473,27 @@ class PanelController extends Controller
                 return redirect()->route('panel.getManage', 'publishers');
 
                 break;
-            case 'students':
+            case 'users':
+                if($type == 'Student') {
+                    $query = Students::where('Student_ID', $id)->delete();
+                } else {
+                    $query = Faculties::where('Faculty_ID', $id)->delete();
+                }
+
+                if($query) {
+                    $query = Accounts::where('Account_Type', $type)->where('Account_Owner', $id)->delete();
+
+                    session()->flash('global_status', 'Success');
+                    session()->flash('global_message', $type . ' has been deleted.');
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Failed to delete ' . strtolower($type) . '.');
+                }
+
+                return redirect()->route('panel.getManage', 'users');
+
+                break;
+            /*case 'students':
                 $query = Students::where('Student_ID', $id)->delete();
 
                 if($query) {
@@ -470,7 +524,7 @@ class PanelController extends Controller
 
                 return redirect()->route('panel.getManage', 'faculties');
 
-                break;
+                break;*/
             case 'librarians':
                 $query = Librarians::where('Librarian_ID', $id)->delete();
 
@@ -487,7 +541,7 @@ class PanelController extends Controller
                 return redirect()->route('panel.getManage', 'librarians');
 
                 break;
-            case 'holidays':
+            /*case 'holidays':
                 $query = Holidays::where('Holiday_ID', $id)->delete();
 
                 if($query) {
@@ -500,7 +554,7 @@ class PanelController extends Controller
 
                 return redirect()->route('panel.getManage', 'holidays');
 
-                break;
+                break;*/
             default:
                 return view('errors.404');
 
@@ -869,7 +923,52 @@ class PanelController extends Controller
                 return redirect()->route('panel.getManage', 'publishers');
 
                 break;
-            case 'students':
+            case 'users':
+                if($request->input('userType') == 'Student') {
+                    $id = Students::insertGetId(array(
+                        'Student_First_Name' => $request->input('userFirstName'),
+                        'Student_Middle_Name' => $request->input('userMiddleName'),
+                        'Student_Last_Name' => $request->input('userLastName'),
+                        'Student_Birth_Date' => $request->input('userBirthDate')
+                    ));
+                } else if($request->input('userType') == 'Faculty') {
+                    $id = Faculties::insertGetId(array(
+                        'Faculty_First_Name' => $request->input('userFirstName'),
+                        'Faculty_Middle_Name' => $request->input('userMiddleName'),
+                        'Faculty_Last_Name' => $request->input('userLastName'),
+                        'Faculty_Birth_Date' => $request->input('userBirthDate')
+                    ));
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Invalid type of user.');
+
+                    return redirect()->route('panel.getManage', 'users');
+                }
+
+                if($id) {
+                    $query = Accounts::insert(array(
+                        'Account_Username' => $request->input('userID'),
+                        'Account_Password' => md5($request->input('userBirthDate')),
+                        'Account_Type' => $request->input('userType'),
+                        'Account_Owner' => $id
+                    ));
+
+                    if($query) {
+                        session()->flash('global_status', 'Success');
+                        session()->flash('global_message', 'User has been added.');
+                    } else {
+                        session()->flash('global_status', 'Warning');
+                        session()->flash('global_message', 'User has been added but account was not created.');
+                    }
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Failed to add user.');
+                }
+
+                return redirect()->route('panel.getManage', 'users');
+
+                break;
+            /*case 'students':
                 $id = Students::insertGetId(array(
                     'Student_First_Name' => $request->input('studentFirstName'),
                     'Student_Middle_Name' => $request->input('studentMiddleName'),
@@ -930,7 +1029,7 @@ class PanelController extends Controller
 
                 return redirect()->route('panel.getManage', 'faculties');
 
-                break;
+                break;*/
             case 'librarians':
                 $id = Librarians::insertGetId(array(
                     'Librarian_First_Name' => $request->input('librarianFirstName'),
@@ -962,7 +1061,7 @@ class PanelController extends Controller
                 return redirect()->route('panel.getManage', 'librarians');
 
                 break;
-            case 'holidays':
+            /*case 'holidays':
                 $query = Holidays::insert(array(
                     'Holiday_Event' => $request->input('holidayEvent'),
                     'Holiday_Date' => $request->input('holidayDate'),
@@ -978,7 +1077,7 @@ class PanelController extends Controller
                 }
 
                 return redirect()->route('panel.getManage', 'holidays');
-                break;
+                break;*/
             default:
                 return view('errors.404');
 
@@ -1086,7 +1185,49 @@ class PanelController extends Controller
                 return redirect()->route('panel.getManage', 'publishers');
 
                 break;
-            case 'students':
+            case 'users':
+                $ctr = 0;
+
+                if($request->input('userType') == 'Student') {
+                    $query = Students::where('Student_ID', $id)->update(array(
+                        'Student_First_Name' => $request->input('userFirstName'),
+                        'Student_Middle_Name' => $request->input('userMiddleName'),
+                        'Student_Last_Name' => $request->input('userLastName'),
+                        'Student_Birth_Date' => $request->input('userBirthDate')
+                    ));
+                } else {
+                    $query = Faculties::where('Faculty_ID', $id)->update(array(
+                        'Faculty_First_Name' => $request->input('userFirstName'),
+                        'Faculty_Middle_Name' => $request->input('userMiddleName'),
+                        'Faculty_Last_Name' => $request->input('userLastName'),
+                        'Faculty_Birth_Date' => $request->input('userBirthDate')
+                    ));
+                }
+
+                if($query) {
+                    $ctr++;
+                }
+
+                $query = Accounts::where('Account_Type', $request->input('userType'))->where('Account_Owner', $id)->update(array(
+                    'Account_Username' => $request->input('userID')
+                ));
+
+                if($query) {
+                    $ctr++;
+                }
+
+                if($ctr > 0) {
+                    session()->flash('global_status', 'Success');
+                    session()->flash('global_message', $request->input('userType') . ' has been modified.');
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'No changes has been made.');
+                }
+
+                return redirect()->route('panel.getManage', 'users');
+
+                break;
+            /*case 'students':
                 $ctr = 0;
 
                 $query = Students::where('Student_ID', $id)->update(array(
@@ -1151,7 +1292,7 @@ class PanelController extends Controller
 
                 return redirect()->route('panel.getManage', 'faculties');
 
-                break;
+                break;*/
             case 'librarians':
                 $ctr = 0;
 

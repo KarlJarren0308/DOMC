@@ -1,20 +1,5 @@
 @extends('template')
 
-@section('pre_ref')
-    <style>
-        .terms {
-            overflow-y: scroll;
-            padding-right: 5px;
-            margin-bottom: 25px;
-            max-height: 500px;
-        }
-
-        .terms > p:last-child {
-            margin-bottom: 0;
-        }
-    </style>
-@stop
-
 @section('content')
     <div class="navbar fixed-top shadow">
         <div class="navbar-content">

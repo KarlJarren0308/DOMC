@@ -54,10 +54,9 @@
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'materials') }}">Manage Books</a></li>
                     <li class="list-group-item active"><a href="{{ route('panel.getManage', 'authors') }}">Manage Authors</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'publishers') }}">Manage Publishers</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'students') }}">Manage Students</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'faculties') }}">Manage Faculties</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'librarians') }}">Manage Librarians</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'holidays') }}">Manage Holidays</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'users') }}">Manage Users</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getManage', 'librarians') }}">Edit Accounts</a></li>
+                    <!-- <li class="list-group-item"><a href="{{ route('panel.getManage', 'holidays') }}">Manage Holidays</a></li> -->
                     <li class="list-group-item"><a href="{{ route('panel.getReports') }}">Library Reports</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getConfiguration') }}">System Configuration</a></li>
                 </ul>
@@ -75,9 +74,9 @@
 
                     <div class="alert{{ $class }}">{{ session()->get('global_message') }}</div>
                 @endif
-                <div class="tray text-right">
+                <!-- <div class="tray">
                     <a href="{{ route('panel.getAdd', $what) }}" class="btn btn-orange">Add</a>
-                </div>
+                </div> -->
                 <table id="authors-table" class="u-full-width">
                     <thead>
                         <tr>
