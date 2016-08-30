@@ -1,6 +1,6 @@
 $(document).ready(function() {
     $('[data-form="search-opac-form"]').submit(function() {
-        openModal(false);
+        openModal(false, 'loader-modal');
 
         $.ajax({
             url: '/search_opac',

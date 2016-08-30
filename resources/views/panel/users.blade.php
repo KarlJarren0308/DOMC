@@ -80,9 +80,10 @@
                 <table id="users-table" class="u-full-width">
                     <thead>
                         <tr>
-                            <th>Student Number</th>
-                            <th>Student's Name</th>
+                            <th>User I.D. Number</th>
+                            <th>Name</th>
                             <th>Birth Date</th>
+                            <th>Type</th>
                             <th width="40%"></th>
                         </tr>
                         <tbody>
@@ -105,6 +106,7 @@
                                         @endif
                                     </td>
                                     <td>{{ date('F d, Y', strtotime($user->Account_Type == 'Student' ? $user->Student_Birth_Date : $user->Faculty_Birth_Date )) }}</td>
+                                    <td>{{ $user->Account_Type }}</td>
                                     <td class="text-center">
                                         @if(strlen(session()->has('username')))
                                             <a href="{{ route('panel.getChangePassword', array($what, ($user->Account_Type == 'Student' ? $user->Student_ID : $user->Faculty_ID))) }}" class="btn btn-orange btn-sm">Change Password</a>

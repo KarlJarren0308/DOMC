@@ -44,3 +44,4 @@ Route::post('panel/manage/{what}/change_password/{id}', array('as' => 'panel.pos
 Route::post('panel/reports/{what}', array('as' => 'panel.postReports', 'uses' => 'PanelController@postReports'));
 Route::post('panel/system_configuration/{what}', array('as' => 'panel.postConfiguration', 'uses' => 'PanelController@postConfiguration'));
 Route::post('panel/initialize', array('as' => 'panel.postInitialize', 'uses' => 'PanelController@postInitialize'));
+Route::post('search/{what}', array('as' => 'search.postSearch', 'uses' => 'SearchController@postSearch'));

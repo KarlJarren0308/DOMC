@@ -14,8 +14,12 @@ function openModal(isDismissableByClick, id) {
     }
 }
 
-function closeModal() {
-    $('.modal').fadeOut(250);
+function closeModal(id) {
+    if(id != null) {
+        $('.modal#' + id).fadeOut(250);
+    } else {
+        $('.modal').fadeOut(250);
+    }
 }
 
 function setModalContent(headerContent, bodyContent, id) {

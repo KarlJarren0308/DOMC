@@ -74,14 +74,6 @@ class PanelController extends Controller
         $this->checkConfigurationFile();
 
         $data['configs'] = simplexml_load_file(storage_path('app') . '/configuration.xml');
-        $data['accounts'] = Accounts::orderBy('Account_Type', 'asc')->get();
-        $data['faculty_accounts'] = new Faculties;
-        $data['librarian_accounts'] = new Librarians;
-        $data['student_accounts'] = new Students;
-        $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
-        $data['works_materials'] = Works::join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->groupBy('works.Material_ID')->get();
-        $data['reserved_materials'] = Reservations::where('Reservation_Status', 'active')->get();
-        $data['loaned_materials'] = Loans::where('Loan_Status', 'active')->get();
 
         return view('panel.loan', $data);
     }
@@ -777,6 +769,40 @@ class PanelController extends Controller
                 }
 
                 return redirect()->route('panel.getReserved');
+
+                break;
+            case '0de0902f12c4b3d0843ecb8288240e96':
+                // arg0: loanAvailableJSON
+                $materialID = $request->input('arg1');
+                $accountUsername = $request->input('arg2');
+
+                $on_loan = $loaned_materials = Loans::where('Loan_Status', 'active')->where('Account_Username', $accountUsername)->count();
+                $reserved_materials = Reservations::where('Reservation_Status', 'active')->where('Material_ID', $materialID)->count();
+                $loaned_materials = Loans::where('Loan_Status', 'active')->where('Material_ID', $materialID)->count();
+                $materialRow = Materials::where('Material_ID', $materialID)->first();
+                $newMaterialCount = $materialRow->Material_Copies - $reserved_materials - $loaned_materials;
+
+                if($newMaterialCount > 0) {
+                    if($on_loan < $this->loanLimit) {
+                        $query = Loans::where('Material_ID', $materialID)->where('Account_Username', $accountUsername)->where('Loan_Status', 'active')->first();
+
+                        if(!$query) {
+                            $query = Loans::insert(array('Material_ID' => $materialID, 'Account_Username' => $accountUsername, 'Loan_Date_Stamp' => date('Y-m-d'), 'Loan_Time_Stamp' => date('H:i:s')));
+
+                            if($query) {
+                                return json_encode(array('status' => 'Success', 'message' => 'Loan Successful.'));
+                            } else {
+                                return json_encode(array('status' => 'Warning', 'message' => 'Oops! Failed to loan book to the borrower.'));
+                            }
+                        } else {
+                            return json_encode(array('status' => 'Failed', 'message' => 'Oops! Borrower has already loan a copy of this book.'));
+                        }
+                    } else {
+                        return json_encode(array('status' => 'Failed', 'message' => 'Oops! You can only loan at most 3 books to this borrower at a time.'));
+                    }
+                } else {
+                    return json_encode(array('status' => 'Failed', 'message' => 'Oops! No more copies available.'));
+                }
 
                 break;
             default:

@@ -375,6 +375,11 @@ p:last-child {
     padding: 10px 15px;
 }
 
+.modal-container > .modal-footer {
+    background: #eee;
+    padding: 10px 15px;
+}
+
 .navbar {
     background: #2c8700;
     z-index: 100;

@@ -63,7 +63,7 @@
             <div class="modal-body"></div>
         </div>
     </div>
-    <div class="modal">
+    <div id="loader-modal" class="modal">
         <div class="modal-container">
             <div class="modal-header"></div>
             <div class="modal-body">
