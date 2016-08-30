@@ -7,10 +7,15 @@ use App\Http\Requests;
 use App\Accounts;
 use App\Faculties;
 use App\Students;
+use App\Librarians;
 use App\Loans;
 use App\Materials;
 use App\Reservations;
+use App\Receives;
 use App\Works;
+use App\Holidays;
+
+use Storage;
 
 date_default_timezone_set('Asia/Manila');
 
@@ -70,6 +75,35 @@ class SearchController extends Controller
 
                 if($data['works_materials']) {
                     return json_encode(array('status' => 'Success', 'message' => 'Found some users.', 'data' => $data));
+                } else {
+                    return json_encode(array('status' => 'Failed', 'message' => 'No results found.'));
+                }
+
+                break;
+            case 'receive':
+                $this->checkConfigurationFile();
+
+                $data['configs'] = simplexml_load_file(storage_path('app') . '/configuration.xml');
+
+                foreach($data['configs'] as $config) {
+                    if($config['name'] == 'penaltyAmount') {
+                        $perDayPenalty = $config['value'];
+                    } else if($config['name'] == 'penaltyDays') {
+                        $startPenaltyAfter = $config['value'];
+                    }
+                }
+
+                $data['per_day_penalty'] = $perDayPenalty;
+                $data['start_penalty_after'] = $startPenaltyAfter;
+                $data['holidays'] = Holidays::get();
+                $data['loans'] = Loans::where('loans.Account_Username', 'like', '%' . $request->input('searchKeyword') . '%')->join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')->join('accounts', 'loans.Account_Username', '=', 'accounts.Account_Username')->get();
+                $data['receives'] = Receives::get();
+                $data['faculty_accounts'] = Faculties::get();
+                $data['librarian_accounts'] = Librarians::get();
+                $data['student_accounts'] = Students::get();
+
+                if($data['loans']) {
+                    return json_encode(array('status' => 'Success', 'message' => 'Found some loans.', 'data' => $data));
                 } else {
                     return json_encode(array('status' => 'Failed', 'message' => 'No results found.'));
                 }
