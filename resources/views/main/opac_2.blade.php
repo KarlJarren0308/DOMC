@@ -68,10 +68,10 @@
             <div class="modal-header"></div>
             <div class="modal-body">
                 <div class="text-center gap-top gap-bottom">
-                    <span class="fa fa-spinner fa-4x fa-pulse"></span>
-                    <div class="gap-top">
-                        Now Searching... Please Wait...
-                    </div>
+                    <br>
+                    <span class="fa fa-spinner fa-biggie-size fa-pulse"></span>
+                    <br><br>
+                    <h3>Now Searching... Please Wait...</h3>
                 </div>
             </div>
         </div>

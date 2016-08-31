@@ -1,3 +1,14 @@
+function getAuthorList(func) {
+    $.ajax({
+        url: '/search/authors',
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+        data: {},
+        dataType: 'json',
+        success: func
+    });
+}
+
 $(document).ready(function() {
     $('#materials-table').dataTable({
         aoColumnDefs: [
@@ -5,29 +16,183 @@ $(document).ready(function() {
         ]
     });
 
+    $('[data-button="new-publisher-button"]').click(function() {
+        setModalContent('Create New Publisher', '<form data-form="new-publisher-form"><div class="input-block"><label for="">Publisher\'s Name:</label><input type="text" class="u-full-width" name="publisherName" placeholder="Enter Publisher\'s Name Here" required></div><div class="input-block text-right"><input type="submit" class="btn btn-orange" value="Create Publisher"></div></form>', 'new-modal');
+        openModal(true, 'new-modal');
+
+        $('[data-form="new-publisher-form"]:first *:input[type!=hidden]:first').focus();
+
+        $('[data-form="new-publisher-form"]').submit(function() {
+            var formSerialize = $(this).serialize();
+
+            openModal(false, 'loader-modal');
+
+            $.ajax({
+                url: '/panel/manage/publishers/add',
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                data: formSerialize,
+                dataType: 'json',
+                success: function(response) {
+                    closeModal('loader-modal');
+                    setModalContent('Create New Publisher', '<h5 class="no-margin">' + response['message'] + '</h5>', 'new-modal');
+                    openModal(false, 'new-modal');
+
+                    $.ajax({
+                        url: '/search/publishers',
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                        data: {},
+                        dataType: 'json',
+                        success: function(response) {
+                            var list = '<option value="" selected disabled>Select an author...</option>';
+                            var name = '';
+                            var myThis = $('.publisher-dropdown');
+
+                            for(var i = 0; i < response['data']['publishers'].length; i++) {
+                                list += '<option value="' + response['data']['publishers'][i]['Publisher_ID'] + '">' + response['data']['publishers'][i]['Publisher_Name'] + '</option>';
+                            }
+
+                            myThis.html(list);
+
+                            setTimeout(function() {
+                                closeModal('new-modal');
+                            }, 2000);
+                        }
+                    });
+
+                    return false;
+                }
+            });
+
+            return false;
+        });
+
+        return false;
+    });
+
+    $('[data-button="new-author-button"]').click(function() {
+        setModalContent('Create New Author', '<form data-form="new-author-form"><div class="row"><div class="four columns"><div class="input-block"><label for="">Author\'s First Name:</label><input type="text" class="u-full-width" name="authorFirstName" placeholder="Author\'s First Name" required></div></div><div class="four columns"><div class="input-block"><label for="">Author\'s Middle Name:</label><input type="text" class="u-full-width" name="authorMiddleName" placeholder="Author\'s Middle Name"></div></div><div class="four columns"><div class="input-block"><label for="">Author\'s Last Name:</label><input type="text" class="u-full-width" name="authorLastName" placeholder="Author\'s Last Name" required></div></div></div><div class="input-block text-right"><input type="submit" class="btn btn-orange" value="Create Author"></div></form>', 'new-modal');
+        openModal(true, 'new-modal');
+
+        $('[data-form="new-author-form"]:first *:input[type!=hidden]:first').focus();
+
+        $('[data-form="new-author-form"]').submit(function() {
+            var formSerialize = $(this).serialize();
+
+            openModal(false, 'loader-modal');
+
+            $.ajax({
+                url: '/panel/manage/authors/add',
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                data: formSerialize,
+                dataType: 'json',
+                success: function(response) {
+                    closeModal('loader-modal');
+                    setModalContent('Create New Author', '<h5 class="no-margin">' + response['message'] + '</h5>', 'new-modal');
+                    openModal(false, 'new-modal');
+
+                    $.ajax({
+                        url: '/search/authors',
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                        data: {},
+                        dataType: 'json',
+                        success: function(response) {
+                            var list = '<option value="" selected disabled>Select an author...</option>';
+                            var name = '';
+                            var myThis = $('.author-dropdown');
+
+                            for(var i = 0; i < response['data']['authors'].length; i++) {
+                                if(response['data']['authors'][i]['Author_Middle_Name'].length > 1) {
+                                    name = response['data']['authors'][i]['Author_First_Name'] + ' ' + response['data']['authors'][i]['Author_Middle_Name'].substr(0, 1) + '. ' + response['data']['authors'][i]['Author_Last_Name'];
+                                } else {
+                                    name = response['data']['authors'][i]['Author_First_Name'] + ' ' + response['data']['authors'][i]['Author_Last_Name'];
+                                }
+
+                                list += '<option value="' + response['data']['authors'][i]['Author_ID'] + '">' + name + '</option>';
+                            }
+
+                            myThis.html(list);
+
+                            setTimeout(function() {
+                                closeModal('new-modal');
+                            }, 2000);
+                        }
+                    });
+
+                    return false;
+                }
+            });
+
+            return false;
+        });
+
+        return false;
+    });
+
     $('[data-button="add-author-button"]').click(function() {
-        var list = '<div class="input-block"><div class="u-three-four-width"><select name="authors[]" class="u-full-width"><option value="" selected disabled>Select an author...</option>';
-        var name = '';
-        var parsedAuthorsList = JSON.parse(atob(authorsList));
+        $.ajax({
+            url: '/search/authors',
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            data: {},
+            dataType: 'json',
+            success: function(response) {
+                var list = '<div class="input-block"><div class="u-three-four-width"><select name="authors[]" class="author-dropdown u-full-width"><option value="" selected disabled>Select an author...</option>';
+                var name = '';
 
-        for(var i = 0; i < parsedAuthorsList.length; i++) {
-            if(parsedAuthorsList[i]['Author_Middle_Name'].length > 1) {
-                name = parsedAuthorsList[i]['Author_First_Name'] + ' ' + parsedAuthorsList[i]['Author_Middle_Name'].substr(0, 1) + '. ' + parsedAuthorsList[i]['Author_Last_Name'];
-            } else {
-                name = parsedAuthorsList[i]['Author_First_Name'] + ' ' + parsedAuthorsList[i]['Author_Last_Name'];
+                for(var i = 0; i < response['data']['authors'].length; i++) {
+                    if(response['data']['authors'][i]['Author_Middle_Name'].length > 1) {
+                        name = response['data']['authors'][i]['Author_First_Name'] + ' ' + response['data']['authors'][i]['Author_Middle_Name'].substr(0, 1) + '. ' + response['data']['authors'][i]['Author_Last_Name'];
+                    } else {
+                        name = response['data']['authors'][i]['Author_First_Name'] + ' ' + response['data']['authors'][i]['Author_Last_Name'];
+                    }
+
+                    list += '<option value="' + response['data']['authors'][i]['Author_ID'] + '">' + name + '</option>';
+                }
+
+                list += '</select></div><div class="u-one-four-width text-center"><a class="link link-sm" data-button="remove-author-button">Remove</a></div></div>';
+
+                $('#authors-block').append(list);
             }
+        });
 
-            list += '<option value="' + parsedAuthorsList[i]['Author_ID'] + '">' + name + '</option>';
-        }
-
-        list += '</select></div><div class="u-one-four-width text-center"><a class="link link-sm" data-button="remove-author-button">Remove</a></div></div>';
-
-        $('#authors-block').append(list);
-
-        return false
+        return false;
     });
 
     $(document).on('click', '[data-button="remove-author-button"]', function() {
         $(this).parent().parent().remove();
     });
+
+    /*$(document).on('click', '.author-dropdown', function() {
+        var myThis = $(this);
+
+        $.ajax({
+            url: '/search/authors',
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            data: {},
+            dataType: 'json',
+            success: function(response) {
+                var list = '<option value="" selected disabled>Select an author...</option>';
+                var name = '';
+
+                for(var i = 0; i < response['data']['authors'].length; i++) {
+                    if(response['data']['authors'][i]['Author_Middle_Name'].length > 1) {
+                        name = response['data']['authors'][i]['Author_First_Name'] + ' ' + response['data']['authors'][i]['Author_Middle_Name'].substr(0, 1) + '. ' + response['data']['authors'][i]['Author_Last_Name'];
+                    } else {
+                        name = response['data']['authors'][i]['Author_First_Name'] + ' ' + response['data']['authors'][i]['Author_Last_Name'];
+                    }
+
+                    list += '<option value="' + response['data']['authors'][i]['Author_ID'] + '">' + name + '</option>';
+                }
+
+                myThis.html(list);
+            }
+        });
+
+        return false;
+    });*/
 });

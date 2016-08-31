@@ -271,9 +271,9 @@ class PanelController extends Controller
 
         switch($what) {
             case 'materials':
-                $data['publishers'] = Publishers::get();
                 $data['authors'] = Authors::get();
-                
+                $data['publishers'] = Publishers::get();
+
                 return view('panel.materials_add', $data);
 
                 break;
@@ -554,7 +554,7 @@ class PanelController extends Controller
         }
     }
 
-    public function getChangePassword($what, $id) {
+    public function getChangePassword($what, $id, $type = null) {
         if(!session()->has('username')) {
             session()->flash('global_status', 'Failed');
             session()->flash('global_message', 'Oops! Please login first.');
@@ -576,7 +576,29 @@ class PanelController extends Controller
         $data['id'] = $id;
 
         switch($what) {
-            case 'students':
+            case 'users':
+                if($type == 'Student') {
+                    $query = Students::where('Student_ID', $id)->first();
+                    $data['who'] = array(
+                        'First_Name' => $query->Student_First_Name,
+                        'Middle_Name' => $query->Student_Middle_Name,
+                        'Last_Name' => $query->Student_Last_Name,
+                        'Type' => 'Student'
+                    );
+                } else {
+                    $query = Faculties::where('Faculty_ID', $id)->first();
+                    $data['who'] = array(
+                        'First_Name' => $query->Faculty_First_Name,
+                        'Middle_Name' => $query->Faculty_Middle_Name,
+                        'Last_Name' => $query->Faculty_Last_Name,
+                        'Type' => 'Faculty'
+                    );
+                }
+
+                return view('panel.change_password', $data);
+
+                break;
+            /*case 'students':
                 $query = Students::where('Student_ID', $id)->first();
                 $data['who'] = array(
                     'First_Name' => $query->Student_First_Name,
@@ -597,13 +619,14 @@ class PanelController extends Controller
 
                 return view('panel.change_password', $data);
 
-                break;
+                break;*/
             case 'librarians':
                 $query = Librarians::where('Librarian_ID', $id)->first();
                 $data['who'] = array(
                     'First_Name' => $query->Librarian_First_Name,
                     'Middle_Name' => $query->Librarian_Middle_Name,
-                    'Last_Name' => $query->Librarian_Last_Name
+                    'Last_Name' => $query->Librarian_Last_Name,
+                    'Type' => 'Librarian'
                 );
 
                 return view('panel.change_password', $data);
@@ -916,37 +939,41 @@ class PanelController extends Controller
 
                 break;
             case 'authors':
-                $query = Authors::insert(array(
-                    'Author_First_Name' => $request->input('authorFirstName'),
-                    'Author_Middle_Name' => $request->input('authorMiddleName'),
-                    'Author_Last_Name' => $request->input('authorLastName')
-                ));
+                $query = Authors::where('Author_First_Name', $request->input('authorFirstName'))->where('Author_Middle_Name', $request->input('authorMiddleName'))->where('Author_Last_Name', $request->input('authorLastName'))->first();
 
                 if($query) {
-                    session()->flash('global_status', 'Success');
-                    session()->flash('global_message', 'Author has been added.');
+                    return json_encode(array('status' => 'Failed', 'message' => 'Author already exist.'));
                 } else {
-                    session()->flash('global_status', 'Failed');
-                    session()->flash('global_message', 'Failed to add author.');
-                }
+                    $query = Authors::insert(array(
+                        'Author_First_Name' => $request->input('authorFirstName'),
+                        'Author_Middle_Name' => $request->input('authorMiddleName'),
+                        'Author_Last_Name' => $request->input('authorLastName')
+                    ));
 
-                return redirect()->route('panel.getManage', 'authors');
+                    if($query) {
+                        return json_encode(array('status' => 'Success', 'message' => 'Author has been added.'));
+                    } else {
+                        return json_encode(array('status' => 'Failed', 'message' => 'Failed to add author.'));
+                    }
+                }
 
                 break;
             case 'publishers':
-                $query = Publishers::insert(array(
-                    'Publisher_Name' => $request->input('publisherName')
-                ));
+                $query = Publishers::where('Publisher_Name', $request->input('publisherName'))->first();
 
                 if($query) {
-                    session()->flash('global_status', 'Success');
-                    session()->flash('global_message', 'Publisher has been added.');
+                    return json_encode(array('status' => 'Failed', 'message' => 'Publisher already exist.'));
                 } else {
-                    session()->flash('global_status', 'Failed');
-                    session()->flash('global_message', 'Failed to add publisher.');
-                }
+                    $query = Publishers::insert(array(
+                        'Publisher_Name' => $request->input('publisherName')
+                    ));
 
-                return redirect()->route('panel.getManage', 'publishers');
+                    if($query) {
+                        return json_encode(array('status' => 'Success', 'message' => 'Publisher has been added.'));
+                    } else {
+                        return json_encode(array('status' => 'Failed', 'message' => 'Failed to add publisher.'));
+                    }
+                }
 
                 break;
             case 'users':
@@ -1377,7 +1404,35 @@ class PanelController extends Controller
         $data['what'] = $what;
 
         switch($what) {
-            case 'students':
+            case 'users':
+                if($request->input('newPassword') == $request->input('confirmPassword')) {
+                    $query = Accounts::where('Account_Owner', $id)->where('Account_Type', $request->input('accountType'))->first();
+
+                    if($query) {
+                        $query = Accounts::where('Account_Owner', $id)->where('Account_Type', $request->input('accountType'))->update(array(
+                            'Account_Password' => md5($request->input('newPassword'))
+                        ));
+
+                        if($query) {
+                            session()->flash('global_status', 'Success');
+                            session()->flash('global_message', 'Password has been changed.');
+                        } else {
+                            session()->flash('global_status', 'Failed');
+                            session()->flash('global_message', 'Failed to change password.');
+                        }
+                    } else {
+                        session()->flash('global_status', 'Failed');
+                        session()->flash('global_message', 'Faculty not found.');
+                    }
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Oops! Password doesn\'t match.');
+                }
+
+                return redirect()->route('panel.getManage', $what);
+
+                break;
+            /*case 'students':
                 if($request->input('newPassword') == $request->input('confirmPassword')) {
                     $query = Accounts::where('Account_Owner', $id)->where('Account_Type', 'Student')->first();
 
@@ -1432,7 +1487,7 @@ class PanelController extends Controller
 
                 return redirect()->route('panel.getManage', $what);
 
-                break;
+                break;*/
             case 'librarians':
                 if($request->input('newPassword') == $request->input('confirmPassword')) {
                     $query = Accounts::where('Account_Owner', $id)->where('Account_Type', 'Librarian')->first();

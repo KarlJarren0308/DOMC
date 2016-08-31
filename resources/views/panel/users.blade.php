@@ -109,7 +109,7 @@
                                     <td>{{ $user->Account_Type }}</td>
                                     <td class="text-center">
                                         @if(strlen(session()->has('username')))
-                                            <a href="{{ route('panel.getChangePassword', array($what, ($user->Account_Type == 'Student' ? $user->Student_ID : $user->Faculty_ID))) }}" class="btn btn-orange btn-sm">Change Password</a>
+                                            <a href="{{ route('panel.getChangePassword', array($what, ($user->Account_Type == 'Student' ? $user->Student_ID : $user->Faculty_ID), $user->Account_Type)) }}" class="btn btn-orange btn-sm">Change Password</a>
                                             <a href="{{ route('panel.getEdit', array($what, ($user->Account_Type == 'Student' ? $user->Student_ID : $user->Faculty_ID), $user->Account_Type)) }}" class="btn btn-green btn-sm">Edit</a>
                                             <a href="{{ route('panel.getDelete', array($what, ($user->Account_Type == 'Student' ? $user->Student_ID : $user->Faculty_ID), $user->Account_Type)) }}" class="btn btn-red btn-sm">Delete</a>
                                         @endif

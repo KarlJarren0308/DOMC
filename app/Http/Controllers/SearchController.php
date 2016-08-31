@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Accounts;
+use App\Authors;
 use App\Faculties;
 use App\Students;
 use App\Librarians;
 use App\Loans;
 use App\Materials;
+use App\Publishers;
 use App\Reservations;
 use App\Receives;
 use App\Works;
@@ -48,6 +50,26 @@ class SearchController extends Controller
         $data['what'] = $what;
 
         switch($what) {
+            case 'authors':
+                $data['authors'] = Authors::get();
+
+                if($data['authors']) {
+                    return json_encode(array('status' => 'Success', 'message' => 'Found some authors.', 'data' => $data));
+                } else {
+                    return json_encode(array('status' => 'Failed', 'message' => 'No results found.'));
+                }
+
+                break;
+            case 'publishers':
+                $data['publishers'] = Publishers::get();
+
+                if($data['publishers']) {
+                    return json_encode(array('status' => 'Success', 'message' => 'Found some publishers.', 'data' => $data));
+                } else {
+                    return json_encode(array('status' => 'Failed', 'message' => 'No results found.'));
+                }
+
+                break;
             case 'loan_borrowers':
                 $data['users'] = Accounts::where('accounts.Account_Username', 'like', '%' . $request->input('searchKeyword') . '%')->whereIn('accounts.Account_Type', ['Student', 'Faculty'])
                     ->leftJoin('students', function($join) {

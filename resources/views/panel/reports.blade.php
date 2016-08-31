@@ -92,63 +92,9 @@
                     </div>
                     <div class="six columns">
                         <div class="panel">
-                            <div class="panel-header">Generate Reservation Report</div>
-                            <div class="panel-body">
-                                {!! Form::open(array('route' => array('panel.postReports', 'reservation_report'))) !!}
-                                    <div class="row">
-                                        <div class="six columns">
-                                            <div class="input-block">
-                                                {!! Form::label('from', 'From:') !!}
-                                                {!! Form::text('from', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'onkeyup' => 'isDate(this)', 'required' => 'required')) !!}
-                                            </div>
-                                        </div>
-                                        <div class="six columns">
-                                            <div class="input-block">
-                                                {!! Form::label('to', 'To:') !!}
-                                                {!! Form::text('to', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'onkeyup' => 'isDate(this)', 'required' => 'required')) !!}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="input-block text-right">
-                                        {!! Form::submit('Generate', array('class' => 'btn btn-orange')) !!}
-                                    </div>
-                                {!! Form::close() !!}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row" style="margin-bottom: 15px;">
-                    <div class="six columns">
-                        <div class="panel">
                             <div class="panel-header">Generate Book Report</div>
                             <div class="panel-body">
                                 {!! Form::open(array('route' => array('panel.postReports', 'material_report'))) !!}
-                                    <div class="row">
-                                        <div class="six columns">
-                                            <div class="input-block">
-                                                {!! Form::label('from', 'From:') !!}
-                                                {!! Form::text('from', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'onkeyup' => 'isDate(this)', 'required' => 'required')) !!}
-                                            </div>
-                                        </div>
-                                        <div class="six columns">
-                                            <div class="input-block">
-                                                {!! Form::label('to', 'To:') !!}
-                                                {!! Form::text('to', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'onkeyup' => 'isDate(this)', 'required' => 'required')) !!}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="input-block text-right">
-                                        {!! Form::submit('Generate', array('class' => 'btn btn-orange')) !!}
-                                    </div>
-                                {!! Form::close() !!}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="six columns">
-                        <div class="panel">
-                            <div class="panel-header">Generate Top Report</div>
-                            <div class="panel-body">
-                                {!! Form::open(array('route' => array('panel.postReports', 'top_report'))) !!}
                                     <div class="row">
                                         <div class="six columns">
                                             <div class="input-block">
