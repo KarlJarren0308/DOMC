@@ -53,9 +53,9 @@ $(document).ready(function() {
                         element += '<td>';
 
                         if(response['data']['users'][i]['Account_Type'] == 'Student') {
-                            element += response['data']['users'][i]['Student_Birth_Date'];
+                            element += moment(response['data']['users'][i]['Student_Birth_Date']).format('MMMM D, YYYY');
                         } else {
-                            element += response['data']['users'][i]['Faculty_Birth_Date'];
+                            element += moment(response['data']['users'][i]['Faculty_Birth_Date']).format('MMMM D, YYYY');
                         }
 
                         element += '</td>';

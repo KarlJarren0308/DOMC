@@ -13,6 +13,7 @@
     <script src="/js/jquery.min.js"></script>
     <script src="/js/jquery.dataTables.min.js"></script>
     <script src="/js/sweetalert.min.js"></script>
+    <script src="/js/moment.js"></script>
     <script src="/js/script.js"></script>
     <script src="/js/validations.js"></script>
 @yield('pre_ref')
