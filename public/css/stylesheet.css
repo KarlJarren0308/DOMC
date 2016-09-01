@@ -1,10 +1,7 @@
-/*html {
-    height: 100%;
-}
-
 body {
     background: linear-gradient(white, white, #f8f8f8 , #eee, rgba(44, 135, 0, 0.5));
-}*/
+    background-attachment: fixed;
+}
 
 input,
 textarea,
