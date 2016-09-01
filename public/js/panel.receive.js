@@ -4,6 +4,7 @@ $(document).ready(function() {
             { bSearchable: false, bSortable: false, aTargets: [5] }
         ]
     });
+    
     $('[data-form="search-loan-form"]').submit(function() {
         openModal(false, 'loader-modal');
 
@@ -39,26 +40,32 @@ $(document).ready(function() {
 
                     if(response['data']['loans'][i]['Account_Type'] == 'Faculty') {
                         for(var m = 0; m < response['data']['faculty_accounts'].length; m++) {
-                            if(response['data']['faculty_accounts'][m]['Faculty_Middle_Name'].length > 1) {
-                                name = response['data']['faculty_accounts'][m]['Faculty_First_Name'] + ' ' + response['data']['faculty_accounts'][m]['Faculty_Middle_Name'].substring(0, 1) + '. ' + response['data']['faculty_accounts'][m]['Faculty_Last_Name'];
-                            } else {
-                                name = response['data']['faculty_accounts'][m]['Faculty_First_Name'] + ' ' + response['data']['faculty_accounts'][m]['Faculty_Last_Name'];
+                            if(response['data']['faculty_accounts'][m]['Faculty_ID'] == response['data']['loans'][i]['Account_Owner']) {
+                                if(response['data']['faculty_accounts'][m]['Faculty_Middle_Name'].length > 1) {
+                                    name = response['data']['faculty_accounts'][m]['Faculty_First_Name'] + ' ' + response['data']['faculty_accounts'][m]['Faculty_Middle_Name'].substring(0, 1) + '. ' + response['data']['faculty_accounts'][m]['Faculty_Last_Name'];
+                                } else {
+                                    name = response['data']['faculty_accounts'][m]['Faculty_First_Name'] + ' ' + response['data']['faculty_accounts'][m]['Faculty_Last_Name'];
+                                }
                             }
                         }
                     } else if(response['data']['loans'][i]['Account_Type'] == 'Librarian') {
                         for(var m = 0; m < response['data']['librarian_accounts'].length; m++) {
-                            if(response['data']['librarian_accounts'][m]['Librarian_Middle_Name'].length > 1) {
-                                name = response['data']['librarian_accounts'][m]['Librarian_First_Name'] + ' ' + response['data']['librarian_accounts'][m]['Librarian_Middle_Name'].substring(0, 1) + '. ' + response['data']['librarian_accounts'][m]['Librarian_Last_Name'];
-                            } else {
-                                name = response['data']['librarian_accounts'][m]['Librarian_First_Name'] + ' ' + response['data']['librarian_accounts'][m]['Librarian_Last_Name'];
+                            if(response['data']['librarian_accounts'][m]['Librarian_ID'] == response['data']['loans'][i]['Account_Owner']) {
+                                if(response['data']['librarian_accounts'][m]['Librarian_Middle_Name'].length > 1) {
+                                    name = response['data']['librarian_accounts'][m]['Librarian_First_Name'] + ' ' + response['data']['librarian_accounts'][m]['Librarian_Middle_Name'].substring(0, 1) + '. ' + response['data']['librarian_accounts'][m]['Librarian_Last_Name'];
+                                } else {
+                                    name = response['data']['librarian_accounts'][m]['Librarian_First_Name'] + ' ' + response['data']['librarian_accounts'][m]['Librarian_Last_Name'];
+                                }
                             }
                         }
                     } else if(response['data']['loans'][i]['Account_Type'] == 'Student') {
                         for(var m = 0; m < response['data']['student_accounts'].length; m++) {
-                            if(response['data']['student_accounts'][m]['Student_Middle_Name'].length > 1) {
-                                name = response['data']['student_accounts'][m]['Student_First_Name'] + ' ' + response['data']['student_accounts'][m]['Student_Middle_Name'].substring(0, 1) + '. ' + response['data']['student_accounts'][m]['Student_Last_Name'];
-                            } else {
-                                name = response['data']['student_accounts'][m]['Student_First_Name'] + ' ' + response['data']['student_accounts'][m]['Student_Last_Name'];
+                            if(response['data']['student_accounts'][m]['Student_ID'] == response['data']['loans'][i]['Account_Owner']) {
+                                if(response['data']['student_accounts'][m]['Student_Middle_Name'].length > 1) {
+                                    name = response['data']['student_accounts'][m]['Student_First_Name'] + ' ' + response['data']['student_accounts'][m]['Student_Middle_Name'].substring(0, 1) + '. ' + response['data']['student_accounts'][m]['Student_Last_Name'];
+                                } else {
+                                    name = response['data']['student_accounts'][m]['Student_First_Name'] + ' ' + response['data']['student_accounts'][m]['Student_Last_Name'];
+                                }
                             }
                         }
                     }
