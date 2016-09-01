@@ -156,6 +156,7 @@
                                         {{ $loan->Student_First_Name . ' ' . $loan->Student_Last_Name }}
                                     @endif
                                 @endif
+                                <br><strong><em>[{{ $loan->Account_Username }}]</em></strong>
                             </td>
                             <td class="text-center">{{ date('F d, Y', strtotime($loan->Loan_Date_Stamp)) }}</td>
                             <td class="text-center">

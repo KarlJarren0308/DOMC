@@ -118,23 +118,29 @@
                                         {!! Form::number('materialCopies', $material->Material_Copies, array('class' => 'u-full-width', 'placeholder' => 'Enter Number of Copies Here', 'required' => 'required')) !!}
                                     </div>
                                 </div>
-                                <div class="eight columns">
-                                    <div class="input-block">
-                                        {!! Form::label('publisher', 'Publisher:') !!}
-                                        <select name="publisher" class="u-full-width">
-                                            <option value="" selected disabled>Select a publisher...</option>
-                                            <option value=""{{ ($material->Publisher_ID == -1 ? ' selected' : '') }}>[None]</option>
-                                            @foreach($publishers as $publisher)
-                                                <option value="{{ $publisher->Publisher_ID }}"{{ ($material->Publisher_ID == $publisher->Publisher_ID ? ' selected' : '') }}>{{ $publisher->Publisher_Name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                         <div class="four columns">
                             <div class="text-right">
+                                {!! Form::label('publisher', 'Publisher:', array('class' => 'u-pull-left')) !!}
+                                <button class="btn btn-green btn-sm" data-button="new-publisher-button">Create New Publisher</button>
+                            </div>
+                            <div class="block" style="border: 1px solid #ccc; overflow-y: scroll; max-height: 300px;">
+                                <div class="input-block">
+                                    {!! Form::label('publisher', 'Publisher:') !!}
+                                    <select name="publisher" class="publisher-dropdown u-full-width">
+                                        <option value="" selected disabled>Select a publisher...</option>
+                                        <option value=""{{ ($material->Publisher_ID == -1 ? ' selected' : '') }}>[None]</option>
+                                        @foreach($publishers as $publisher)
+                                            <option value="{{ $publisher->Publisher_ID }}"{{ ($material->Publisher_ID == $publisher->Publisher_ID ? ' selected' : '') }}>{{ $publisher->Publisher_Name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="text-right">
                                 <label for="" class="u-pull-left">Author(s):</label>
+                                <button class="btn btn-green btn-sm" data-button="new-author-button">Create New Author</button>
                                 <button class="btn btn-green btn-sm" data-button="add-author-button">Add Author</button>
                             </div>
                             <div id="authors-block" class="block" style="overflow-y: scroll; max-height: 300px;">
@@ -143,7 +149,7 @@
                                     @if($isFirst)
                                         <div class="input-block">
                                             <div class="u-three-four-width">
-                                                <select name="authors[]" class="u-full-width" required>
+                                                <select name="authors[]" class="author-dropdown u-full-width" required>
                                                     <option value="" selected disabled>Select an author...</option>
                                                     @foreach($authors as $author)
                                                         @if(strlen($author->Author_Middle_Name) > 1)
@@ -186,11 +192,30 @@
             </div>
         </div>
     </div>
+    <div id="new-modal" class="modal">
+        <div class="modal-container">
+            <div class="modal-header"></div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+    <div id="loader-modal" class="modal">
+        <div class="modal-container">
+            <div class="modal-header"></div>
+            <div class="modal-body">
+                <div class="text-center gap-top gap-bottom">
+                    <br>
+                    <span class="fa fa-spinner fa-biggie-size fa-pulse"></span>
+                    <br><br>
+                    <h3>Now Searching... Please Wait...</h3>
+                </div>
+            </div>
+        </div>
+    </div>
 @stop
 
 @section('post_ref')
-    <script>
+    <!-- <script>
         var authorsList = '<?php echo base64_encode(json_encode($authors)); ?>';
-    </script>
+    </script> -->
     <script src="/js/panel.materials.js"></script>
 @stop
