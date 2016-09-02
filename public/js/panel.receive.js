@@ -1,3 +1,43 @@
+function isHoliday(dateStamp, holidays) {
+    dateStamp = moment(dateStamp).format('YYYY-MM-DD');
+
+    if(holidays.length > 0) {
+        for(var i = 0; i < holidays.length; i++) {
+            if(holidays[i]['Holiday_Type'] == 'Suspension') {
+                if(moment(dateStamp).isSame(holidays[i]['Holiday_Date'])) {
+                    return true;
+                }
+            } if(holidays[i]['Holiday_Type'] == 'Regular') {
+                if(moment(dateStamp).isSame(holidays[i]['Holiday_Date'])) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    } else {
+        return false;
+    }
+}
+
+function isWeekend(dateStamp) {
+    dateStamp = moment(dateStamp).format('dddd');
+
+    if(dateStamp == 'Sunday') {
+        return true;
+    } else if(dateStamp == 'Saturday') {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function nextDay(dateStamp) {
+    return moment(dateStamp).add(1, 'days').format('YYYY-MM-DD');
+}
+
+function computePenalty() {}
+
 $(document).ready(function() {
     $('#receive-table').dataTable({
         aoColumnDefs: [
@@ -74,7 +114,7 @@ $(document).ready(function() {
                     element += '<td>' + response['data']['loans'][i]['Material_Call_Number'] + '</td>';
                     element += '<td>' + response['data']['loans'][i]['Material_Title'] + '</td>';
                     element += '<td>' + name + '</td>';
-                    element += '<td>' + response['data']['loans'][i]['Loan_Date_Stamp'] + '</td>';
+                    element += '<td>' + moment(response['data']['loans'][i]['Loan_Date_Stamp']).format('MMMM D, YYYY') + '</td>';
                     element += '<td>';
 
                     if(response['data']['loans'][i]['Loan_Status'] == 'active') {
