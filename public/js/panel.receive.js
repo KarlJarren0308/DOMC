@@ -280,6 +280,14 @@ $(document).ready(function() {
                         tab.print();
                         tab.close();
                     });
+
+                    $('#receipt-modal.modal').click(function() {
+                        $('.modal#receipt-modal').fadeOut(250);
+                    });
+
+                    $('#receipt-modal.modal>.modal-container').click(function(e) {
+                        e.stopPropagation();
+                    });
                 }
             });
 
