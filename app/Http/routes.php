@@ -30,6 +30,7 @@ Route::get('panel/manage/{what}/delete/{id}/{type?}', array('as' => 'panel.getDe
 Route::get('panel/manage/{what}/change_password/{id}/{type?}', array('as' => 'panel.getChangePassword', 'uses' => 'PanelController@getChangePassword'));
 Route::get('panel/reports', array('as' => 'panel.getReports', 'uses' => 'PanelController@getReports'));
 Route::get('panel/system_configuration', array('as' => 'panel.getConfiguration', 'uses' => 'PanelController@getConfiguration'));
+Route::get('panel/print_receipt/{what}/{id}', array('as' => 'panel.getPrintReceipt', 'uses' => 'PanelController@getPrintReceipt'));
 
 Route::post('login', array('as' => 'main.postLogin', 'uses' => 'MainController@postLogin'));
 Route::post('account_information/change_password', array('as' => 'main.postChangePassword', 'uses' => 'MainController@postChangePassword'));

@@ -83,6 +83,8 @@ function computePenalty(dateLoaned, holidays, startPenaltyAfter, perDayPenalty) 
 }
 
 $(document).ready(function() {
+    var data1 = '', data2 = '', data3 = '', data4 = '', data5 = '';
+
     $('#receive-table').dataTable({
         aoColumnDefs: [
             { bSearchable: false, bSortable: false, aTargets: [5] }
@@ -194,10 +196,7 @@ $(document).ready(function() {
                     element += '<td>';
 
                     if(response['data']['loans'][i]['Loan_Status'] == 'active') {
-                        element += '<form method="POST" action="http://localhost:8000/panel/receive" accept-charset="UTF-8" class="no-margin">';
-                        element += '<input name="_token" type="hidden" value="' + $('meta[name="csrf-token"]').attr('content') + '">';
-                        element += '<input name="arg0" type="hidden" value="' + response['data']['loans'][i]['Loan_ID'] + '">';
-                        element += '<input name="arg1" type="hidden" value="';
+                        element += '<button class="btn btn-green btn-sm" data-button="receive-button" data-var-id="' + response['data']['loans'][i]['Loan_ID'] + '" data-var-title="' + response['data']['loans'][i]['Material_Title'] + '" data-var-date-loaned="' + moment(response['data']['loans'][i]['Loan_Date_Stamp']).format('MMMM D, YYYY') + '" data-var-loaned-by="' + name + '" data-var-penalty="';
 
                         if(totalPenalty > 0) {
                             element += totalPenalty;
@@ -205,7 +204,7 @@ $(document).ready(function() {
                             element += 0;
                         }
 
-                        element += '"><input class="btn btn-green btn-sm" type="submit" value="Receive"></form>';
+                        element += '">Receive</button>';
                     } else {
                         element += '<div class="btn btn-red btn-sm">Returned</div>';
                     }
@@ -237,5 +236,54 @@ $(document).ready(function() {
         return false;
     });
 
-    $('body').on('click', '')
+    $('body').on('click', '[data-button="receive-button"]', function() {
+        data1 = $(this).data('var-id');
+        data2 = $(this).data('var-penalty');
+        data3 = $(this).data('var-date-loaned');
+        data4 = $(this).data('var-loaned-by');
+        data5 = $(this).data('var-title');
+
+        setModalContent('Receive Book(s)', 'Are you sure ' + data4 + ' is returning a book title "' + data5 + '"?<br><br><div class="text-right"><button class="btn btn-orange" data-button="yes-button">Yes</button>&nbsp;<button class="btn btn-red" data-button="no-button">No</button></div>', 'receipt-modal');
+        openModal(false, 'receipt-modal');
+
+        $('[data-button="no-button"]').click(function() {
+            closeModal('receipt-modal');
+        });
+
+        $('[data-button="yes-button"]').click(function() {
+            openModal(false, 'loader-modal');
+
+            $.ajax({
+                url: '/panel/receive',
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                data: {
+                    arg0: data1,
+                    arg1: data2
+                },
+                dataType: 'json',
+                success: function(response) {
+                    var output = response['message'];
+
+                    if(response['status'] == 'Success') {
+                        output += 'You may now print the receipt.<div class="text-right"><button class="btn btn-orange" data-button="print-button">Print Receipt</button></div>';
+                    }
+
+                    closeModal('loader-modal');
+                    setModalContent('Receive Book(s)', output, 'receipt-modal');
+                    openModal(true, 'receipt-modal');
+
+                    $('[data-button="print-button"]').click(function() {
+                        var tab = window.open();
+
+                        tab.document.write('<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>De Ocampo Memorial College</title><style>.receipt { border: 1px solid black; display: inline-block; font-family: "Helvetica"; padding: 10px 15px; width: 250px; } .title { font-size: 1.5em; font-weight: bold; margin-bottom: 15px; } .info { font-size: 0.8em; text-indent: -15px; padding: 0 15px; }</style></head><body><div class="receipt"><div class="title">De Ocampo Memorial College</div><div class="info">Book Title: ' + data5 + '</div><div class="info">Loaned By: ' + data4 + '</div><div class="info">Date Loaned: ' + data3 + '</div><div class="info">Date Returned: ' + moment(dateTimeToday).format('MMMM DD, YYYY') + '</div><div class="info">Total Penalty: &#8369; ' + data2 + '</div></div></body></html>');
+                        tab.print();
+                        tab.close();
+                    });
+                }
+            });
+
+            return false;
+        });
+    });
 });

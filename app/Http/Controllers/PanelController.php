@@ -859,22 +859,16 @@ class PanelController extends Controller
                 if($query) {
                     $query = Loans::where('Loan_ID', $id)->update(array('Loan_Status' => 'inactive'));
                     
-                    session()->flash('global_status', 'Success');
-                    session()->flash('global_message', 'Receive Successful.');
+                    return json_encode(array('status' => 'Success', 'message' => 'Receive Successful.'));
                 } else {
-                    session()->flash('global_status', 'Warning');
-                    session()->flash('global_message', 'Oops! Failed to receive book.');
+                    return json_encode(array('status' => 'Warning', 'message' => 'Oops! Failed to receive book.'));
                 }
             } else {
-                session()->flash('global_status', 'Warning');
-                session()->flash('global_message', 'Oops! Borrower has already returned this book.');
+                return json_encode(array('status' => 'Warning', 'message' => 'Oops! Borrower has already returned this book.'));
             }
         } else {
-            session()->flash('global_status', 'Failed');
-            session()->flash('global_message', 'Oops! This loan doesn\'t exist.');
+            return json_encode(array('status' => 'Failed', 'message' => 'Oops! This loan doesn\'t exist.'));
         }
-
-        return redirect()->route('panel.getReceive');
     }
 
     public function postAdd($what, Request $request) {
