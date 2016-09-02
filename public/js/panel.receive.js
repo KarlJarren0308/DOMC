@@ -266,7 +266,7 @@ $(document).ready(function() {
                     var output = response['message'];
 
                     if(response['status'] == 'Success') {
-                        output += 'You may now print the receipt.<div class="text-right"><button class="btn btn-orange" data-button="print-button">Print Receipt</button></div>';
+                        output += ' You may now print the receipt.<div class="text-right"><button class="btn btn-orange" data-button="print-button">Print Receipt</button></div>';
                     }
 
                     closeModal('loader-modal');
@@ -283,6 +283,8 @@ $(document).ready(function() {
 
                     $('#receipt-modal.modal').click(function() {
                         $('.modal#receipt-modal').fadeOut(250);
+
+                        location.reload();
                     });
 
                     $('#receipt-modal.modal>.modal-container').click(function(e) {
