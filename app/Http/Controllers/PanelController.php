@@ -1655,7 +1655,7 @@ class PanelController extends Controller
 
                 $data['from'] = $from;
                 $data['to'] = $to;
-                $data['users'] = Accounts::where('accounts.Account_Type', 'Faculty')->orWhere('accounts.Account_Type', 'Student')
+                $data['users'] = Accounts::whereBetween('accounts.Date_Added', array($from, $to))->whereIn('accounts.Account_Type', ['Faculty', 'Student'])
                     ->leftJoin('faculties', function($join) {
                         $join->on('accounts.Account_Owner', '=', 'faculties.Faculty_ID')->where('accounts.Account_Type', '=', 'Faculty');
                     })
