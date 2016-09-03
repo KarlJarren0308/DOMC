@@ -117,6 +117,60 @@
                         </div>
                     </div>
                 </div>
+                <div class="row" style="margin-bottom: 15px;">
+                    <div class="six columns">
+                        <div class="panel">
+                            <div class="panel-header">Generate Receive Report</div>
+                            <div class="panel-body">
+                                {!! Form::open(array('route' => array('panel.postReports', 'receive_report'))) !!}
+                                    <div class="row">
+                                        <div class="six columns">
+                                            <div class="input-block">
+                                                {!! Form::label('from', 'From:') !!}
+                                                {!! Form::text('from', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'onkeyup' => 'isDate(this)', 'required' => 'required')) !!}
+                                            </div>
+                                        </div>
+                                        <div class="six columns">
+                                            <div class="input-block">
+                                                {!! Form::label('to', 'To:') !!}
+                                                {!! Form::text('to', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'onkeyup' => 'isDate(this)', 'required' => 'required')) !!}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="input-block text-right">
+                                        {!! Form::submit('Generate', array('class' => 'btn btn-orange')) !!}
+                                    </div>
+                                {!! Form::close() !!}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="six columns">
+                        <div class="panel">
+                            <div class="panel-header">Generate User List Report</div>
+                            <div class="panel-body">
+                                {!! Form::open(array('route' => array('panel.postReports', 'user_list_report'))) !!}
+                                    <div class="row">
+                                        <div class="six columns">
+                                            <div class="input-block">
+                                                {!! Form::label('from', 'From:') !!}
+                                                {!! Form::text('from', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'onkeyup' => 'isDate(this)', 'required' => 'required')) !!}
+                                            </div>
+                                        </div>
+                                        <div class="six columns">
+                                            <div class="input-block">
+                                                {!! Form::label('to', 'To:') !!}
+                                                {!! Form::text('to', null, array('class' => 'u-full-width', 'placeholder' => 'yyyy-mm-dd', 'maxlength' => '10', 'onkeyup' => 'isDate(this)', 'required' => 'required')) !!}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="input-block text-right">
+                                        {!! Form::submit('Generate', array('class' => 'btn btn-orange')) !!}
+                                    </div>
+                                {!! Form::close() !!}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

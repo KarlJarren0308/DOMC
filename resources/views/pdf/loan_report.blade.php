@@ -23,6 +23,7 @@
         .table thead > tr {
             background: #2c8700;
             color: white;
+            font-size: 0.85em;
         }
 
         .table tbody > tr:nth-child(even) {
@@ -122,21 +123,19 @@
             <thead>
                 <tr>
                     <th width="15%">Call Number</th>
-                    <th width="45%">Book Title</th>
-                    <th width="20%">Loaned By</th>
-                    <th width="20%">Date Loaned</th>
-                    <th width="20%">Date Received</th>
-                    <th width="20%">Penalty</th>
+                    <th>Book Title</th>
+                    <th colspan="2">Loaned By</th>
+                    <th width="15%">Date Loaned</th>
                 </tr>
             </thead>
             <tbody>
                 @if($loans)
-                    <?php $totalPenalty = 0; ?>
                     @foreach($loans as $loan)
                         <tr>
                             <td class="text-center">{{ $loan->Material_Call_Number }}</td>
                             <td class="text-center">{{ $loan->Material_Title }}</td>
-                            <td class="text-center">
+                            <td class="text-center" width="10%">{{ $loan->Account_Username }}</td>
+                            <td class="text-center" width="10%">
                                 @if($loan->Account_Type == 'Faculty')
                                     @if(strlen($loan->Faculty_Middle_Name) > 1)
                                         {{ $loan->Faculty_First_Name . ' ' . substr($loan->Faculty_Middle_Name, 0, 1) . '. ' . $loan->Faculty_Last_Name }}
@@ -156,15 +155,8 @@
                                         {{ $loan->Student_First_Name . ' ' . $loan->Student_Last_Name }}
                                     @endif
                                 @endif
-                                <br><strong><em>[{{ $loan->Account_Username }}]</em></strong>
                             </td>
                             <td class="text-center">{{ date('F d, Y', strtotime($loan->Loan_Date_Stamp)) }}</td>
-                            <td class="text-center">
-                                @if(isset($loan->Receive_Date_Stamp))
-                                    {{ date('F d, Y', strtotime($loan->Receive_Date_Stamp)) }}
-                                @endif
-                            </td>
-                            <td class="text-center">{{ $loan->Penalty }}</td>
                         </tr>
                         <?php
                             if(isset($loan->Penalty) && $loan->Penalty != '') {
@@ -180,17 +172,7 @@
             </tbody>
         </table>
         <br>
-        <table class="full-width gap-bottom">
-            <tbody>
-                <tr>
-                    <td class="text-right">
-                        <small>
-                            <div>Total Penalty Collected: {{ $totalPenalty }}</div>
-                        </small>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="text-right">Total number of books loaned: {{ count($loans) }}</div>
     </div>
 </body>
 </html>

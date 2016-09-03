@@ -997,7 +997,8 @@ class PanelController extends Controller
                         'Account_Username' => $request->input('userID'),
                         'Account_Password' => md5($request->input('userBirthDate')),
                         'Account_Type' => $request->input('userType'),
-                        'Account_Owner' => $id
+                        'Account_Owner' => $id,
+                        'Date_Added' => date('Y-m-d')
                     ));
 
                     if($query) {
@@ -1090,7 +1091,8 @@ class PanelController extends Controller
                         'Account_Username' => $request->input('librarianID'),
                         'Account_Password' => md5($request->input('librarianBirthDate')),
                         'Account_Type' => 'Librarian',
-                        'Account_Owner' => $id
+                        'Account_Owner' => $id,
+                        'Date_Added' => date('Y-m-d')
                     ));
 
                     if($query) {
@@ -1582,6 +1584,30 @@ class PanelController extends Controller
                 return $pdf->stream('domc_reservation_report.pdf');
 
                 break;
+            case 'receive_report':
+                $from = date('Y-m-d', strtotime($request->input('from')));
+                $to = date('Y-m-d', strtotime($request->input('to')));
+
+                $data['from'] = $from;
+                $data['to'] = $to;
+                $data['receives'] = Receives::join('loans', 'receives.Receive_Reference', '=', 'loans.Loan_ID')->join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')
+                    ->join('accounts', 'loans.Account_Username', '=', 'accounts.Account_Username')
+                    ->leftJoin('faculties', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'faculties.Faculty_ID')->where('accounts.Account_Type', '=', 'Faculty');
+                    })
+                    ->leftJoin('librarians', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'librarians.Librarian_ID')->where('accounts.Account_Type', '=', 'Librarian');
+                    })
+                    ->leftJoin('students', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'students.Student_ID')->where('accounts.Account_Type', '=', 'Student');
+                    })
+                ->get();
+
+                $pdf = PDF::loadView('pdf.receive_report', $data);
+
+                return $pdf->stream('domc_receive_report.pdf');
+
+                break;
             case 'material_report':
                 $from = date('Y-m-d', strtotime($request->input('from')));
                 $to = date('Y-m-d', strtotime($request->input('to')));
@@ -1621,6 +1647,26 @@ class PanelController extends Controller
                 $pdf = PDF::loadView('pdf.top_report', $data);
 
                 return $pdf->stream('domc_top_report.pdf');
+
+                break;
+            case 'user_list_report':
+                $from = date('Y-m-d', strtotime($request->input('from')));
+                $to = date('Y-m-d', strtotime($request->input('to')));
+
+                $data['from'] = $from;
+                $data['to'] = $to;
+                $data['users'] = Accounts::where('accounts.Account_Type', 'Faculty')->orWhere('accounts.Account_Type', 'Student')
+                    ->leftJoin('faculties', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'faculties.Faculty_ID')->where('accounts.Account_Type', '=', 'Faculty');
+                    })
+                    ->leftJoin('students', function($join) {
+                        $join->on('accounts.Account_Owner', '=', 'students.Student_ID')->where('accounts.Account_Type', '=', 'Student');
+                    })
+                ->get();
+
+                $pdf = PDF::loadView('pdf.user_list_report', $data);
+
+                return $pdf->stream('domc_user_list_report.pdf');
 
                 break;
             default:

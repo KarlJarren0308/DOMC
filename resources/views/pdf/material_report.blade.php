@@ -23,6 +23,7 @@
         .table thead > tr {
             background: #2c8700;
             color: white;
+            font-size: 0.85em;
         }
 
         .table tbody > tr:nth-child(even) {

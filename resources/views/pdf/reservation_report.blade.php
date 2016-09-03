@@ -23,6 +23,7 @@
         .table thead > tr {
             background: #2c8700;
             color: white;
+            font-size: 0.85em;
         }
 
         .table tbody > tr:nth-child(even) {
@@ -288,19 +289,9 @@
             </tbody>
         </table>
         <br>
-        <table class="full-width gap-bottom">
-            <tbody>
-                <tr>
-                    <td class="text-right">
-                        <small>
-                            <div>Total copies reserved: {{ count($reservations) }}</div>
-                            <div>Total copies loaned from reservation: {{ $lCount }}</div>
-                            <div>Total copies cancelled: {{ $cCount }}</div>
-                        </small>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="text-right">Total copies reserved: {{ count($reservations) }}</div>
+        <div class="text-right">Total copies loaned from reservation: {{ $lCount }}</div>
+        <div class="text-right">Total copies cancelled: {{ $cCount }}</div>
     </div>
 </body>
 </html>
