@@ -194,7 +194,10 @@ $(document).ready(function() {
                     element += '<td>';
 
                     if(response['data']['loans'][i]['Loan_Status'] == 'active') {
-                        element += '<form method="POST" action="http://localhost:8000/panel/receive" accept-charset="UTF-8" class="no-margin"><input name="_token" type="hidden" value="' + $('meta[name="csrf-token"]').attr('content') + '"><input name="arg0" type="hidden" value="' + response['data']['loans'][i]['Loan_ID'] + '"><input name="arg1" type="hidden" value="';
+                        element += '<form method="POST" action="http://localhost:8000/panel/receive" accept-charset="UTF-8" class="no-margin">';
+                        element += '<input name="_token" type="hidden" value="' + $('meta[name="csrf-token"]').attr('content') + '">';
+                        element += '<input name="arg0" type="hidden" value="' + response['data']['loans'][i]['Loan_ID'] + '">';
+                        element += '<input name="arg1" type="hidden" value="';
 
                         if(totalPenalty > 0) {
                             element += totalPenalty;
@@ -233,4 +236,6 @@ $(document).ready(function() {
 
         return false;
     });
+
+    $('body').on('click', '')
 });
