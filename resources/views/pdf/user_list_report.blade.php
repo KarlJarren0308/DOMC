@@ -103,7 +103,7 @@
     <div class="header">
         <img class="logo" src="img/logo.png">
         <h1 class="no-margin">De Ocampo Memorial College</h1>
-        <h3 class="no-margin">Library Loan Report</h3>
+        <h3 class="no-margin">Library User List Report</h3>
     </div>
     <div class="footer">
         <script type="text/php">
