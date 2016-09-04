@@ -36,7 +36,51 @@ function nextDay(dateStamp) {
     return moment(dateStamp).add(1, 'days').format('YYYY-MM-DD');
 }
 
-function computePenalty() {}
+function computePenalty(dateLoaned, holidays, startPenaltyAfter, perDayPenalty) {
+    dateLoaned = moment(dateLoaned).format('YYYY-MM-DD HH:mm:ss');
+    var dayEnd = moment(dateLoaned).add(startPenaltyAfter, 'days').format('YYYY-MM-DD HH:mm:ss');
+    var graceDays = moment(dayEnd).diff(dateLoaned, 'days');
+    var i = 1;
+    var j = 1;
+    var markedDate;
+
+    while(i <= graceDays) {
+        markedDate = moment(dateLoaned).add(i, 'days');
+
+        if(isWeekend(markedDate)) {
+            graceDays++;
+            dayEnd = nextDay(dayEnd);
+        } else {
+            if(isHoliday(markedDate, holidays)) {
+                graceDays++;
+                dayEnd = nextDay(dayEnd);
+            }
+        }
+
+        i++;
+    }
+
+    dateTimeToday = moment(dateTimeToday).format('YYYY-MM-DD HH:mm:ss');
+    graceDays = moment(dateTimeToday).diff(dayEnd, 'days');
+
+    while(j <= graceDays) {
+        markedDate = moment(dayEnd).add(j, 'days');
+
+        if(isWeekend(markedDate)) {
+            graceDays++;
+            dayEnd = nextDay(dayEnd);
+        } else {
+            if(isHoliday(markedDate, holidays)) {
+                graceDays++;
+                dayEnd = nextDay(dayEnd);
+            }
+        }
+
+        j++;
+    }
+
+    return moment(dateTimeToday).diff(dayEnd, 'days') * parseFloat(perDayPenalty);
+}
 
 $(document).ready(function() {
     $('#receive-table').dataTable({
@@ -60,6 +104,10 @@ $(document).ready(function() {
                 var element = '<table id="loans-table" class="u-full-width">';
                 var name = '';
                 var totalPenalty = 0;
+                var holidays;
+                var dateLoaned;
+                var startPenaltyAfter;
+                var perDayPenalty;
 
                 element += '<thead>';
                 element += '<tr>';
@@ -117,6 +165,17 @@ $(document).ready(function() {
                     element += '<td>' + moment(response['data']['loans'][i]['Loan_Date_Stamp']).format('MMMM D, YYYY') + '</td>';
                     element += '<td>';
 
+                    if(response['data']['holidays'].length > 0) {
+                        holidays = response['data']['holidays'];
+                    } else {
+                        holidays = [];
+                    }
+
+                    dateLoaned = response['data']['loans'][i]['Loan_Date_Stamp'] + ' ' + response['data']['loans'][i]['Loan_Time_Stamp'];
+                    startPenaltyAfter = response['data']['start_penalty_after'][0];
+                    perDayPenalty = response['data']['per_day_penalty'][0];
+                    totalPenalty = computePenalty(dateLoaned, holidays, startPenaltyAfter, perDayPenalty);
+
                     if(response['data']['loans'][i]['Loan_Status'] == 'active') {
                         if(totalPenalty > 0) {
                             element += '&#8369; ' + totalPenalty + '.00';
@@ -132,7 +191,7 @@ $(document).ready(function() {
                     }
 
                     element += '</td>';
-                    element += '<td>'
+                    element += '<td>';
 
                     if(response['data']['loans'][i]['Loan_Status'] == 'active') {
                         element += '<form method="POST" action="http://localhost:8000/panel/receive" accept-charset="UTF-8" class="no-margin"><input name="_token" type="hidden" value="' + $('meta[name="csrf-token"]').attr('content') + '"><input name="arg0" type="hidden" value="' + response['data']['loans'][i]['Loan_ID'] + '"><input name="arg1" type="hidden" value="';

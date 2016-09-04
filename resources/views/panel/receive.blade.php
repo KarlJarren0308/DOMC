@@ -140,5 +140,8 @@
 @stop
 
 @section('post_ref')
+    <script>
+        var dateTimeToday = "{{ date('Y-m-d H:i:s') }}";
+    </script>
     <script src="/js/panel.receive.js"></script>
 @stop
