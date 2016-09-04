@@ -107,6 +107,8 @@ class MainController extends Controller
                 $perDayPenalty = $config['value'];
             } else if($config['name'] == 'penaltyDays') {
                 $startPenaltyAfter = $config['value'];
+            } else if($config['name'] == 'reservation') {
+                $reservation = $config['value'];
             }
         }
 

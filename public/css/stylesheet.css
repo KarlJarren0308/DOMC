@@ -137,6 +137,31 @@ table {
     min-width: 75px;
 }
 
+.btn-search {
+    background-color: #e98a2a !important;
+    color: white;
+    border: none !important;
+    margin-bottom: 0;
+    margin-left: 0.5em;
+    padding: 0 10px;
+}
+
+.btn-search:focus {
+    color: white;
+}
+
+.btn-search:hover {
+    background-color: #fa9b3b !important;
+    color: white;
+    border: none;
+}
+
+.btn-search:active {
+    background-color: #d87919 !important;
+    color: white;
+    border: none;
+}
+
 .btn-sm {
     font-size: 0.75em !important;
     font-weight: normal !important;

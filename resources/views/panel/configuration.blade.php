@@ -45,7 +45,7 @@
         <div class="row">
             <div class="three columns">
                 <ul class="list-group">
-                    <li class="list-group-item active"><a href="{{ route('panel.getIndex') }}">Home</a></li>
+                    <li class="list-group-item"><a href="{{ route('panel.getIndex') }}">Home</a></li>
                     <li class="list-group-item"><a href="{{ route('panel.getLoan') }}">Loan Book(s)</a></li>
                     @if(isset($reservation) && $reservation == 'Show')
                         <li class="list-group-item"><a href="{{ route('panel.getReserved') }}">Reserved Book(s)</a></li>
@@ -58,7 +58,7 @@
                     <li class="list-group-item"><a href="{{ route('panel.getManage', 'librarians') }}">Edit Accounts</a></li>
                     <!-- <li class="list-group-item"><a href="{{ route('panel.getManage', 'holidays') }}">Manage Holidays</a></li> -->
                     <li class="list-group-item"><a href="{{ route('panel.getReports') }}">Library Reports</a></li>
-                    <li class="list-group-item"><a href="{{ route('panel.getConfiguration') }}">System Configuration</a></li>
+                    <li class="list-group-item active"><a href="{{ route('panel.getConfiguration') }}">System Configuration</a></li>
                 </ul>
             </div>
             <div class="nine columns">

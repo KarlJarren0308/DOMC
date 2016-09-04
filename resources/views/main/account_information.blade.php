@@ -146,47 +146,49 @@
             </tbody>
         </table>
         <div class="row">
-            <div class="six columns">
-                <div class="banner">Reservation(s)</div>
-                <div class="list" style="overflow-y: scroll; max-height: 500px;">
-                    @foreach($reservations as $reservation)
-                        <div class="list-item">
-                            <div class="header">{{ $reservation->Material_Title }}</div>
-                            <div class="body">  
-                                <div class="text-justify">Published by: <em>{{ ($reservation->Publisher_Name != '' ? $reservation->Publisher_Name : '[None]') }}</em></div>
-                                <div>
-                                    Author(s):
-                                    <ul class="bullet-list">
-                                        @foreach($works_authors as $workAuthor)
-                                            @if($workAuthor->Material_ID == $reservation->Material_ID)
-                                                @if(strlen($workAuthor->Author_Middle_Name) > 1)
-                                                    <li><em>{{ $workAuthor->Author_First_Name . ' ' . substr($workAuthor->Author_Middle_Name, 0, 1) . '. ' . $workAuthor->Author_Last_Name }}</em></li>
-                                                @else
-                                                    <li><em>{{ $workAuthor->Author_First_Name . ' ' . $workAuthor->Author_Last_Name }}</em></li>
+            @if(isset($reservation) && $reservation == 'Show')
+                <div class="six columns">
+                    <div class="banner">Reservation(s)</div>
+                    <div class="list" style="overflow-y: scroll; max-height: 500px;">
+                        @foreach($reservations as $reservation)
+                            <div class="list-item">
+                                <div class="header">{{ $reservation->Material_Title }}</div>
+                                <div class="body">  
+                                    <div class="text-justify">Published by: <em>{{ ($reservation->Publisher_Name != '' ? $reservation->Publisher_Name : '[None]') }}</em></div>
+                                    <div>
+                                        Author(s):
+                                        <ul class="bullet-list">
+                                            @foreach($works_authors as $workAuthor)
+                                                @if($workAuthor->Material_ID == $reservation->Material_ID)
+                                                    @if(strlen($workAuthor->Author_Middle_Name) > 1)
+                                                        <li><em>{{ $workAuthor->Author_First_Name . ' ' . substr($workAuthor->Author_Middle_Name, 0, 1) . '. ' . $workAuthor->Author_Last_Name }}</em></li>
+                                                    @else
+                                                        <li><em>{{ $workAuthor->Author_First_Name . ' ' . $workAuthor->Author_Last_Name }}</em></li>
+                                                    @endif
                                                 @endif
-                                            @endif
-                                        @endforeach
-                                    </ul>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="footer">
+                                    @if($reservation->Reservation_Status == 'active')
+                                        <div class="gap-bottom gap-left gap-right">Expires in <span class="countdown" data-var-id="{{ $reservation->Reservation_ID }}" data-var-start="{{ strtotime('+1 day', strtotime($reservation->Reservation_Date_Stamp . ' ' . $reservation->Reservation_Time_Stamp)) }}" data-var-end="{{ strtotime(date('Y-m-d H:i:s')) }}"></span></div>
+                                        {!! Form::open(array('route' => array('main.postCancelReservation'))) !!}
+                                        {!! Form::hidden('arg0', 'a8affc088cbca89fa20dbd98c91362e4') !!}
+                                        {!! Form::hidden('arg1', $reservation->Reservation_ID) !!}
+                                        {!! Form::submit('Cancel Reservation', array('class' => 'btn btn-red btn-sm u-pull-right')) !!}
+                                        {!! Form::close() !!}
+                                    @elseif($reservation->Reservation_Status == 'loaned')
+                                        <div class="text-right">Book Loaned</div>
+                                    @else
+                                        <div class="text-right">Reservation Cancelled</div>
+                                    @endif
                                 </div>
                             </div>
-                            <div class="footer">
-                                @if($reservation->Reservation_Status == 'active')
-                                    <div class="gap-bottom gap-left gap-right">Expires in <span class="countdown" data-var-id="{{ $reservation->Reservation_ID }}" data-var-start="{{ strtotime('+1 day', strtotime($reservation->Reservation_Date_Stamp . ' ' . $reservation->Reservation_Time_Stamp)) }}" data-var-end="{{ strtotime(date('Y-m-d H:i:s')) }}"></span></div>
-                                    {!! Form::open(array('route' => array('main.postCancelReservation'))) !!}
-                                    {!! Form::hidden('arg0', 'a8affc088cbca89fa20dbd98c91362e4') !!}
-                                    {!! Form::hidden('arg1', $reservation->Reservation_ID) !!}
-                                    {!! Form::submit('Cancel Reservation', array('class' => 'btn btn-red btn-sm u-pull-right')) !!}
-                                    {!! Form::close() !!}
-                                @elseif($reservation->Reservation_Status == 'loaned')
-                                    <div class="text-right">Book Loaned</div>
-                                @else
-                                    <div class="text-right">Reservation Cancelled</div>
-                                @endif
-                            </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
                 </div>
-            </div>
+            @endif
             <div class="six columns">
                 <div class="banner">Loaned Book(s)</div>
                 <div class="list" style="overflow-y: scroll; max-height: 500px;">
