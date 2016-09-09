@@ -115,7 +115,7 @@ class MainController extends Controller
         $data['per_day_penalty'] = $perDayPenalty;
         $data['start_penalty_after'] = $startPenaltyAfter;
         $data['holidays'] = Holidays::get();
-        $data['loans'] = Loans::where('loans.Account_Username', $username)->join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')->leftJoin('publishers', 'materials.Publisher_ID', '=', 'publishers.Publisher_ID')->orderBy('loans.Loan_Status', 'asc')->get();
+        $data['loans'] = Loans::where('loans.Account_Username', $username)->join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')->leftJoin('publishers', 'materials.Publisher_ID', '=', 'publishers.Publisher_ID')->orderBy('loans.Loan_Status', 'asc')->leftJoin('receives', 'loans.Loan_ID', '=', 'receives.Receive_Reference')->get();
         $data['reservations'] = Reservations::where('reservations.Account_Username', $username)->join('materials', 'reservations.Material_ID', '=', 'materials.Material_ID')->leftJoin('publishers', 'materials.Publisher_ID', '=', 'publishers.Publisher_ID')->orderBy('reservations.Reservation_Status', 'asc')->get();
         $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
         $data['my_account_one'] = Accounts::where('Account_Username', $username)->first();

@@ -219,7 +219,7 @@
                                 $dateLoaned = $loan->Loan_Date_Stamp . ' ' . $loan->Loan_Time_Stamp;
                                 $dayEnd = date('Y-m-d H:i:s', strtotime('+' . $start_penalty_after . ' days', strtotime($dateLoaned)));
                                 $dayStart = strtotime($dateLoaned);
-                                $graceDays = ceil((strtotime($dayEnd) - $dayStart) / 86400);
+                                $graceDays = floor((strtotime($dayEnd) - $dayStart) / 86400);
                                 $i = 1;
 
                                 while($i <= $graceDays) {
@@ -239,7 +239,7 @@
                                 }
 
                                 $newDayEnd = $dayEnd;
-                                $newGraceDays = ceil((strtotime(date('Y-m-d H:i:s')) - strtotime($newDayEnd)) / 86400);
+                                $newGraceDays = floor((strtotime(date('Y-m-d H:i:s')) - strtotime($newDayEnd)) / 86400);
                                 $j = 1;
 
                                 while($j <= $newGraceDays) {
@@ -265,6 +265,7 @@
                                     <div class="u-pull-left">Penalty: <strong>&#8369;{{ ($totalPenalty > 0 ? $totalPenalty : 0) }}.00</strong></div>
                                     <div class="text-right">Not yet returned</div>
                                 @else
+                                    <div class="u-pull-left">Penalty: <strong>&#8369;{{ $loan->Penalty }}.00</strong></div>
                                     <div class="text-right">Book Returned</div>
                                 @endif
                             </div>
