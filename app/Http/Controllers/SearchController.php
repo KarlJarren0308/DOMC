@@ -60,6 +60,16 @@ class SearchController extends Controller
                 }
 
                 break;
+            case 'username':
+                $query = Accounts::where('Account_Username', $request->input('username'))->first();
+
+                if($query) {
+                    return json_encode(array('status' => 'Success', 'Username has been found.'));
+                } else {
+                    return json_encode(array('status' => 'Failed', 'Username not found.'));
+                }
+
+                break;
             case 'librarians':
                 $query = Librarians::where('Librarian_First_Name', $request->input('first_name'))->where('Librarian_Last_Name', $request->input('last_name'))->count();
 

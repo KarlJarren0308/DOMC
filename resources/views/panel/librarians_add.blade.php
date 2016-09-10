@@ -68,8 +68,8 @@
                     <div class="row">
                         <div class="six columns">
                             <div class="input-block">
-                                {!! Form::label('librarianID', 'Librarian Number:') !!}
-                                {!! Form::text('librarianID', null, array('class' => 'u-full-width', 'placeholder' => 'Enter Librarian Number Here', 'required' => 'required', 'autofocus' => 'autofocus')) !!}
+                                {!! Form::label('librarianID', 'Librarian ID:') !!}
+                                {!! Form::text('librarianID', null, array('class' => 'u-full-width', 'placeholder' => 'Enter Librarian ID Here', 'required' => 'required', 'autofocus' => 'autofocus')) !!}
                             </div>
                         </div>
                         <div class="six columns">
