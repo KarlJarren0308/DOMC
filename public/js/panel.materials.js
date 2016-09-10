@@ -25,6 +25,43 @@ $(document).ready(function() {
         ]
     });
 
+    $('[data-form="materials-confirmation-form"]').submit(function() {
+        var thisForm = $(this);
+
+        setModalLoader();
+        openModal(false);
+
+        $.ajax({
+            url: '/search/materials',
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            data: {
+                call_number: $('input[name="materialCallNumber"]').val(),
+                title: $('input[name="materialTitle"]').val()
+            },
+            dataType: 'json',
+            success: function(response) {
+                if(response['status'] == 'Success') {
+                    setModalContent('Manage Books', 'Oops! A book with the same call number and/or title already exist. Do you still want to submit this form?<div class="text-right"><button class="btn btn-orange" data-button="yes-button">Yes</button>&nbsp;<button class="btn btn-red" data-button="no-button">No</button></div>');
+
+                    $('[data-button="yes-button"]').click(function() {
+                        thisForm.off('submit');
+                        thisForm.submit();
+                    });
+
+                    $('[data-button="no-button"]').click(function() {
+                        closeModal();
+                    });
+                } else {
+                    thisForm.off('submit');
+                    thisForm.submit();
+                }
+            }
+        });
+
+        return false;
+    });
+
     $('[data-button="new-publisher-button"]').click(function() {
         setModalContent('Create New Publisher', '<form data-form="new-publisher-form"><div class="input-block"><label for="">Publisher\'s Name:</label><input type="text" class="u-full-width" name="publisherName" placeholder="Enter Publisher\'s Name Here" required></div><div class="input-block text-right"><input type="submit" class="btn btn-orange" value="Create Publisher"></div></form>', 'new-modal');
         openModal(true, 'new-modal');

@@ -63,7 +63,7 @@
             </div>
             <div class="nine columns">
                 <div class="banner">Manage Books - Edit</div>
-                {!! Form::open(array('route' => array('panel.postEdit', $what, $id))) !!}
+                {!! Form::open(array('route' => array('panel.postEdit', $what, $id), 'data-form' => 'materials-confirmation-form')) !!}
                     <div class="row">
                         <div class="eight columns">
                             <div class="row">

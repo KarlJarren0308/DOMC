@@ -50,6 +50,16 @@ class SearchController extends Controller
         $data['what'] = $what;
 
         switch($what) {
+            case 'materials':
+                $query = Materials::where('Material_Call_Number', $request->input('call_number'))->orWhere('Material_Title', $request->input('title'))->count();
+
+                if($query > 0) {
+                    return json_encode(array('status' => 'Success', 'Book has been found.'));
+                } else {
+                    return json_encode(array('status' => 'Failed', 'Book not found.'));
+                }
+
+                break;
             case 'librarians':
                 $query = Librarians::where('Librarian_First_Name', $request->input('first_name'))->where('Librarian_Last_Name', $request->input('last_name'))->count();
 
