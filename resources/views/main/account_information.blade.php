@@ -258,7 +258,7 @@
                                     $j++;
                                 }
 
-                                $totalPenalty = floor((strtotime(date('Y-m-d H:i:s')) - strtotime($newDayEnd)) / 86400) * (double) $per_day_penalty;
+                                $totalPenalty = ceil((strtotime(date('Y-m-d H:i:s')) - strtotime($newDayEnd)) / 86400) * (double) $per_day_penalty;
                             ?>
                             <div class="footer">
                                 @if($loan->Loan_Status == 'active')
