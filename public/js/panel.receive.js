@@ -25,8 +25,8 @@ function isWeekend(dateStamp) {
 
     if(dateStamp == 'Sunday') {
         return true;
-    } else if(dateStamp == 'Saturday') {
-        return true;
+    /*} else if(dateStamp == 'Saturday') {
+        return true;*/
     } else {
         return false;
     }
