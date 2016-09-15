@@ -64,7 +64,7 @@
             <div class="nine columns">
                 <div class="banner">Manage Users - Edit</div>
                 <p class="text-justify"><strong>Note</strong>: Changing the user's birth date won't change his/her account's current password. To change user's password, please use the "Change Password" module.</p>
-                {!! Form::open(array('route' => array('panel.postEdit', $what, $id))) !!}
+                {!! Form::open(array('route' => array('panel.postEdit', $what, $id), 'data-form' => 'users-confirmation-form')) !!}
                     {!! Form::hidden('userType', $user_account->Account_Type) !!}
                     <div class="row">
                         <div class="six columns">
@@ -117,4 +117,14 @@
             </div>
         </div>
     </div>
+    <div class="modal">
+        <div class="modal-container">
+            <div class="modal-header"></div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+@stop
+
+@section('post_ref')
+    <script src="/js/panel.users.js"></script>
 @stop

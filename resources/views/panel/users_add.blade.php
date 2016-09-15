@@ -64,7 +64,7 @@
             <div class="nine columns">
                 <div class="banner">Manage Users - Add</div>
                 <p class="text-justify"><strong>Note</strong>: User's default password is their birth date in <em>yyyy-mm-dd</em> format.</p>
-                {!! Form::open(array('route' => array('panel.postAdd', $what))) !!}
+                {!! Form::open(array('route' => array('panel.postAdd', $what), 'data-form' => 'users-confirmation-form')) !!}
                     <div class="row">
                         <div class="six columns">
                             <div class="input-block">
@@ -116,4 +116,14 @@
             </div>
         </div>
     </div>
+    <div class="modal">
+        <div class="modal-container">
+            <div class="modal-header"></div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+@stop
+
+@section('post_ref')
+    <script src="/js/panel.users.js"></script>
 @stop

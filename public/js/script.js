@@ -33,11 +33,13 @@ function setModalContent(headerContent, bodyContent, id) {
 }
 
 function setModalLoader(id) {
-    $('.modal#' + id + ' > .modal-container > .modal-header').html();
-    $('.modal#' + id + ' > .modal-container > .modal-body').html('<div class="text-center gap-top gap-bottom"><span class="fa fa-spinner fa-4x fa-pulse"></span><div class="gap-top">Now Searching... Please Wait...</div></div>');
-}
-
-function initializeCarousel() {
+    if(id != null) {
+        $('.modal#' + id + ' > .modal-container > .modal-header').html('');
+        $('.modal#' + id + ' > .modal-container > .modal-body').html('<div class="text-center gap-top gap-bottom"><span class="fa fa-spinner fa-4x fa-pulse"></span><div class="gap-top">Now Searching... Please Wait...</div></div>');
+    } else {
+        $('.modal > .modal-container > .modal-header').html('');
+        $('.modal > .modal-container > .modal-body').html('<div class="text-center gap-top gap-bottom"><span class="fa fa-spinner fa-4x fa-pulse"></span><div class="gap-top">Now Searching... Please Wait...</div></div>');
+    }
 }
 
 $(document).ready(function() {

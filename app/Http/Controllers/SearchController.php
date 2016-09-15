@@ -50,6 +50,32 @@ class SearchController extends Controller
         $data['what'] = $what;
 
         switch($what) {
+            case 'librarians':
+                $query = Librarians::where('Librarian_First_Name', $request->input('first_name'))->where('Librarian_Last_Name', $request->input('last_name'))->count();
+
+                if($query > 0) {
+                    return json_encode(array('status' => 'Success', 'Librarian has been found.'));
+                } else {
+                    return json_encode(array('status' => 'Failed', 'Librarian not found.'));
+                }
+
+                break;
+            case 'users':
+                $query = Faculties::where('Faculty_First_Name', $request->input('first_name'))->where('Faculty_Last_Name', $request->input('last_name'))->count();
+
+                if($query > 0) {
+                    return json_encode(array('status' => 'Success', 'User has been found.'));
+                } else {
+                    $query = Students::where('Student_First_Name', $request->input('first_name'))->where('Student_Last_Name', $request->input('last_name'))->count();
+
+                    if($query > 0) {
+                        return json_encode(array('status' => 'Success', 'User has been found.'));
+                    } else {
+                        return json_encode(array('status' => 'Failed', 'User not found.'));
+                    }
+                }
+
+                break;
             case 'authors':
                 $data['authors'] = Authors::get();
 

@@ -64,7 +64,7 @@
             <div class="nine columns">
                 <div class="banner">Edit Accounts - Edit</div>
                 <p class="text-justify"><strong>Note</strong>: Changing the librarian's birth date won't change its default password. To change librarian's password, please use the "Change Password" module.</p>
-                {!! Form::open(array('route' => array('panel.postEdit', $what, $id))) !!}
+                {!! Form::open(array('route' => array('panel.postEdit', $what, $id), 'data-form' => 'librarians-confirmation-form')) !!}
                     <div class="row">
                         <div class="six columns">
                             <div class="input-block">
@@ -106,4 +106,14 @@
             </div>
         </div>
     </div>
+    <div class="modal">
+        <div class="modal-container">
+            <div class="modal-header"></div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+@stop
+
+@section('post_ref')
+    <script src="/js/panel.librarians.js"></script>
 @stop
