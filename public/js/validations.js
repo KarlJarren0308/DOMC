@@ -93,3 +93,27 @@ function isISBN(selector) {
         selector.focus();
     }
 }
+
+function isYear(selector) {
+    var regex = /[^0-9]/i;
+    var format = /^([0-9]{4})$/;
+
+    if(((regex.test(selector.value)) || (selector.value.length == 4 && !format.test(selector.value)))) {
+        if(sweetAlertPrompt == true) {
+            sweetAlert({
+                title: 'Invalid Input',
+                text: 'Input should be a date in yyyy format.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+
+        selector.value = '';
+        selector.focus();
+    }
+
+    if(selector.value > moment().format('YYYY')) {
+        selector.value = '';
+        selector.focus();
+    }
+}

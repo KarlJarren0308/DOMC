@@ -3,14 +3,8 @@ function isHoliday(dateStamp, holidays) {
 
     if(holidays.length > 0) {
         for(var i = 0; i < holidays.length; i++) {
-            if(holidays[i]['Holiday_Type'] == 'Suspension') {
-                if(moment(dateStamp).isSame(holidays[i]['Holiday_Date'])) {
-                    return true;
-                }
-            } if(holidays[i]['Holiday_Type'] == 'Regular') {
-                if(moment(dateStamp).isSame(holidays[i]['Holiday_Date'])) {
-                    return true;
-                }
+            if(moment(dateStamp).isSame(holidays[i]['Holiday_Date'])) {
+                return true;
             }
         }
 

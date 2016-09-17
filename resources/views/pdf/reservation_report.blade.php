@@ -16,7 +16,6 @@
         }
 
         .table {
-            border: 1px solid #2c8700;
             border-spacing: none;
         }
 

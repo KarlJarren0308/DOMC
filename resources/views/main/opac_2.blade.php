@@ -51,6 +51,12 @@
             <div class="input-block">
                 {!! Form::label('searchKeyword', 'Search for:') !!}
                 {!! Form::text('searchKeyword', null, array('style' => 'margin-right: 5px; vertical-align: middle;', 'placeholder' => 'Enter Keyword Here', 'required' => 'required', 'autofocus' => 'autofocus')) !!}
+                <select name="searchBy" style="margin-right: 5px; vertical-align: middle;" required>
+                    <option value="" selected disabled>Search By...</option>
+                    <option value="Material_Call_Number">Call Number</option>
+                    <option value="Material_Title">Book Title</option>
+                    <option value="Author">Author</option>
+                </select>
                 {!! Form::submit('Search', array('class' => 'btn btn-orange', 'style' => 'vertical-align: middle; height: 38px !important;')) !!}
             </div>
         </form>

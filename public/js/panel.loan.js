@@ -60,7 +60,7 @@ $(document).ready(function() {
 
                         element += '</td>';
                         element += '<td>' + response['data']['users'][i]['Account_Type'] + '</td>';
-                        element += '<td><button class="btn btn-orange btn-sm" data-button="loan-button" data-var-id="' + response['data']['users'][i]['Account_Username'] + '" data-var-name="' + name + '">Loan</button></td>';
+                        element += '<td class="text-center"><button class="btn btn-orange btn-sm" data-button="loan-button" data-var-id="' + response['data']['users'][i]['Account_Username'] + '" data-var-name="' + name + '">Loan</button></td>';
                         element += '</tr>';
                     }
                 }

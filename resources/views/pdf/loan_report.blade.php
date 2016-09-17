@@ -16,7 +16,6 @@
         }
 
         .table {
-            border: 1px solid #2c8700;
             border-spacing: none;
         }
 
@@ -158,11 +157,6 @@
                             </td>
                             <td class="text-center">{{ date('F d, Y', strtotime($loan->Loan_Date_Stamp)) }}</td>
                         </tr>
-                        <?php
-                            if(isset($loan->Penalty) && $loan->Penalty != '') {
-                                $totalPenalty += $loan->Penalty;
-                            }
-                        ?>
                     @endforeach
                 @else
                     <tr>

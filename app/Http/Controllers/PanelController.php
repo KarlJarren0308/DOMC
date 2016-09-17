@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests;
+use App\Accessions;
 use App\Accounts;
 use App\Authors;
 use App\Faculties;
@@ -160,6 +161,32 @@ class PanelController extends Controller
         return view('panel.receive', $data);
     }
 
+    public function getMasterInfo($id) {
+        if(!session()->has('username')) {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Oops! Please login first.');
+
+            return redirect()->route('main.getLogin');
+        } else {
+            if(session()->get('account_type') != 'Librarian') {
+                session()->flash('global_status', 'Failed');
+                session()->flash('global_message', 'Oops! You are not authorized to access the panel.');
+
+                return redirect()->route('main.getOpac');
+            }
+        }
+
+        $this->checkConfigurationFile();
+
+        $data['configs'] = simplexml_load_file(storage_path('app') . '/configuration.xml');
+        $data['works_authors'] = Works::where('works.Material_ID', $id)->join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
+        $data['material'] = Materials::where('Material_ID', $id)->first();
+        $data['accessions'] = Accessions::where('accessions.Material_ID', $id)->whereIn('accessions.Accession_Status', ['available', 'archived'])->join('materials', 'accessions.Material_ID', '=', 'materials.Material_ID')->get();
+        $data['available_copies'] = Accessions::where('Material_ID', $id)->whereIn('Accession_Status', ['available', 'archive'])->count();
+
+        return view('panel.material_master_accessions', $data);
+    }
+
     public function getManage($what) {
         if(!session()->has('username')) {
             session()->flash('global_status', 'Failed');
@@ -181,6 +208,15 @@ class PanelController extends Controller
         $data['what'] = $what;
 
         switch($what) {
+            case 'material_master':
+                $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
+                $data['works_materials'] = Works::join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->groupBy('works.Material_ID')->get();
+                $data['reserved_materials'] = Reservations::where('Reservation_Status', 'active')->get();
+                $data['loaned_materials'] = Loans::where('Loan_Status', 'active')->get();
+
+                return view('panel.material_master', $data);
+
+                break;
             case 'materials':
                 $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
                 $data['works_materials'] = Works::join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->groupBy('works.Material_ID')->get();
@@ -236,12 +272,18 @@ class PanelController extends Controller
                 return view('panel.librarians', $data);
 
                 break;
-            /*case 'holidays':
+            case 'holidays':
                 $data['holidays'] = Holidays::get();
 
                 return view('panel.holidays', $data);
 
-                break;*/
+                break;
+            case 'weeded':
+                $data['accessions'] = Accessions::whereIn('accessions.Accession_Status', ['archived', 'lost', 'weeded'])->join('materials', 'accessions.Material_ID', '=', 'materials.Material_ID')->get();
+
+                return view('panel.weeded_materials', $data);
+
+                break;
             default:
                 return view('errors.404');
 
@@ -301,10 +343,10 @@ class PanelController extends Controller
                 return view('panel.librarians_add', $data);
 
                 break;
-            /*case 'holidays':
+            case 'holidays':
                 return view('panel.holidays_add', $data);
 
-                break;*/
+                break;
             default:
                 return view('errors.404');
 
@@ -355,7 +397,7 @@ class PanelController extends Controller
                 return view('panel.publishers_edit', $data);
 
                 break;
-            case 'users':
+            /*case 'users':
                 if($type == 'Student') {
                     $data['user_account'] = Accounts::where('Account_Type', 'Student')->where('Account_Owner', $id)->first();
                     $data['user'] = Students::where('Student_ID', $id)->first();
@@ -371,7 +413,7 @@ class PanelController extends Controller
 
                 return view('panel.users_edit', $data);
 
-                break;
+                break;*/
             /*case 'students':
                 $data['student_account'] = Accounts::where('Account_Type', 'Student')->where('Account_Owner', $id)->first();
                 $data['student'] = Students::where('Student_ID', $id)->first();
@@ -465,7 +507,7 @@ class PanelController extends Controller
                 return redirect()->route('panel.getManage', 'publishers');
 
                 break;
-            case 'users':
+            /*case 'users':
                 if($type == 'Student') {
                     $query = Students::where('Student_ID', $id)->delete();
                 } else {
@@ -484,7 +526,7 @@ class PanelController extends Controller
 
                 return redirect()->route('panel.getManage', 'users');
 
-                break;
+                break;*/
             /*case 'students':
                 $query = Students::where('Student_ID', $id)->delete();
 
@@ -533,7 +575,7 @@ class PanelController extends Controller
                 return redirect()->route('panel.getManage', 'librarians');
 
                 break;
-            /*case 'holidays':
+            case 'holidays':
                 $query = Holidays::where('Holiday_ID', $id)->delete();
 
                 if($query) {
@@ -546,7 +588,7 @@ class PanelController extends Controller
 
                 return redirect()->route('panel.getManage', 'holidays');
 
-                break;*/
+                break;
             default:
                 return view('errors.404');
 
@@ -657,6 +699,7 @@ class PanelController extends Controller
         $this->checkConfigurationFile();
 
         $data['configs'] = simplexml_load_file(storage_path('app') . '/configuration.xml');
+        $data['students'] = Accounts::where('accounts.Account_Type', 'Student')->join('students', 'accounts.Account_Owner', '=', 'students.Student_ID')->get();
 
         return view('panel.reports', $data);
     }
@@ -681,6 +724,40 @@ class PanelController extends Controller
         $data['configs'] = simplexml_load_file(storage_path('app') . '/configuration.xml');
 
         return view('panel.configuration', $data);
+    }
+
+    public function postChangeAccessionStatus(Request $request) {
+        if(!session()->has('username')) {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Oops! Please login first.');
+
+            return redirect()->route('main.getLogin');
+        } else {
+            if(session()->get('account_type') != 'Librarian') {
+                session()->flash('global_status', 'Failed');
+                session()->flash('global_message', 'Oops! You are not authorized to access the panel.');
+
+                return redirect()->route('main.getOpac');
+            }
+        }
+
+        $query = Accessions::where('Accession_Number', $request->input('accessionNumber'))->update(array(
+            'Accession_Status' => $request->input('accessionStatus')
+        ));
+
+        if($query) {
+            session()->flash('global_status', 'Success');
+            session()->flash('global_message', 'Status has been changed.');
+        } else {
+            session()->flash('global_status', 'Failed');
+            session()->flash('global_message', 'Oops! Failed to change status.');
+        }
+
+        if($request->input('materialID') == -1) {
+            return redirect()->route('panel.getManage', 'weeded');
+        } else {
+            return redirect()->route('panel.getMasterInfo', $request->input('materialID'));
+        }
     }
 
     public function postLoan(Request $request) {
@@ -890,43 +967,74 @@ class PanelController extends Controller
         $res = '';
 
         switch($what) {
-            case 'materials':
-                $materialID = Materials::insertGetId(array(
-                    'Material_Title' => $request->input('materialTitle'),
-                    'Material_Collection_Type' => $request->input('materialCollectionType'),
-                    'Material_ISBN' => $request->input('materialISBN'),
-                    'Material_Call_Number' => $request->input('materialCallNumber'),
-                    'Material_Location' => $request->input('materialLocation'),
-                    'Material_Copyright_Year' => $request->input('materialCopyrightYear'),
-                    'Material_Copies' => $request->input('materialCopies'),
-                    'Date_Added' => date('Y-m-d'),
-                    'Publisher_ID' => ($request->input('publisher') != '' ? $request->input('publisher') : '-1')
-                ));
+            case 'accessions':
+                $ctr = 0;
 
-                if($materialID) {
-                    $ctr = 0;
+                for($i = 0; $i < $request->input('copies'); $i++) {
+                    $query = Accessions::insert(array(
+                        'Material_ID' => $request->input('materialID')
+                    ));
 
-                    foreach($request->input('authors') as $authorID) {
-                        $query = Works::insert(array(
-                            'Material_ID' => $materialID,
-                            'Author_ID' => $authorID
-                        ));
-
-                        if($query) {
-                            $ctr++;
-                        }
+                    if($query) {
+                        $ctr++;
                     }
+                }
 
-                    if($ctr > 0) {
-                        session()->flash('global_status', 'Success');
-                        session()->flash('global_message', 'Book has been added.');
+                if($ctr > 0) {
+                    session()->flash('global_status', 'Success');
+                    session()->flash('global_message', $ctr . ' accession(s) has been added.');
+                } else {
+                    session()->flash('global_status', 'Failed');
+                    session()->flash('global_message', 'Failed to add accession numbers.');
+                }
+
+                return redirect()->route('panel.getMasterInfo', $request->input('materialID'));
+
+                break;
+            case 'materials':
+                $query = Materials::where('Material_Title', $request->input('materialTitle'))->orWhere('Material_Call_Number', $request->input('materialCallNumber'))->orWhere('Material_ISBN', $request->input('materialISBN'))->get();
+
+                if(!$query) {
+                    $materialID = Materials::insertGetId(array(
+                        'Material_Title' => $request->input('materialTitle'),
+                        'Material_Collection_Type' => $request->input('materialCollectionType'),
+                        'Material_ISBN' => $request->input('materialISBN'),
+                        'Material_Call_Number' => $request->input('materialCallNumber'),
+                        'Material_Location' => $request->input('materialLocation'),
+                        'Material_Copyright_Year' => $request->input('materialCopyrightYear'),
+                        'Material_Copies' => $request->input('materialCopies'),
+                        'Date_Added' => date('Y-m-d'),
+                        'Publisher_ID' => ($request->input('publisher') != '' ? $request->input('publisher') : '-1')
+                    ));
+
+                    if($materialID) {
+                        $ctr = 0;
+
+                        foreach($request->input('authors') as $authorID) {
+                            $query = Works::insert(array(
+                                'Material_ID' => $materialID,
+                                'Author_ID' => $authorID
+                            ));
+
+                            if($query) {
+                                $ctr++;
+                            }
+                        }
+
+                        if($ctr > 0) {
+                            session()->flash('global_status', 'Success');
+                            session()->flash('global_message', 'Book has been added.');
+                        } else {
+                            session()->flash('global_status', 'Failed');
+                            session()->flash('global_message', 'Failed to associate author(s) to the book.');
+                        }
                     } else {
                         session()->flash('global_status', 'Failed');
-                        session()->flash('global_message', 'Failed to associate author(s) to the book.');
+                        session()->flash('global_message', 'Failed to add book.');
                     }
                 } else {
                     session()->flash('global_status', 'Failed');
-                    session()->flash('global_message', 'Failed to add book.');
+                    session()->flash('global_message', 'Book with the same title, call number and/or isbn already exist.');
                 }
 
                 return redirect()->route('panel.getManage', 'materials');
@@ -1110,7 +1218,7 @@ class PanelController extends Controller
                 return redirect()->route('panel.getManage', 'librarians');
 
                 break;
-            /*case 'holidays':
+            case 'holidays':
                 $query = Holidays::insert(array(
                     'Holiday_Event' => $request->input('holidayEvent'),
                     'Holiday_Date' => $request->input('holidayDate'),
@@ -1126,7 +1234,8 @@ class PanelController extends Controller
                 }
 
                 return redirect()->route('panel.getManage', 'holidays');
-                break;*/
+
+                break;
             default:
                 return view('errors.404');
 
@@ -1234,7 +1343,7 @@ class PanelController extends Controller
                 return redirect()->route('panel.getManage', 'publishers');
 
                 break;
-            case 'users':
+            /*case 'users':
                 $ctr = 0;
 
                 if($request->input('userType') == 'Student') {
@@ -1275,7 +1384,7 @@ class PanelController extends Controller
 
                 return redirect()->route('panel.getManage', 'users');
 
-                break;
+                break;*/
             /*case 'students':
                 $ctr = 0;
 
@@ -1606,6 +1715,15 @@ class PanelController extends Controller
                 $pdf = PDF::loadView('pdf.receive_report', $data);
 
                 return $pdf->stream('domc_receive_report.pdf');
+
+                break;
+            case 'student_report':
+                $data['student'] = Accounts::where('accounts.Account_Username', $request->input('studentID'))->where('accounts.Account_Type', 'Student')->join('students', 'accounts.Account_Owner', '=', 'students.Student_ID')->first();
+                $data['loans'] = Loans::where('loans.Account_Username', $request->input('studentID'))->join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')->leftJoin('receives', 'loans.Loan_ID', '=', 'receives.Receive_Reference')->get();
+
+                $pdf = PDF::loadView('pdf.student_report', $data);
+
+                return $pdf->stream('domc_student_report.pdf');
 
                 break;
             case 'material_report':

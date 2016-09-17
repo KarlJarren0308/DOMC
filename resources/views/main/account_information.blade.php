@@ -7,14 +7,8 @@
 
             if(count($holidays) > 0) {
                 foreach($holidays as $holiday) {
-                    if($holiday->Holiday_Type == 'Suspension') {
-                        if($date == date('Y-m-d', strtotime($holiday->Holiday_Date))) {
-                            return true;
-                        }
-                    } else if($holiday->Holiday_Type == 'Regular') {
-                        if(date('m-d', strtotime($date)) == date('m-d', strtotime($holiday->Holiday_Type))) {
-                            return true;
-                        }
+                    if($date == date('Y-m-d', strtotime($holiday->Holiday_Date))) {
+                        return true;
                     }
                 }
 

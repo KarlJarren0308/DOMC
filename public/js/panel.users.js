@@ -14,7 +14,6 @@ $(document).ready(function() {
         ]
     });
 
-
     $('[data-form="users-confirmation-form"]').submit(function() {
         var thisForm = $(this);
 

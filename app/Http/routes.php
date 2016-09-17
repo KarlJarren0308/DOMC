@@ -23,6 +23,7 @@ Route::get('panel', array('as' => 'panel.getIndex', 'uses' => 'PanelController@g
 Route::get('panel/loan', array('as' => 'panel.getLoan', 'uses' => 'PanelController@getLoan'));
 Route::get('panel/reserved', array('as' => 'panel.getReserved', 'uses' => 'PanelController@getReserved'));
 Route::get('panel/receive', array('as' => 'panel.getReceive', 'uses' => 'PanelController@getReceive'));
+Route::get('panel/master_info/{id}', array('as' => 'panel.getMasterInfo', 'uses' => 'PanelController@getMasterInfo'));
 Route::get('panel/manage/{what}', array('as' => 'panel.getManage', 'uses' => 'PanelController@getManage'));
 Route::get('panel/manage/{what}/add', array('as' => 'panel.getAdd', 'uses' => 'PanelController@getAdd'));
 Route::get('panel/manage/{what}/edit/{id}/{type?}', array('as' => 'panel.getEdit', 'uses' => 'PanelController@getEdit'));
@@ -40,6 +41,7 @@ Route::post('panel/loan', array('as' => 'panel.postLoan', 'uses' => 'PanelContro
 Route::post('panel/receive', array('as' => 'panel.postReceive', 'uses' => 'PanelController@postReceive'));
 Route::post('panel/test', array('as' => 'panel.postTest', 'uses' => 'PanelController@postTest'));
 Route::post('panel/manage/{what}/add', array('as' => 'panel.postAdd', 'uses' => 'PanelController@postAdd'));
+Route::post('panel/manage/accession/status', array('as' => 'panel.postChangeAccessionStatus', 'uses' => 'PanelController@postChangeAccessionStatus'));
 Route::post('panel/manage/{what}/edit/{id}', array('as' => 'panel.postEdit', 'uses' => 'PanelController@postEdit'));
 Route::post('panel/manage/{what}/change_password/{id}', array('as' => 'panel.postChangePassword', 'uses' => 'PanelController@postChangePassword'));
 Route::post('panel/reports/{what}', array('as' => 'panel.postReports', 'uses' => 'PanelController@postReports'));
