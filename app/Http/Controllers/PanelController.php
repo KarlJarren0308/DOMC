@@ -279,7 +279,7 @@ class PanelController extends Controller
 
                 break;
             case 'weeded':
-                $data['accessions'] = Accessions::whereIn('accessions.Accession_Status', ['archived', 'lost', 'weeded'])->join('materials', 'accessions.Material_ID', '=', 'materials.Material_ID')->get();
+                $data['accessions'] = Accessions::whereIn('accessions.Accession_Status', ['archived', 'sold', 'donated', 'lost', 'weeded'])->join('materials', 'accessions.Material_ID', '=', 'materials.Material_ID')->get();
 
                 return view('panel.weeded_materials', $data);
 
@@ -876,21 +876,37 @@ class PanelController extends Controller
                 $materialID = $request->input('arg1');
                 $accountUsername = $request->input('arg2');
 
-                $on_loan = $loaned_materials = Loans::where('Loan_Status', 'active')->where('Account_Username', $accountUsername)->count();
+                $on_loan = Loans::where('Loan_Status', 'active')->where('Account_Username', $accountUsername)->count();
                 $reserved_materials = Reservations::where('Reservation_Status', 'active')->where('Material_ID', $materialID)->count();
                 $loaned_materials = Loans::where('Loan_Status', 'active')->where('Material_ID', $materialID)->count();
                 $materialRow = Materials::where('Material_ID', $materialID)->first();
                 $newMaterialCount = $materialRow->Material_Copies - $reserved_materials - $loaned_materials;
+                $accessions = Accessions::where('Material_ID', $materialID)->where('Accession_Status', 'available')->get();
+                $availableAccessions = [];
 
-                if($newMaterialCount > 0) {
+                foreach($accessions as $accssn) {
+                    array_push($availableAccessions, $accssn->Accession_Number);
+                }
+
+                shuffle($availableAccessions);
+
+                if($newMaterialCount > 0 || $availableAccessions > 0) {
+                    $accs = $availableAccessions[0];
+
                     if($on_loan < $this->loanLimit) {
                         $query = Loans::where('Material_ID', $materialID)->where('Account_Username', $accountUsername)->where('Loan_Status', 'active')->first();
 
                         if(!$query) {
-                            $query = Loans::insert(array('Material_ID' => $materialID, 'Account_Username' => $accountUsername, 'Loan_Date_Stamp' => date('Y-m-d'), 'Loan_Time_Stamp' => date('H:i:s')));
+                            $query = Loans::insert(array(
+                                'Accession_Number' => $accs,
+                                'Material_ID' => $materialID,
+                                'Account_Username' => $accountUsername,
+                                'Loan_Date_Stamp' => date('Y-m-d'),
+                                'Loan_Time_Stamp' => date('H:i:s')
+                            ));
 
                             if($query) {
-                                return json_encode(array('status' => 'Success', 'message' => 'Loan Successful.'));
+                                return json_encode(array('status' => 'Success', 'message' => 'Loan Successful. You may now hand out the book with the accession number of ' . $materialRow->Call_Number . '-' . sprintf('%04d', $accs)));
                             } else {
                                 return json_encode(array('status' => 'Warning', 'message' => 'Oops! Failed to loan book to the borrower.'));
                             }
@@ -931,7 +947,15 @@ class PanelController extends Controller
 
         if($loan) {
             if($loan->Loan_Status == 'active') {
-                $query = Receives::insert(array('Material_ID' => $loan->Material_ID, 'Account_Username' => $loan->Account_Username, 'Receive_Date_Stamp' => date('Y-m-d'), 'Receive_Time_Stamp' => date('H:i:s'), 'Receive_Reference' => $id, 'Penalty' => $request->input('arg1')));
+                $query = Receives::insert(array(
+                    'Material_ID' => $loan->Material_ID,
+                    'Account_Username' => $loan->Account_Username,
+                    'Receive_Date_Stamp' => date('Y-m-d'),
+                    'Receive_Time_Stamp' => date('H:i:s'),
+                    'Receive_Reference' => $id,
+                    'Penalty' => $request->input('arg1'),
+                    'Clearance' => 'paid'
+                ));
 
                 if($query) {
                     $query = Loans::where('Loan_ID', $id)->update(array('Loan_Status' => 'inactive'));
@@ -982,7 +1006,7 @@ class PanelController extends Controller
 
                 if($ctr > 0) {
                     session()->flash('global_status', 'Success');
-                    session()->flash('global_message', $ctr . ' accession(s) has been added.');
+                    session()->flash('global_message', $ctr . ' accession number(s) has been added.');
                 } else {
                     session()->flash('global_status', 'Failed');
                     session()->flash('global_message', 'Failed to add accession numbers.');
@@ -992,9 +1016,9 @@ class PanelController extends Controller
 
                 break;
             case 'materials':
-                $query = Materials::where('Material_Title', $request->input('materialTitle'))->orWhere('Material_Call_Number', $request->input('materialCallNumber'))->orWhere('Material_ISBN', $request->input('materialISBN'))->get();
+                $count = Materials::where('Material_Title', $request->input('materialTitle'))->orWhere('Material_Call_Number', $request->input('materialCallNumber'))->orWhere('Material_ISBN', $request->input('materialISBN'))->count();
 
-                if(!$query) {
+                if($count == 0) {
                     $materialID = Materials::insertGetId(array(
                         'Material_Title' => $request->input('materialTitle'),
                         'Material_Collection_Type' => $request->input('materialCollectionType'),
@@ -1009,6 +1033,17 @@ class PanelController extends Controller
 
                     if($materialID) {
                         $ctr = 0;
+                        $ctrAccessions = 0;
+
+                        for($i = 0; $i < $request->input('materialCopies'); $i++) {
+                            $query = Accessions::insert(array(
+                                'Material_ID' => $materialID
+                            ));
+
+                            if($query) {
+                                $ctrAccessions++;
+                            }
+                        }
 
                         foreach($request->input('authors') as $authorID) {
                             $query = Works::insert(array(

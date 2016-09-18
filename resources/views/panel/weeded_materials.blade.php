@@ -98,9 +98,7 @@
                                 <td class="text-center">{{ date('F d, Y', strtotime($accession->Accession_Date_Added)) }}</td>
                                 <td class="text-center">{{ ucfirst($accession->Accession_Status) }}</td>
                                 <td class="text-center">
-                                    @if($accession->Accession_Status !== 'lost' && $accession->Accession_Status !== 'weeded')
-                                        <button class="btn btn-green btn-sm" data-button="manage-accession-button" data-var-id="{{ $accession->Accession_Number }}" data-var-status="{{ $accession->Accession_Status }}">Manage</button>
-                                    @endif
+                                    <button class="btn btn-green btn-sm" data-button="manage-accession-button" data-var-id="{{ $accession->Accession_Number }}" data-var-status="{{ $accession->Accession_Status }}">Manage</button>
                                 </td>
                             </tr>
                         @endforeach
@@ -127,8 +125,8 @@
                         <select name="accessionStatus" id="accessionStatus" class="u-full-width" required>
                             <option value="" selected disabled>Select a status...</option>
                             <option value="available">Available</option>
-                            <option value="sold">Sold</option>
                             <option value="archived">Archived</option>
+                            <option value="sold">Sold</option>
                             <option value="donated">Donated</option>
                             <option value="weeded">Weeded</option>
                         </select>

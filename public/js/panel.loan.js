@@ -329,13 +329,24 @@ $(document).ready(function() {
             },
             dataType: 'json',
             success: function(response) {
+                var tm = 2000;
+
                 closeModal('loader-modal');
                 setModalContent('Loan Book(s)', response['message'], 'done-modal');
                 openModal(false, 'done-modal');
 
+                if(response['status'] == 'Success') {
+                    tm = 5000;
+                } else {
+                    tm = 2000;
+                }
+
                 setTimeout(function() {
                     location.reload();
-                }, 2000);
+                }, tm);
+            },
+            error: function(arg0, arg1, arg2) {
+                console.log(arg0.responseText);
             }
         });
 

@@ -77,13 +77,12 @@ function isDate(selector) {
 
 function isISBN(selector) {
     var regex = /[^0-9-]/i;
-    var format = /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/;
 
-    if((regex.test(selector.value)) || (selector.value.length == 10 && !format.test(selector.value))) {
+    if((regex.test(selector.value)) || (selector.value.length == 20)) {
         if(sweetAlertPrompt == true) {
             sweetAlert({
                 title: 'Invalid Input',
-                text: 'Input should be a date in yyyy-mm-dd format.',
+                text: 'Input should be a valid isbn format.',
                 timer: 2000,
                 showConfirmButton: false
             });

@@ -164,7 +164,7 @@ class SearchController extends Controller
                 $data['per_day_penalty'] = $perDayPenalty;
                 $data['start_penalty_after'] = $startPenaltyAfter;
                 $data['holidays'] = Holidays::get();
-                $data['loans'] = Loans::where('loans.Account_Username', 'like', '%' . $request->input('searchKeyword') . '%')->join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')->join('accounts', 'loans.Account_Username', '=', 'accounts.Account_Username')->get();
+                $data['loans'] = Loans::where('materials.Material_Title', 'like', $request->input('searchKeyword') . '%')->orWhere('materials.Material_Call_Number', 'like', $request->input('searchKeyword') . '%')->orWhere('materials.Material_ISBN', 'like', $request->input('searchKeyword') . '%')->join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')->join('accounts', 'loans.Account_Username', '=', 'accounts.Account_Username')->get();
                 $data['receives'] = Receives::get();
                 $data['faculty_accounts'] = Faculties::get();
                 $data['librarian_accounts'] = Librarians::get();

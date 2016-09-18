@@ -89,7 +89,7 @@
                                 <div class="four columns">
                                     <div class="input-block">
                                         {!! Form::label('materialISBN', 'ISBN:') !!}
-                                        {!! Form::text('materialISBN', null, array('class' => 'u-full-width', 'placeholder' => 'Enter ISBN Here', 'onkeyup' => 'isISBN(this)', 'required' => 'required')) !!}
+                                        {!! Form::text('materialISBN', null, array('class' => 'u-full-width', 'placeholder' => 'Enter ISBN Here', 'maxlength' => '20', 'onkeyup' => 'isISBN(this)', 'required' => 'required')) !!}
                                     </div>
                                 </div>
                             </div>
