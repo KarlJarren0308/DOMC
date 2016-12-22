@@ -168,12 +168,12 @@ class MainController extends Controller
             $on_reserved = Reservations::where('Reservation_Status', 'active')->where('Account_Username', session()->get('username'))->count();
 
             if($on_reserved < $this->reservationLimit) {
-                $query = Reservations::insert(array(
+                $query = Reservations::insert([
                     'Material_ID' => $what,
                     'Account_Username' => session()->get('username'),
                     'Reservation_Date_Stamp' => date('Y-m-d'),
                     'Reservation_Time_Stamp' => date('H:i:s')
-                ));
+                ]);
 
                 if($query) {
                     session()->flash('global_status', 'Success');
@@ -206,9 +206,9 @@ class MainController extends Controller
             $query = Accounts::where('Account_Username', session()->get('username'))->where('Account_Password', md5($request->input('oldPassword')))->first();
 
             if($query) {
-                $query = Accounts::where('Account_Username', session()->get('username'))->update(array(
+                $query = Accounts::where('Account_Username', session()->get('username'))->update([
                     'Account_Password' => md5($request->input('newPassword'))
-                ));
+                ]);
 
                 if($query) {
                     session()->flash('global_status', 'Success');
@@ -240,22 +240,28 @@ class MainController extends Controller
         switch($request->input('arg0')) {
             case '2705a83a5a0659cce34583972637eda5':
                 // arg0: ajax
-                $query = Reservations::where('Reservation_ID', $request->input('arg1'))->update(array(
+                $query = Reservations::where('Reservation_ID', $request->input('arg1'))->update([
                     'Reservation_Status' => 'inactive'
-                ));
+                ]);
 
                 if($query) {
-                    return json_encode(array('status' => 'Success', 'message' => 'Reservation has been cancelled.'));
+                    return json_encode([
+                        'status' => 'Success',
+                        'message' => 'Reservation has been cancelled.'
+                    ]);
                 } else {
-                    return json_encode(array('status' => 'Failed', 'message' => 'Failed to cancel reservation.'));
+                    return json_encode([
+                        'status' => 'Failed',
+                        'message' => 'Failed to cancel reservation.'
+                    ]);
                 }
 
                 break;
             case 'a8affc088cbca89fa20dbd98c91362e4':
                 // arg0: click
-                $query = Reservations::where('Reservation_ID', $request->input('arg1'))->update(array(
+                $query = Reservations::where('Reservation_ID', $request->input('arg1'))->update([
                     'Reservation_Status' => 'inactive'
-                ));
+                ]);
 
                 if($query) {
                     session()->flash('global_status', 'Success');
@@ -355,6 +361,10 @@ class MainController extends Controller
             $data['on_reserved'] = Reservations::where('Reservation_Status', 'active')->where('Account_Username', session()->get('username'))->count();
         }
 
-        return json_encode(array('status' => 'Success', 'message' => 'Request Successful.', 'data' => $data));
+        return json_encode([
+            'status' => 'Success',
+            'message' => 'Request Successful.',
+            'data' => $data
+        ]);
     }
 }

@@ -182,7 +182,7 @@ class PanelController extends Controller
         $data['works_authors'] = Works::where('works.Material_ID', $id)->join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
         $data['material'] = Materials::where('Material_ID', $id)->first();
         $data['accessions'] = Accessions::where('accessions.Material_ID', $id)->whereIn('accessions.Accession_Status', ['available', 'archived'])->join('materials', 'accessions.Material_ID', '=', 'materials.Material_ID')->get();
-        $data['available_copies'] = Accessions::where('Material_ID', $id)->whereIn('Accession_Status', ['available', 'archive'])->count();
+        $data['available_copies'] = Accessions::where('Material_ID', $id)->whereIn('Accession_Status', ['available', 'archived'])->count();
 
         return view('panel.material_master_accessions', $data);
     }
@@ -222,6 +222,7 @@ class PanelController extends Controller
                 $data['works_materials'] = Works::join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->groupBy('works.Material_ID')->get();
                 $data['reserved_materials'] = Reservations::where('Reservation_Status', 'active')->get();
                 $data['loaned_materials'] = Loans::where('Loan_Status', 'active')->get();
+                $data['accession_numbers'] = Accessions::get();
 
                 return view('panel.materials', $data);
 
@@ -279,7 +280,7 @@ class PanelController extends Controller
 
                 break;
             case 'weeded':
-                $data['accessions'] = Accessions::whereIn('accessions.Accession_Status', ['archived', 'sold', 'donated', 'lost', 'weeded'])->join('materials', 'accessions.Material_ID', '=', 'materials.Material_ID')->get();
+                $data['accessions'] = Accessions::whereIn('accessions.Accession_Status', ['archived', 'lost', 'weeded'])->join('materials', 'accessions.Material_ID', '=', 'materials.Material_ID')->get();
 
                 return view('panel.weeded_materials', $data);
 
@@ -621,20 +622,20 @@ class PanelController extends Controller
             case 'users':
                 if($type == 'Student') {
                     $query = Students::where('Student_ID', $id)->first();
-                    $data['who'] = array(
+                    $data['who'] = [
                         'First_Name' => $query->Student_First_Name,
                         'Middle_Name' => $query->Student_Middle_Name,
                         'Last_Name' => $query->Student_Last_Name,
                         'Type' => 'Student'
-                    );
+                    ];
                 } else {
                     $query = Faculties::where('Faculty_ID', $id)->first();
-                    $data['who'] = array(
+                    $data['who'] = [
                         'First_Name' => $query->Faculty_First_Name,
                         'Middle_Name' => $query->Faculty_Middle_Name,
                         'Last_Name' => $query->Faculty_Last_Name,
                         'Type' => 'Faculty'
-                    );
+                    ];
                 }
 
                 return view('panel.change_password', $data);
@@ -642,34 +643,34 @@ class PanelController extends Controller
                 break;
             /*case 'students':
                 $query = Students::where('Student_ID', $id)->first();
-                $data['who'] = array(
+                $data['who'] = [
                     'First_Name' => $query->Student_First_Name,
                     'Middle_Name' => $query->Student_Middle_Name,
                     'Last_Name' => $query->Student_Last_Name
-                );
+                ];
 
                 return view('panel.change_password', $data);
 
                 break;
             case 'faculties':
                 $query = Faculties::where('Faculty_ID', $id)->first();
-                $data['who'] = array(
+                $data['who'] = [
                     'First_Name' => $query->Faculty_First_Name,
                     'Middle_Name' => $query->Faculty_Middle_Name,
                     'Last_Name' => $query->Faculty_Last_Name
-                );
+                ];
 
                 return view('panel.change_password', $data);
 
                 break;*/
             case 'librarians':
                 $query = Librarians::where('Librarian_ID', $id)->first();
-                $data['who'] = array(
+                $data['who'] = [
                     'First_Name' => $query->Librarian_First_Name,
                     'Middle_Name' => $query->Librarian_Middle_Name,
                     'Last_Name' => $query->Librarian_Last_Name,
                     'Type' => 'Librarian'
-                );
+                ];
 
                 return view('panel.change_password', $data);
 
@@ -741,9 +742,9 @@ class PanelController extends Controller
             }
         }
 
-        $query = Accessions::where('Accession_Number', $request->input('accessionNumber'))->update(array(
+        $query = Accessions::where('Accession_Number', $request->input('accessionNumber'))->update([
             'Accession_Status' => $request->input('accessionStatus')
-        ));
+        ]);
 
         if($query) {
             session()->flash('global_status', 'Success');
@@ -792,7 +793,12 @@ class PanelController extends Controller
                         $query = Loans::where('Material_ID', $materialID)->where('Account_Username', $accountUsername)->where('Loan_Status', 'active')->first();
 
                         if(!$query) {
-                            $query = Loans::insert(array('Material_ID' => $materialID, 'Account_Username' => $accountUsername, 'Loan_Date_Stamp' => date('Y-m-d'), 'Loan_Time_Stamp' => date('H:i:s')));
+                            $query = Loans::insert([
+                                'Material_ID' => $materialID,
+                                'Account_Username' => $accountUsername,
+                                'Loan_Date_Stamp' => date('Y-m-d'),
+                                'Loan_Time_Stamp' => date('H:i:s')
+                            ]);
 
                             if($query) {
                                 session()->flash('global_status', 'Success');
@@ -833,10 +839,18 @@ class PanelController extends Controller
                             $datetime = date('Y-m-d H:i:s', strtotime($reservation->Reservation_Date_Stamp . ' ' . $reservation->Reservation_Time_Stamp));
 
                             if(strtotime('+1 day', strtotime($datetime)) >= strtotime(date('Y-m-d H:i:s'))) {
-                                $query = Reservations::where('Reservation_ID', $id)->update(array('Reservation_Status' => 'loaned'));
+                                $query = Reservations::where('Reservation_ID', $id)->update([
+                                    'Reservation_Status' => 'loaned'
+                                ]);
 
                                 if($query) {
-                                    $query = Loans::insert(array('Material_ID' => $reservation->Material_ID, 'Account_Username' => $reservation->Account_Username, 'Loan_Date_Stamp' => date('Y-m-d'), 'Loan_Time_Stamp' => date('H:i:s'), 'Loan_Reference' => $id));
+                                    $query = Loans::insert([
+                                        'Material_ID' => $reservation->Material_ID,
+                                        'Account_Username' => $reservation->Account_Username,
+                                        'Loan_Date_Stamp' => date('Y-m-d'),
+                                        'Loan_Time_Stamp' => date('H:i:s'),
+                                        'Loan_Reference' => $id
+                                    ]);
 
                                     if($query) {
                                         session()->flash('global_status', 'Success');
@@ -850,7 +864,9 @@ class PanelController extends Controller
                                     session()->flash('global_message', 'Oops! Failed to loan book to the borrower. Request has been interrupted.');
                                 }
                             } else {
-                                $query = Reservations::where('Reservation_ID', $id)->update(array('Reservation_Status' => 'inactive'));
+                                $query = Reservations::where('Reservation_ID', $id)->update([
+                                    'Reservation_Status' => 'inactive'
+                                ]);
 
                                 session()->flash('global_status', 'Failed');
                                 session()->flash('global_message', 'Oops! This reservation has already expired.');
@@ -897,27 +913,42 @@ class PanelController extends Controller
                         $query = Loans::where('Material_ID', $materialID)->where('Account_Username', $accountUsername)->where('Loan_Status', 'active')->first();
 
                         if(!$query) {
-                            $query = Loans::insert(array(
+                            $query = Loans::insert([
                                 'Accession_Number' => $accs,
                                 'Material_ID' => $materialID,
                                 'Account_Username' => $accountUsername,
                                 'Loan_Date_Stamp' => date('Y-m-d'),
                                 'Loan_Time_Stamp' => date('H:i:s')
-                            ));
+                            ]);
 
                             if($query) {
-                                return json_encode(array('status' => 'Success', 'message' => 'Loan Successful. You may now hand out the book with the accession number of ' . $materialRow->Call_Number . '-' . sprintf('%04d', $accs)));
+                                return json_encode([
+                                    'status' => 'Success',
+                                    'message' => 'Loan Successful. You may now hand out the book with the accession number of ' . $materialRow->Call_Number . '-' . sprintf('%04d', $accs)
+                                ]);
                             } else {
-                                return json_encode(array('status' => 'Warning', 'message' => 'Oops! Failed to loan book to the borrower.'));
+                                return json_encode([
+                                    'status' => 'Warning',
+                                    'message' => 'Oops! Failed to loan book to the borrower.'
+                                ]);
                             }
                         } else {
-                            return json_encode(array('status' => 'Failed', 'message' => 'Oops! Borrower has already loan a copy of this book.'));
+                            return json_encode([
+                                'status' => 'Failed',
+                                'message' => 'Oops! Borrower has already loan a copy of this book.'
+                            ]);
                         }
                     } else {
-                        return json_encode(array('status' => 'Failed', 'message' => 'Oops! You can only loan at most 3 books to this borrower at a time.'));
+                        return json_encode([
+                            'status' => 'Failed',
+                            'message' => 'Oops! You can only loan at most 3 books to this borrower at a time.'
+                        ]);
                     }
                 } else {
-                    return json_encode(array('status' => 'Failed', 'message' => 'Oops! No more copies available.'));
+                    return json_encode([
+                        'status' => 'Failed',
+                        'message' => 'Oops! No more copies available.'
+                    ]);
                 }
 
                 break;
@@ -947,7 +978,7 @@ class PanelController extends Controller
 
         if($loan) {
             if($loan->Loan_Status == 'active') {
-                $query = Receives::insert(array(
+                $query = Receives::insert([
                     'Material_ID' => $loan->Material_ID,
                     'Account_Username' => $loan->Account_Username,
                     'Receive_Date_Stamp' => date('Y-m-d'),
@@ -955,20 +986,34 @@ class PanelController extends Controller
                     'Receive_Reference' => $id,
                     'Penalty' => $request->input('arg1'),
                     'Clearance' => 'paid'
-                ));
+                ]);
 
                 if($query) {
-                    $query = Loans::where('Loan_ID', $id)->update(array('Loan_Status' => 'inactive'));
+                    $query = Loans::where('Loan_ID', $id)->update([
+                        'Loan_Status' => 'inactive'
+                    ]);
                     
-                    return json_encode(array('status' => 'Success', 'message' => 'Receive Successful.'));
+                    return json_encode([
+                        'status' => 'Success',
+                        'message' => 'Receive Successful.'
+                    ]);
                 } else {
-                    return json_encode(array('status' => 'Warning', 'message' => 'Oops! Failed to receive book.'));
+                    return json_encode([
+                        'status' => 'Warning',
+                        'message' => 'Oops! Failed to receive book.'
+                    ]);
                 }
             } else {
-                return json_encode(array('status' => 'Warning', 'message' => 'Oops! Borrower has already returned this book.'));
+                return json_encode([
+                    'status' => 'Warning',
+                    'message' => 'Oops! Borrower has already returned this book.'
+                ]);
             }
         } else {
-            return json_encode(array('status' => 'Failed', 'message' => 'Oops! This loan doesn\'t exist.'));
+            return json_encode([
+                'status' => 'Failed',
+                'message' => 'Oops! This loan doesn\'t exist.'
+            ]);
         }
     }
 
@@ -995,9 +1040,9 @@ class PanelController extends Controller
                 $ctr = 0;
 
                 for($i = 0; $i < $request->input('copies'); $i++) {
-                    $query = Accessions::insert(array(
+                    $query = Accessions::insert([
                         'Material_ID' => $request->input('materialID')
-                    ));
+                    ]);
 
                     if($query) {
                         $ctr++;
@@ -1019,7 +1064,7 @@ class PanelController extends Controller
                 $count = Materials::where('Material_Title', $request->input('materialTitle'))->orWhere('Material_Call_Number', $request->input('materialCallNumber'))->orWhere('Material_ISBN', $request->input('materialISBN'))->count();
 
                 if($count == 0) {
-                    $materialID = Materials::insertGetId(array(
+                    $materialID = Materials::insertGetId([
                         'Material_Title' => $request->input('materialTitle'),
                         'Material_Collection_Type' => $request->input('materialCollectionType'),
                         'Material_ISBN' => $request->input('materialISBN'),
@@ -1029,16 +1074,16 @@ class PanelController extends Controller
                         'Material_Copies' => $request->input('materialCopies'),
                         'Date_Added' => date('Y-m-d'),
                         'Publisher_ID' => ($request->input('publisher') != '' ? $request->input('publisher') : '-1')
-                    ));
+                    ]);
 
                     if($materialID) {
                         $ctr = 0;
                         $ctrAccessions = 0;
 
                         for($i = 0; $i < $request->input('materialCopies'); $i++) {
-                            $query = Accessions::insert(array(
+                            $query = Accessions::insert([
                                 'Material_ID' => $materialID
-                            ));
+                            ]);
 
                             if($query) {
                                 $ctrAccessions++;
@@ -1046,10 +1091,10 @@ class PanelController extends Controller
                         }
 
                         foreach($request->input('authors') as $authorID) {
-                            $query = Works::insert(array(
+                            $query = Works::insert([
                                 'Material_ID' => $materialID,
                                 'Author_ID' => $authorID
-                            ));
+                            ]);
 
                             if($query) {
                                 $ctr++;
@@ -1079,18 +1124,25 @@ class PanelController extends Controller
                 $query = Authors::where('Author_First_Name', $request->input('authorFirstName'))->where('Author_Middle_Name', $request->input('authorMiddleName'))->where('Author_Last_Name', $request->input('authorLastName'))->first();
 
                 if($query) {
-                    return json_encode(array('status' => 'Failed', 'message' => 'Author already exist.'));
+                    return json_encode([
+                        'status' => 'Failed',
+                        'message' => 'Author already exist.'
+                    ]);
                 } else {
-                    $query = Authors::insert(array(
+                    $query = Authors::insert([
                         'Author_First_Name' => $request->input('authorFirstName'),
                         'Author_Middle_Name' => $request->input('authorMiddleName'),
                         'Author_Last_Name' => $request->input('authorLastName')
-                    ));
+                    ]);
 
                     if($query) {
-                        return json_encode(array('status' => 'Success', 'message' => 'Author has been added.'));
+                        return json_encode(['status' => 'Success',
+                            'message' => 'Author has been added.'
+                        ]);
                     } else {
-                        return json_encode(array('status' => 'Failed', 'message' => 'Failed to add author.'));
+                        return json_encode(['status' => 'Failed',
+                            'message' => 'Failed to add author.'
+                        ]);
                     }
                 }
 
@@ -1099,35 +1151,44 @@ class PanelController extends Controller
                 $query = Publishers::where('Publisher_Name', $request->input('publisherName'))->first();
 
                 if($query) {
-                    return json_encode(array('status' => 'Failed', 'message' => 'Publisher already exist.'));
+                    return json_encode([
+                        'status' => 'Failed',
+                        'message' => 'Publisher already exist.'
+                    ]);
                 } else {
-                    $query = Publishers::insert(array(
+                    $query = Publishers::insert([
                         'Publisher_Name' => $request->input('publisherName')
-                    ));
+                    ]);
 
                     if($query) {
-                        return json_encode(array('status' => 'Success', 'message' => 'Publisher has been added.'));
+                        return json_encode([
+                            'status' => 'Success',
+                            'message' => 'Publisher has been added.'
+                        ]);
                     } else {
-                        return json_encode(array('status' => 'Failed', 'message' => 'Failed to add publisher.'));
+                        return json_encode([
+                            'status' => 'Failed',
+                            'message' => 'Failed to add publisher.'
+                        ]);
                     }
                 }
 
                 break;
             case 'users':
                 if($request->input('userType') == 'Student') {
-                    $id = Students::insertGetId(array(
+                    $id = Students::insertGetId([
                         'Student_First_Name' => $request->input('userFirstName'),
                         'Student_Middle_Name' => $request->input('userMiddleName'),
                         'Student_Last_Name' => $request->input('userLastName'),
                         'Student_Birth_Date' => $request->input('userBirthDate')
-                    ));
+                    ]);
                 } else if($request->input('userType') == 'Faculty') {
-                    $id = Faculties::insertGetId(array(
+                    $id = Faculties::insertGetId([
                         'Faculty_First_Name' => $request->input('userFirstName'),
                         'Faculty_Middle_Name' => $request->input('userMiddleName'),
                         'Faculty_Last_Name' => $request->input('userLastName'),
                         'Faculty_Birth_Date' => $request->input('userBirthDate')
-                    ));
+                    ]);
                 } else {
                     session()->flash('global_status', 'Failed');
                     session()->flash('global_message', 'Invalid type of user.');
@@ -1136,13 +1197,13 @@ class PanelController extends Controller
                 }
 
                 if($id) {
-                    $query = Accounts::insert(array(
+                    $query = Accounts::insert([
                         'Account_Username' => $request->input('userID'),
                         'Account_Password' => md5($request->input('userBirthDate')),
                         'Account_Type' => $request->input('userType'),
                         'Account_Owner' => $id,
                         'Date_Added' => date('Y-m-d')
-                    ));
+                    ]);
 
                     if($query) {
                         session()->flash('global_status', 'Success');
@@ -1160,20 +1221,20 @@ class PanelController extends Controller
 
                 break;
             /*case 'students':
-                $id = Students::insertGetId(array(
+                $id = Students::insertGetId([
                     'Student_First_Name' => $request->input('studentFirstName'),
                     'Student_Middle_Name' => $request->input('studentMiddleName'),
                     'Student_Last_Name' => $request->input('studentLastName'),
                     'Student_Birth_Date' => $request->input('studentBirthDate')
-                ));
+                ]);
 
                 if($id) {
-                    $query = Accounts::insert(array(
+                    $query = Accounts::insert([
                         'Account_Username' => $request->input('studentID'),
                         'Account_Password' => md5($request->input('studentBirthDate')),
                         'Account_Type' => 'Student',
                         'Account_Owner' => $id
-                    ));
+                    ]);
 
                     if($query) {
                         session()->flash('global_status', 'Success');
@@ -1191,20 +1252,20 @@ class PanelController extends Controller
 
                 break;
             case 'faculties':
-                $id = Faculties::insertGetId(array(
+                $id = Faculties::insertGetId([
                     'Faculty_First_Name' => $request->input('facultyFirstName'),
                     'Faculty_Middle_Name' => $request->input('facultyMiddleName'),
                     'Faculty_Last_Name' => $request->input('facultyLastName'),
                     'Faculty_Birth_Date' => $request->input('facultyBirthDate')
-                ));
+                ]);
 
                 if($id) {
-                    $query = Accounts::insert(array(
+                    $query = Accounts::insert([
                         'Account_Username' => $request->input('facultyID'),
                         'Account_Password' => md5($request->input('facultyBirthDate')),
                         'Account_Type' => 'Faculty',
                         'Account_Owner' => $id
-                    ));
+                    ]);
 
                     if($query) {
                         session()->flash('global_status', 'Success');
@@ -1222,21 +1283,21 @@ class PanelController extends Controller
 
                 break;*/
             case 'librarians':
-                $id = Librarians::insertGetId(array(
+                $id = Librarians::insertGetId([
                     'Librarian_First_Name' => $request->input('librarianFirstName'),
                     'Librarian_Middle_Name' => $request->input('librarianMiddleName'),
                     'Librarian_Last_Name' => $request->input('librarianLastName'),
                     'Librarian_Birth_Date' => $request->input('librarianBirthDate')
-                ));
+                ]);
 
                 if($id) {
-                    $query = Accounts::insert(array(
+                    $query = Accounts::insert([
                         'Account_Username' => $request->input('librarianID'),
                         'Account_Password' => md5($request->input('librarianBirthDate')),
                         'Account_Type' => 'Librarian',
                         'Account_Owner' => $id,
                         'Date_Added' => date('Y-m-d')
-                    ));
+                    ]);
 
                     if($query) {
                         session()->flash('global_status', 'Success');
@@ -1254,11 +1315,11 @@ class PanelController extends Controller
 
                 break;
             case 'holidays':
-                $query = Holidays::insert(array(
+                $query = Holidays::insert([
                     'Holiday_Event' => $request->input('holidayEvent'),
                     'Holiday_Date' => $request->input('holidayDate'),
                     'Holiday_Type' => $request->input('holidayType')
-                ));
+                ]);
 
                 if($query) {
                     session()->flash('global_status', 'Success');
@@ -1301,7 +1362,7 @@ class PanelController extends Controller
                 $query = Works::where('Material_ID', $id)->delete();
 
                 if($query) {
-                    $query = Materials::where('Material_ID', $id)->update(array(
+                    $query = Materials::where('Material_ID', $id)->update([
                         'Material_Title' => $request->input('materialTitle'),
                         'Material_Collection_Type' => $request->input('materialCollectionType'),
                         'Material_ISBN' => $request->input('materialISBN'),
@@ -1310,7 +1371,7 @@ class PanelController extends Controller
                         'Material_Copyright_Year' => $request->input('materialCopyrightYear'),
                         'Material_Copies' => $request->input('materialCopies'),
                         'Publisher_ID' => ($request->input('publisher') != '' ? $request->input('publisher') : '-1')
-                    ));
+                    ]);
 
                     $ctr = 0;
 
@@ -1318,10 +1379,10 @@ class PanelController extends Controller
                         $query = Works::where('Material_ID', $id)->where('Author_ID', $authorID)->first();
 
                         if(!$query) {
-                            $query = Works::insert(array(
+                            $query = Works::insert([
                                 'Material_ID' => $id,
                                 'Author_ID' => $authorID
-                            ));
+                            ]);
 
                             if($query) {
                                 $ctr++;
@@ -1345,11 +1406,11 @@ class PanelController extends Controller
 
                 break;
             case 'authors':
-                $query = Authors::where('Author_ID', $id)->update(array(
+                $query = Authors::where('Author_ID', $id)->update([
                     'Author_First_Name' => $request->input('authorFirstName'),
                     'Author_Middle_Name' => $request->input('authorMiddleName'),
                     'Author_Last_Name' => $request->input('authorLastName')
-                ));
+                ]);
 
                 if($query) {
                     session()->flash('global_status', 'Success');
@@ -1363,9 +1424,9 @@ class PanelController extends Controller
 
                 break;
             case 'publishers':
-                $query = Publishers::where('Publisher_ID', $id)->update(array(
+                $query = Publishers::where('Publisher_ID', $id)->update([
                     'Publisher_Name' => $request->input('publisherName')
-                ));
+                ]);
 
                 if($query) {
                     session()->flash('global_status', 'Success');
@@ -1382,28 +1443,28 @@ class PanelController extends Controller
                 $ctr = 0;
 
                 if($request->input('userType') == 'Student') {
-                    $query = Students::where('Student_ID', $id)->update(array(
+                    $query = Students::where('Student_ID', $id)->update([
                         'Student_First_Name' => $request->input('userFirstName'),
                         'Student_Middle_Name' => $request->input('userMiddleName'),
                         'Student_Last_Name' => $request->input('userLastName'),
                         'Student_Birth_Date' => $request->input('userBirthDate')
-                    ));
+                    ]);
                 } else {
-                    $query = Faculties::where('Faculty_ID', $id)->update(array(
+                    $query = Faculties::where('Faculty_ID', $id)->update([
                         'Faculty_First_Name' => $request->input('userFirstName'),
                         'Faculty_Middle_Name' => $request->input('userMiddleName'),
                         'Faculty_Last_Name' => $request->input('userLastName'),
                         'Faculty_Birth_Date' => $request->input('userBirthDate')
-                    ));
+                    ]);
                 }
 
                 if($query) {
                     $ctr++;
                 }
 
-                $query = Accounts::where('Account_Type', $request->input('userType'))->where('Account_Owner', $id)->update(array(
+                $query = Accounts::where('Account_Type', $request->input('userType'))->where('Account_Owner', $id)->update([
                     'Account_Username' => $request->input('userID')
-                ));
+                ]);
 
                 if($query) {
                     $ctr++;
@@ -1423,20 +1484,20 @@ class PanelController extends Controller
             /*case 'students':
                 $ctr = 0;
 
-                $query = Students::where('Student_ID', $id)->update(array(
+                $query = Students::where('Student_ID', $id)->update([
                     'Student_First_Name' => $request->input('studentFirstName'),
                     'Student_Middle_Name' => $request->input('studentMiddleName'),
                     'Student_Last_Name' => $request->input('studentLastName'),
                     'Student_Birth_Date' => $request->input('studentBirthDate')
-                ));
+                ]);
 
                 if($query) {
                     $ctr++;
                 }
 
-                $query = Accounts::where('Account_Type', 'Student')->where('Account_Owner', $id)->update(array(
+                $query = Accounts::where('Account_Type', 'Student')->where('Account_Owner', $id)->update([
                     'Account_Username' => $request->input('studentID')
-                ));
+                ]);
 
                 if($query) {
                     $ctr++;
@@ -1456,20 +1517,20 @@ class PanelController extends Controller
             case 'faculties':
                 $ctr = 0;
 
-                $query = Faculties::where('Faculty_ID', $id)->update(array(
+                $query = Faculties::where('Faculty_ID', $id)->update([
                     'Faculty_First_Name' => $request->input('facultyFirstName'),
                     'Faculty_Middle_Name' => $request->input('facultyMiddleName'),
                     'Faculty_Last_Name' => $request->input('facultyLastName'),
                     'Faculty_Birth_Date' => $request->input('facultyBirthDate')
-                ));
+                ]);
 
                 if($query) {
                     $ctr++;
                 }
 
-                $query = Accounts::where('Account_Type', 'Faculty')->where('Account_Owner', $id)->update(array(
+                $query = Accounts::where('Account_Type', 'Faculty')->where('Account_Owner', $id)->update([
                     'Account_Username' => $request->input('facultyID')
-                ));
+                ]);
 
                 if($query) {
                     $ctr++;
@@ -1489,20 +1550,20 @@ class PanelController extends Controller
             case 'librarians':
                 $ctr = 0;
 
-                $query = Librarians::where('Librarian_ID', $id)->update(array(
+                $query = Librarians::where('Librarian_ID', $id)->update([
                     'Librarian_First_Name' => $request->input('librarianFirstName'),
                     'Librarian_Middle_Name' => $request->input('librarianMiddleName'),
                     'Librarian_Last_Name' => $request->input('librarianLastName'),
                     'Librarian_Birth_Date' => $request->input('librarianBirthDate')
-                ));
+                ]);
 
                 if($query) {
                     $ctr++;
                 }
 
-                $query = Accounts::where('Account_Type', 'Librarian')->where('Account_Owner', $id)->update(array(
+                $query = Accounts::where('Account_Type', 'Librarian')->where('Account_Owner', $id)->update([
                     'Account_Username' => $request->input('librarianID')
-                ));
+                ]);
 
                 if($query) {
                     $ctr++;
@@ -1549,9 +1610,9 @@ class PanelController extends Controller
                     $query = Accounts::where('Account_Owner', $id)->where('Account_Type', $request->input('accountType'))->first();
 
                     if($query) {
-                        $query = Accounts::where('Account_Owner', $id)->where('Account_Type', $request->input('accountType'))->update(array(
+                        $query = Accounts::where('Account_Owner', $id)->where('Account_Type', $request->input('accountType'))->update([
                             'Account_Password' => md5($request->input('newPassword'))
-                        ));
+                        ]);
 
                         if($query) {
                             session()->flash('global_status', 'Success');
@@ -1577,9 +1638,9 @@ class PanelController extends Controller
                     $query = Accounts::where('Account_Owner', $id)->where('Account_Type', 'Student')->first();
 
                     if($query) {
-                        $query = Accounts::where('Account_Owner', $id)->where('Account_Type', 'Student')->update(array(
+                        $query = Accounts::where('Account_Owner', $id)->where('Account_Type', 'Student')->update([
                             'Account_Password' => md5($request->input('newPassword'))
-                        ));
+                        ]);
 
                         if($query) {
                             session()->flash('global_status', 'Success');
@@ -1605,9 +1666,9 @@ class PanelController extends Controller
                     $query = Accounts::where('Account_Owner', $id)->where('Account_Type', 'Faculty')->first();
 
                     if($query) {
-                        $query = Accounts::where('Account_Owner', $id)->where('Account_Type', 'Faculty')->update(array(
+                        $query = Accounts::where('Account_Owner', $id)->where('Account_Type', 'Faculty')->update([
                             'Account_Password' => md5($request->input('newPassword'))
-                        ));
+                        ]);
 
                         if($query) {
                             session()->flash('global_status', 'Success');
@@ -1633,9 +1694,9 @@ class PanelController extends Controller
                     $query = Accounts::where('Account_Owner', $id)->where('Account_Type', 'Librarian')->first();
 
                     if($query) {
-                        $query = Accounts::where('Account_Owner', $id)->where('Account_Type', 'Librarian')->update(array(
+                        $query = Accounts::where('Account_Owner', $id)->where('Account_Type', 'Librarian')->update([
                             'Account_Password' => md5($request->input('newPassword'))
-                        ));
+                        ]);
 
                         if($query) {
                             session()->flash('global_status', 'Success');
@@ -1686,7 +1747,7 @@ class PanelController extends Controller
 
                 $data['from'] = $from;
                 $data['to'] = $to;
-                $data['loans'] = Loans::whereBetween('loans.Loan_Date_Stamp', array($from, $to))->join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')->leftJoin('receives', 'loans.Loan_ID', '=', 'receives.Receive_Reference')
+                $data['loans'] = Loans::whereBetween('loans.Loan_Date_Stamp', [$from, $to])->join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')->leftJoin('receives', 'loans.Loan_ID', '=', 'receives.Receive_Reference')
                     ->join('accounts', 'loans.Account_Username', '=', 'accounts.Account_Username')
                     ->leftJoin('faculties', function($join) {
                         $join->on('accounts.Account_Owner', '=', 'faculties.Faculty_ID')->where('accounts.Account_Type', '=', 'Faculty');
@@ -1710,7 +1771,7 @@ class PanelController extends Controller
 
                 $data['from'] = $from;
                 $data['to'] = $to;
-                $data['reservations'] = Reservations::whereBetween('reservations.Reservation_Date_Stamp', array($from, $to))->join('materials', 'reservations.Material_ID', '=', 'materials.Material_ID')
+                $data['reservations'] = Reservations::whereBetween('reservations.Reservation_Date_Stamp', [$from, $to])->join('materials', 'reservations.Material_ID', '=', 'materials.Material_ID')
                     ->join('accounts', 'reservations.Account_Username', '=', 'accounts.Account_Username')
                     ->leftJoin('faculties', function($join) {
                         $join->on('accounts.Account_Owner', '=', 'faculties.Faculty_ID')->where('accounts.Account_Type', '=', 'Faculty');
@@ -1768,7 +1829,7 @@ class PanelController extends Controller
                 $data['from'] = $from;
                 $data['to'] = $to;
                 $data['works_authors'] = Works::join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
-                $data['works_materials'] = Works::whereBetween('materials.Date_Added', array($from, $to))->join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->leftJoin('publishers', 'materials.Publisher_ID', '=', 'publishers.Publisher_ID')->groupBy('works.Material_ID')->get();
+                $data['works_materials'] = Works::whereBetween('materials.Date_Added', [$from, $to])->join('materials', 'works.Material_ID', '=', 'materials.Material_ID')->leftJoin('publishers', 'materials.Publisher_ID', '=', 'publishers.Publisher_ID')->groupBy('works.Material_ID')->get();
 
                 $pdf = PDF::loadView('pdf.material_report', $data);
 
@@ -1781,7 +1842,7 @@ class PanelController extends Controller
 
                 $data['from'] = $from;
                 $data['to'] = $to;
-                $data['borrowers'] = Loans::whereBetween('loans.Loan_Date_Stamp', array($from, $to))
+                $data['borrowers'] = Loans::whereBetween('loans.Loan_Date_Stamp', [$from, $to])
                     ->join('accounts', 'loans.Account_Username', '=', 'accounts.Account_Username')
                     ->leftJoin('faculties', function($join) {
                         $join->on('accounts.Account_Owner', '=', 'faculties.Faculty_ID')->where('accounts.Account_Type', '=', 'Faculty');
@@ -1793,7 +1854,7 @@ class PanelController extends Controller
                         $join->on('accounts.Account_Owner', '=', 'students.Student_ID')->where('accounts.Account_Type', '=', 'Student');
                     })
                 ->groupBy('loans.Account_Username')->orderBy('Row_Count', 'desc')->select('*', DB::raw('count(*) as Row_Count'))->get();
-                $data['materials'] = Loans::whereBetween('loans.Loan_Date_Stamp', array($from, $to))
+                $data['materials'] = Loans::whereBetween('loans.Loan_Date_Stamp', [$from, $to])
                     ->join('materials', 'loans.Material_ID', '=', 'materials.Material_ID')
                 ->groupBy('loans.Material_ID')->orderBy('Row_Count', 'desc')->select('*', DB::raw('count(*) as Row_Count'))->get();
 
@@ -1808,7 +1869,7 @@ class PanelController extends Controller
 
                 $data['from'] = $from;
                 $data['to'] = $to;
-                $data['users'] = Accounts::whereBetween('accounts.Date_Added', array($from, $to))->whereIn('accounts.Account_Type', ['Faculty', 'Student'])
+                $data['users'] = Accounts::whereBetween('accounts.Date_Added', [$from, $to])->whereIn('accounts.Account_Type', ['Faculty', 'Student'])
                     ->leftJoin('faculties', function($join) {
                         $join->on('accounts.Account_Owner', '=', 'faculties.Faculty_ID')->where('accounts.Account_Type', '=', 'Faculty');
                     })
@@ -1853,9 +1914,9 @@ class PanelController extends Controller
             if(strtotime('+1 day', strtotime($datetime)) >= strtotime(date('Y-m-d H:i:s'))) {
                 $rCount++;
             } else {
-                Reservations::where('Reservation_ID', $reservation->Reservation_ID)->update(array(
+                Reservations::where('Reservation_ID', $reservation->Reservation_ID)->update([
                     'Reservation_Status' => 'inactive'
-                ));
+                ]);
 
                 if($query) {
                     $eCount++;
@@ -1865,7 +1926,15 @@ class PanelController extends Controller
             }
         }
 
-        return json_encode(array('status' => 'Success', 'message' => 'Initializing Complete.', 'data' => array('reserved' => $rCount, 'expired' => $eCount, 'loaned' => $lCount)));
+        return json_encode([
+            'status' => 'Success',
+            'message' => 'Initializing Complete.',
+            'data' => [
+                'reserved' => $rCount,
+                'expired' => $eCount,
+                'loaned' => $lCount
+            ]
+        ]);
     }
 
     public function postConfiguration($what, Request $request) {
