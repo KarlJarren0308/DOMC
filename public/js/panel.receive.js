@@ -106,6 +106,7 @@ $(document).ready(function() {
                 element += '<thead>';
                 element += '<tr>';
                 element += '<th>Call Number</th>';
+                element += '<th>Accession Number</th>';
                 element += '<th>Title</th>';
                 element += '<th>Loaned By</th>';
                 element += '<th>Date Loaned</th>';
@@ -154,6 +155,7 @@ $(document).ready(function() {
 
                     element += '<tr>';
                     element += '<td>' + response['data']['loans'][i]['Material_Call_Number'] + '</td>';
+                    element += '<td>' + padZeros(response['data']['loans'][i]['Accession_Number'], 4) + '</td>';
                     element += '<td>' + response['data']['loans'][i]['Material_Title'] + '</td>';
                     element += '<td>' + name + '</td>';
                     element += '<td>' + moment(response['data']['loans'][i]['Loan_Date_Stamp']).format('MMMM D, YYYY') + '</td>';

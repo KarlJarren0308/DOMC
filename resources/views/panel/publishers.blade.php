@@ -83,14 +83,14 @@
                     <thead>
                         <tr>
                             <th>Publisher's Name</th>
+                            <th>Contact Number</th>
                             <th width="25%"></th>
                         </tr>
                         <tbody>
                             @foreach($publishers as $publisher)
                                 <tr>
-                                    <td>
-                                        {{ $publisher->Publisher_Name }}
-                                    </td>
+                                    <td>{{ $publisher->Publisher_Name }}</td>
+                                    <td>{{ $publisher->Contact_Number }}</td>
                                     <td class="text-center">
                                         @if(strlen(session()->has('username')))
                                             <a href="{{ route('panel.getEdit', array($what, $publisher->Publisher_ID)) }}" class="btn btn-green btn-sm">Edit</a>

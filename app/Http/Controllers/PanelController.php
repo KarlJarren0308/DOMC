@@ -181,7 +181,7 @@ class PanelController extends Controller
         $data['configs'] = simplexml_load_file(storage_path('app') . '/configuration.xml');
         $data['works_authors'] = Works::where('works.Material_ID', $id)->join('authors', 'works.Author_ID', '=', 'authors.Author_ID')->get();
         $data['material'] = Materials::where('Material_ID', $id)->first();
-        $data['accessions'] = Accessions::where('accessions.Material_ID', $id)->whereIn('accessions.Accession_Status', ['available', 'archived'])->join('materials', 'accessions.Material_ID', '=', 'materials.Material_ID')->get();
+        $data['accessions'] = Accessions::where('accessions.Material_ID', $id)/*->whereIn('accessions.Accession_Status', ['available', 'archived'])*/->join('materials', 'accessions.Material_ID', '=', 'materials.Material_ID')->get();
         $data['available_copies'] = Accessions::where('Material_ID', $id)->whereIn('Accession_Status', ['available', 'archived'])->count();
 
         return view('panel.material_master_accessions', $data);
@@ -786,7 +786,7 @@ class PanelController extends Controller
                 $reserved_materials = Reservations::where('Reservation_Status', 'active')->where('Material_ID', $materialID)->count();
                 $loaned_materials = Loans::where('Loan_Status', 'active')->where('Material_ID', $materialID)->count();
                 $materialRow = Materials::where('Material_ID', $materialID)->first();
-                $newMaterialCount = $materialRow->Material_Copies - $reserved_materials - $loaned_materials;
+                $newMaterialCount = Accessions::where('Material_ID', $materialID)->where('Accession_Status', 'available')->count() - $reserved_materials - $loaned_materials;
 
                 if($newMaterialCount > 0) {
                     if($on_loan < $this->loanLimit) {
@@ -896,7 +896,7 @@ class PanelController extends Controller
                 $reserved_materials = Reservations::where('Reservation_Status', 'active')->where('Material_ID', $materialID)->count();
                 $loaned_materials = Loans::where('Loan_Status', 'active')->where('Material_ID', $materialID)->count();
                 $materialRow = Materials::where('Material_ID', $materialID)->first();
-                $newMaterialCount = $materialRow->Material_Copies - $reserved_materials - $loaned_materials;
+                $newMaterialCount = Accessions::where('Material_ID', $materialID)->where('Accession_Status', 'available')->count() - $reserved_materials - $loaned_materials;
                 $accessions = Accessions::where('Material_ID', $materialID)->where('Accession_Status', 'available')->get();
                 $availableAccessions = [];
 
@@ -922,9 +922,13 @@ class PanelController extends Controller
                             ]);
 
                             if($query) {
+                                $query = Accessions::where('Accession_Number', $accs)->update([
+                                    'Accession_Status' => 'onloan'
+                                ]);
+
                                 return json_encode([
                                     'status' => 'Success',
-                                    'message' => 'Loan Successful. You may now hand out the book with the accession number of ' . $materialRow->Call_Number . '-' . sprintf('%04d', $accs)
+                                    'message' => 'Loan Successful. You may now hand out the book with the accession number of ' . $materialRow->Material_Call_Number . '-' . sprintf('%04d', $accs)
                                 ]);
                             } else {
                                 return json_encode([
@@ -948,6 +952,57 @@ class PanelController extends Controller
                     return json_encode([
                         'status' => 'Failed',
                         'message' => 'Oops! No more copies available.'
+                    ]);
+                }
+
+                break;
+            case '47e3a812a18f9ae64a8c3ac8b8cc78af':
+                // arg0: loanAvailableAccessionJSON
+                $materialID = $request->input('arg1');
+                $accs = $request->input('arg2');
+                $accountUsername = $request->input('arg3');
+
+                $on_loan = Loans::where('Loan_Status', 'active')->where('Account_Username', $accountUsername)->count();
+                $materialRow = Materials::where('Material_ID', $materialID)->first();
+                $accessions = Accessions::where('Material_ID', $materialID)->where('Accession_Status', 'available')->get();
+
+                if($on_loan < $this->loanLimit) {
+                    $query = Loans::where('Material_ID', $materialID)->where('Account_Username', $accountUsername)->where('Loan_Status', 'active')->first();
+
+                    if(!$query) {
+                        $query = Loans::insert([
+                            'Accession_Number' => $accs,
+                            'Material_ID' => $materialID,
+                            'Account_Username' => $accountUsername,
+                            'Loan_Date_Stamp' => date('Y-m-d'),
+                            'Loan_Time_Stamp' => date('H:i:s')
+                        ]);
+
+                        if($query) {
+                            $query = Accessions::where('Accession_Number', $accs)->update([
+                                'Accession_Status' => 'onloan'
+                            ]);
+
+                            return json_encode([
+                                'status' => 'Success',
+                                'message' => 'Loan Successful. You may now hand out the book with the accession number of ' . $materialRow->Material_Call_Number . '-' . sprintf('%04d', $accs)
+                            ]);
+                        } else {
+                            return json_encode([
+                                'status' => 'Warning',
+                                'message' => 'Oops! Failed to loan book to the borrower.'
+                            ]);
+                        }
+                    } else {
+                        return json_encode([
+                            'status' => 'Failed',
+                            'message' => 'Oops! Borrower has already loan a copy of this book.'
+                        ]);
+                    }
+                } else {
+                    return json_encode([
+                        'status' => 'Failed',
+                        'message' => 'Oops! You can only loan at most 3 books to this borrower at a time.'
                     ]);
                 }
 
@@ -991,6 +1046,10 @@ class PanelController extends Controller
                 if($query) {
                     $query = Loans::where('Loan_ID', $id)->update([
                         'Loan_Status' => 'inactive'
+                    ]);
+
+                    $qry = Accessions::where('Accession_Number', $loan->Accession_Number)->update([
+                        'Accession_Status' => 'available'
                     ]);
                     
                     return json_encode([
@@ -1041,7 +1100,8 @@ class PanelController extends Controller
 
                 for($i = 0; $i < $request->input('copies'); $i++) {
                     $query = Accessions::insert([
-                        'Material_ID' => $request->input('materialID')
+                        'Material_ID' => $request->input('materialID'),
+                        'Accession_Date_Added' => date('Y-m-d')
                     ]);
 
                     if($query) {
@@ -1082,7 +1142,8 @@ class PanelController extends Controller
 
                         for($i = 0; $i < $request->input('materialCopies'); $i++) {
                             $query = Accessions::insert([
-                                'Material_ID' => $materialID
+                                'Material_ID' => $materialID,
+                                'Accession_Date_Added' => date('Y-m-d')
                             ]);
 
                             if($query) {
@@ -1157,7 +1218,8 @@ class PanelController extends Controller
                     ]);
                 } else {
                     $query = Publishers::insert([
-                        'Publisher_Name' => $request->input('publisherName')
+                        'Publisher_Name' => $request->input('publisherName'),
+                        'Contact_Number' => $request->input('publisherContact')
                     ]);
 
                     if($query) {
@@ -1175,14 +1237,14 @@ class PanelController extends Controller
 
                 break;
             case 'users':
-                if($request->input('userType') == 'Student') {
+                if($request->input('userType') == 'Student' || $request->input('userType') == 'Guest') {
                     $id = Students::insertGetId([
                         'Student_First_Name' => $request->input('userFirstName'),
                         'Student_Middle_Name' => $request->input('userMiddleName'),
                         'Student_Last_Name' => $request->input('userLastName'),
                         'Student_Birth_Date' => $request->input('userBirthDate')
                     ]);
-                } else if($request->input('userType') == 'Faculty') {
+                } else if($request->input('userType') == 'Faculty' || $request->input('userType') == 'Employee') {
                     $id = Faculties::insertGetId([
                         'Faculty_First_Name' => $request->input('userFirstName'),
                         'Faculty_Middle_Name' => $request->input('userMiddleName'),
@@ -1202,7 +1264,9 @@ class PanelController extends Controller
                         'Account_Password' => md5($request->input('userBirthDate')),
                         'Account_Type' => $request->input('userType'),
                         'Account_Owner' => $id,
-                        'Date_Added' => date('Y-m-d')
+                        'Date_Added' => date('Y-m-d'),
+                        'Email_Address' => $request->input('userEmail'),
+                        'Contact_Number' => $request->input('userContact')
                     ]);
 
                     if($query) {
@@ -1425,7 +1489,8 @@ class PanelController extends Controller
                 break;
             case 'publishers':
                 $query = Publishers::where('Publisher_ID', $id)->update([
-                    'Publisher_Name' => $request->input('publisherName')
+                    'Publisher_Name' => $request->input('publisherName'),
+                    'Contact_Number' => $request->input('publisherContact')
                 ]);
 
                 if($query) {

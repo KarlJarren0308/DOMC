@@ -35,7 +35,8 @@
         </div>
     </div>
     <div id="main-container" class="container">
-        <img src="/img/banner.jpg" style="margin-bottom: 25px; width: 100%;">
+        <img src="/img/banner.jpg" style="margin-bottom: 0; width: 100%;">
+        <h5 class="text-center" style="margin: 0 0 25px 0;">3222 Pureza Ramon Magsaysay Boulevard, 631 Santa Mesa, Manila, 1016 Metro Manila</h5>
         <div class="banner text-center">Library System</div>
         <h3 class="no-margin">Bulletin Board</h3>
         <hr>

@@ -63,7 +63,7 @@ $(document).ready(function() {
     });
 
     $('[data-button="new-publisher-button"]').click(function() {
-        setModalContent('Create New Publisher', '<form data-form="new-publisher-form"><div class="input-block"><label for="">Publisher\'s Name:</label><input type="text" class="u-full-width" name="publisherName" placeholder="Enter Publisher\'s Name Here" required></div><div class="input-block text-right"><input type="submit" class="btn btn-orange" value="Create Publisher"></div></form>', 'new-modal');
+        setModalContent('Create New Publisher', '<form data-form="new-publisher-form"><div class="input-block"><label for="">Publisher\'s Name:</label><input type="text" class="u-full-width" name="publisherName" placeholder="Enter Publisher\'s Name Here" required></div><div class="input-block"><label for="">Contact Number:</label><input type="text" class="u-full-width" name="publisherContact" placeholder="Enter Contact Number Here"></div><div class="input-block text-right"><input type="submit" class="btn btn-orange" value="Create Publisher"></div></form>', 'new-modal');
         openModal(true, 'new-modal');
 
         $('[data-form="new-publisher-form"]:first *:input[type!=hidden]:first').focus();
@@ -91,7 +91,7 @@ $(document).ready(function() {
                         data: {},
                         dataType: 'json',
                         success: function(response) {
-                            var list = '<option value="" selected disabled>Select an author...</option>';
+                            var list = '<option value="" selected disabled>Select a publisher...</option>';
                             var name = '';
                             var myThis = $('.publisher-dropdown');
 

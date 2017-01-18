@@ -87,6 +87,8 @@
                                     <option value="" selected disabled>Select a type...</option>
                                     <option value="Student">Student</option>
                                     <option value="Faculty">Faculty</option>
+                                    <option value="Employee">Employee</option>
+                                    <option value="Guest">Guest</option>
                                 </select>
                             </div>
                         </div>
@@ -108,6 +110,20 @@
                             <div class="input-block">
                                 {!! Form::label('userLastName', 'Last Name:') !!}
                                 {!! Form::text('userLastName', null, array('class' => 'u-full-width', 'placeholder' => 'Enter Last Name Here', 'required' => 'required')) !!}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="six columns">
+                            <div class="input-block">
+                                {!! Form::label('userEmail', 'E-mail Address:') !!}
+                                {!! Form::text('userEmail', null, array('class' => 'u-full-width', 'placeholder' => 'Enter E-mail Address Here', 'required' => 'required')) !!}
+                            </div>
+                        </div>
+                        <div class="six columns">
+                            <div class="input-block">
+                                {!! Form::label('userContact', 'Contact Number:') !!}
+                                {!! Form::text('userContact', null, array('class' => 'u-full-width', 'placeholder' => 'Enter Contact Number Here', 'required' => 'required')) !!}
                             </div>
                         </div>
                     </div>

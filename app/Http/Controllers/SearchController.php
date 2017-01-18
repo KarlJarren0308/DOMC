@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Accounts;
+use App\Accessions;
 use App\Authors;
 use App\Faculties;
 use App\Students;
@@ -50,13 +51,25 @@ class SearchController extends Controller
         $data['what'] = $what;
 
         switch($what) {
+            case 'accessions':
+                $materialID = $request->input('materialID');
+
+                $query = Accessions::where('Material_ID', $materialID)->where('Accession_Status', 'available')->get();
+
+                if($query) {
+                    return json_encode(array('status' => 'Success', 'message' => 'Book has been found.', 'data' => $query));
+                } else {
+                    return json_encode(array('status' => 'Failed', 'message' => 'Book not found.'));
+                }
+
+                break;
             case 'materials':
                 $query = Materials::where('Material_Call_Number', $request->input('call_number'))->orWhere('Material_Title', $request->input('title'))->count();
 
                 if($query > 0) {
-                    return json_encode(array('status' => 'Success', 'Book has been found.'));
+                    return json_encode(array('status' => 'Success', 'message' => 'Book has been found.'));
                 } else {
-                    return json_encode(array('status' => 'Failed', 'Book not found.'));
+                    return json_encode(array('status' => 'Failed', 'message' => 'Book not found.'));
                 }
 
                 break;
@@ -64,9 +77,9 @@ class SearchController extends Controller
                 $query = Accounts::where('Account_Username', $request->input('username'))->first();
 
                 if($query) {
-                    return json_encode(array('status' => 'Success', 'Username has been found.'));
+                    return json_encode(array('status' => 'Success', 'message' => 'Username has been found.'));
                 } else {
-                    return json_encode(array('status' => 'Failed', 'Username not found.'));
+                    return json_encode(array('status' => 'Failed', 'message' => 'Username not found.'));
                 }
 
                 break;
@@ -74,9 +87,9 @@ class SearchController extends Controller
                 $query = Librarians::where('Librarian_First_Name', $request->input('first_name'))->where('Librarian_Last_Name', $request->input('last_name'))->count();
 
                 if($query > 0) {
-                    return json_encode(array('status' => 'Success', 'Librarian has been found.'));
+                    return json_encode(array('status' => 'Success', 'message' => 'Librarian has been found.'));
                 } else {
-                    return json_encode(array('status' => 'Failed', 'Librarian not found.'));
+                    return json_encode(array('status' => 'Failed', 'message' => 'Librarian not found.'));
                 }
 
                 break;
@@ -89,9 +102,9 @@ class SearchController extends Controller
                     $query = Students::where('Student_First_Name', $request->input('first_name'))->where('Student_Last_Name', $request->input('last_name'))->count();
 
                     if($query > 0) {
-                        return json_encode(array('status' => 'Success', 'User has been found.'));
+                        return json_encode(array('status' => 'Success', 'message' => 'User has been found.'));
                     } else {
-                        return json_encode(array('status' => 'Failed', 'User not found.'));
+                        return json_encode(array('status' => 'Failed', 'message' => 'User not found.'));
                     }
                 }
 
@@ -140,6 +153,7 @@ class SearchController extends Controller
                 $data['reservations'] = Reservations::where('Account_Username', session()->get('username'))->where('Reservation_Status', 'active')->get();
                 $data['reserved_materials'] = Reservations::where('Reservation_Status', 'active')->get();
                 $data['loaned_materials'] = Loans::where('Loan_Status', 'active')->get();
+                $data['accession_numbers'] = Accessions::where('Accession_Status', 'available')->get();
 
                 if($data['works_materials']) {
                     return json_encode(array('status' => 'Success', 'message' => 'Found some users.', 'data' => $data));

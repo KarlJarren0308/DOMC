@@ -1,5 +1,15 @@
 var isModalDismissableByClick = true;
 
+function padZeros(number, length) {
+    var output = number.toString();
+
+    while(output.length < length) {
+        output = '0' + output;
+    }
+
+    return output;
+}
+
 function openModal(isDismissableByClick, id) {
     if(isDismissableByClick != null) {
         if(typeof isDismissableByClick === 'boolean') {

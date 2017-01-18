@@ -107,6 +107,7 @@ $(document).ready(function() {
                 var element = '<table id="books-table" class="u-full-width">';
                 var name = '';
                 var type = '';
+                var accessionNumbers, reservedCount, loanedCount;
 
                 isModalDismissableByClick = true;
 
@@ -150,8 +151,15 @@ $(document).ready(function() {
                     element += '</td>';
                     element += '<td class="text-center">';
 
+                    accessionNumbers = 0;
                     reservedCount = 0;
                     loanedCount = 0;
+
+                    for(var k = 0; k < response['data']['accession_numbers'].length; k++) {
+                        if(response['data']['accession_numbers'][k]['Material_ID'] == response['data']['works_materials'][i]['Material_ID']) {
+                            accessionNumbers++;
+                        }
+                    }
 
                     for(var k = 0; k < response['data']['reserved_materials'].length; k++) {
                         if(response['data']['reserved_materials'][k]['Material_ID'] == response['data']['works_materials'][i]['Material_ID']) {
@@ -165,7 +173,7 @@ $(document).ready(function() {
                         }
                     }
 
-                    materialCount = response['data']['works_materials'][i]['Material_Copies'] - reservedCount - loanedCount;
+                    materialCount = accessionNumbers - reservedCount - loanedCount;
 
                     if(materialCount > 0) {
                         element += materialCount;
@@ -302,10 +310,86 @@ $(document).ready(function() {
 
                     $('[data-button="loan-book-button"]').click(function() {
                         materialID = $(this).data('var-id');
-                        materialTitle = $(this).data('var-title');
+                        /*materialTitle = $(this).data('var-title');
 
                         $('.modal#confirmation-modal > .modal-container > .modal-body').html('Are you sure you want to lend the book title <strong>' + materialTitle + '</strong> to <strong>' + usersName + '</strong>');
-                        openModal(false, 'confirmation-modal');
+                        openModal(false, 'confirmation-modal');*/
+                        openModal(false, 'loader-modal');
+
+                        $.ajax({
+                            url: '/search/accessions',
+                            method: 'POST',
+                            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                            data: {
+                                materialID: $(this).data('var-id')
+                            },
+                            dataType: 'json',
+                            success: function(response) {
+                                var accessionInfo = '<table id="books-table" class="u-full-width">';
+
+                                closeModal('loader-modal');
+
+                                accessionInfo += '<thead>';
+                                accessionInfo += '<tr>';
+                                accessionInfo += '<th>Accession Number</th>';
+                                accessionInfo += '<th>Status</th>';
+                                accessionInfo += '<th></th>';
+                                accessionInfo += '</tr>';
+                                accessionInfo += '</thead>';
+                                accessionInfo += '<tbody>';
+
+                                for(var i = 0; i < response['data'].length; i++) {
+                                    accessionInfo += '<tr>';
+                                    accessionInfo += '<td>' + response['data'][i]['Accession_Number'] + '</td>';
+                                    accessionInfo += '<td>' + response['data'][i]['Accession_Status'] + '</td>';
+                                    accessionInfo += '<td><button class="btn btn-orange btn-sm" data-button="loan-accession-button" data-var-id="' + materialID + '" data-var-accession="' + response['data'][i]['Accession_Number'] + '">Loan</button></td>';
+                                    accessionInfo += '</tr>';
+                                }
+
+                                accessionInfo += '</tbody>';
+                                accessionInfo += '</table>';
+
+                                setModalContent('Loan Book(s)', accessionInfo, 'accession-modal');
+                                openModal(false, 'accession-modal');
+
+                                $('[data-button="loan-accession-button"]').click(function() {
+                                    openModal(false, 'loader-modal');
+
+                                    $.ajax({
+                                        url: '/panel/loan',
+                                        method: 'POST',
+                                        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                                        data: {
+                                            arg0: '47e3a812a18f9ae64a8c3ac8b8cc78af',
+                                            arg1: $(this).data('var-id'),
+                                            arg2: $(this).data('var-accession'),
+                                            arg3: usersID
+                                        },
+                                        dataType: 'json',
+                                        success: function(response) {
+                                            closeModal('loader-modal');
+                                            setModalContent('Loan Book(s)', response['message'], 'done-modal');
+                                            openModal(false, 'done-modal');
+
+                                            setTimeout(function() {
+                                                closeModal('done-modal');
+
+                                                location.reload();
+                                            }, 2000);
+                                        }
+                                    });
+
+                                    return false;
+                                });
+
+                                console.log(response['data']);
+                            },
+                            error: function(arg0, arg1, arg2) {
+                                console.log(arg0.responseText);
+                            }
+                        });
+
+                        return false;
                     });
                 });
             }

@@ -10,7 +10,7 @@ $(document).ready(function() {
             $('.dataTables_filter label').append(searchButton);
         },
         aoColumnDefs: [
-            { bSearchable: false, bSortable: false, aTargets: [1] }
+            { bSearchable: false, bSortable: false, aTargets: [3] }
         ]
     });
 });

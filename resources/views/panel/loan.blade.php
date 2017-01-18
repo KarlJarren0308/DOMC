@@ -117,6 +117,12 @@
             </div>
         </div>
     </div>
+    <div id="accession-modal" class="modal">
+        <div class="modal-container">
+            <div class="modal-header">Loan Book(s)</div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
     <div id="loader-modal" class="modal">
         <div class="modal-container">
             <div class="modal-header"></div>

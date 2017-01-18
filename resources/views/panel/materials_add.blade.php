@@ -69,7 +69,7 @@
                     <div class="row">
                         <div class="eight columns">
                             <div class="row">
-                                <div class="four columns">
+                                <div class="eight columns">
                                     <div class="input-block">
                                         {!! Form::label('materialTitle', 'Book Title:') !!}
                                         {!! Form::text('materialTitle', null, array('class' => 'u-full-width', 'placeholder' => 'Enter Book Title Here', 'required' => 'required', 'autofocus' => 'autofocus')) !!}
@@ -86,14 +86,14 @@
                                         </select>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="four columns">
                                     <div class="input-block">
                                         {!! Form::label('materialISBN', 'ISBN:') !!}
                                         {!! Form::text('materialISBN', null, array('class' => 'u-full-width', 'placeholder' => 'Enter ISBN Here', 'maxlength' => '20', 'onkeyup' => 'isISBN(this)', 'required' => 'required')) !!}
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="four columns">
                                     <div class="input-block">
                                         {!! Form::label('materialCallNumber', 'Call Number:') !!}
@@ -106,14 +106,14 @@
                                         {!! Form::text('materialLocation', null, array('class' => 'u-full-width', 'placeholder' => 'Enter Location Here', 'required' => 'required')) !!}
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="four columns">
                                     <div class="input-block">
                                         {!! Form::label('materialCopyrightYear', 'Copyright Year:') !!}
                                         {!! Form::text('materialCopyrightYear', null, array('class' => 'u-full-width', 'placeholder' => 'Enter Copyright Year Here', 'maxlength' => '4', 'onkeyup' => 'isYear(this)', 'required' => 'required')) !!}
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="four columns">
                                     <div class="input-block">
                                         {!! Form::label('materialCopies', 'Number of Copies:') !!}

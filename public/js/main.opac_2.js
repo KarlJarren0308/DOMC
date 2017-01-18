@@ -29,33 +29,6 @@ $(document).ready(function() {
                 element += '<tbody>';
 
                 for(var i = 0; i < response['data']['works_materials'].length; i++) {
-                    isFirst = true;
-
-                    element += '<tr>';
-                    element += '<td>' + response['data']['works_materials'][i]['Material_Call_Number'] + '</td>';
-                    element += '<td><a href="" data-link="book-info-link" data-var-reference="' + i + '">' + response['data']['works_materials'][i]['Material_Title'] + '</a></td>';
-                    element += '<td>' + response['data']['works_materials'][i]['Material_ISBN'] + '</td>';
-                    element += '<td>';
-
-                    for(var j = 0; j < response['data']['works_authors'].length; j++) {
-                        if(response['data']['works_authors'][j]['Material_ID'] == response['data']['works_materials'][i]['Material_ID']) {
-                            if(isFirst) {
-                                isFirst = false;
-                            } else {
-                                element += '<br>';
-                            }
-
-                            if(response['data']['works_authors'][j]['Author_Middle_Name'].length > 1) {
-                                element += response['data']['works_authors'][j]['Author_First_Name'] + ' ' + response['data']['works_authors'][j]['Author_Middle_Name'].substring(0, 1) + '. ' + response['data']['works_authors'][j]['Author_Last_Name'];
-                            } else {
-                                element += response['data']['works_authors'][j]['Author_First_Name'] + ' ' + response['data']['works_authors'][j]['Author_Last_Name'];
-                            }
-                        }
-                    }
-
-                    element += '</td>';
-                    element += '<td class="text-center">';
-
                     reservedCount = 0;
                     loanedCount = 0;
 
@@ -74,42 +47,71 @@ $(document).ready(function() {
                     materialCount = response['data']['works_materials'][i]['Material_Copies'] - reservedCount - loanedCount;
 
                     if(materialCount > 0) {
-                        element += materialCount;
-                    } else {
-                        element += '0';
-                    }
+                        isFirst = true;
 
-                    element += '</td>';
-
-                    if(response['data']['toggle_reservation'] == 'Show') {
+                        element += '<tr>';
+                        element += '<td>' + response['data']['works_materials'][i]['Material_Call_Number'] + '</td>';
+                        element += '<td><a href="" data-link="book-info-link" data-var-reference="' + i + '">' + response['data']['works_materials'][i]['Material_Title'] + '</a></td>';
+                        element += '<td>' + response['data']['works_materials'][i]['Material_ISBN'] + '</td>';
                         element += '<td>';
 
-                        if(issetUsername == true) {
-                            isReserved = false;
-
-                            for(var m = 0; m < response['data']['reservations'].length; m++) {
-                                if(response['data']['reservations'][m]['Material_ID'] == response['data']['works_materials'][i]['Material_ID']) {
-                                    isReserved = true;
-
-                                    break;
+                        for(var j = 0; j < response['data']['works_authors'].length; j++) {
+                            if(response['data']['works_authors'][j]['Material_ID'] == response['data']['works_materials'][i]['Material_ID']) {
+                                if(isFirst) {
+                                    isFirst = false;
+                                } else {
+                                    element += '<br>';
                                 }
-                            }
 
-                            if(isReserved) {
-                                element += '<a class="btn btn-red btn-sm">Already Reserved</a>';
-                            } else {
-                                if(response['data']['on_reserved'] < response['data']['reservation_limit']) {
-                                    if(materialCount > 0) {
-                                        element += '<a href="/opac/reserve/' + response['data']['works_materials'][i]['Material_ID'] + '" class="btn btn-orange btn-sm">Reserve</a>';
-                                    }
+                                if(response['data']['works_authors'][j]['Author_Middle_Name'].length > 1) {
+                                    element += response['data']['works_authors'][j]['Author_First_Name'] + ' ' + response['data']['works_authors'][j]['Author_Middle_Name'].substring(0, 1) + '. ' + response['data']['works_authors'][j]['Author_Last_Name'];
+                                } else {
+                                    element += response['data']['works_authors'][j]['Author_First_Name'] + ' ' + response['data']['works_authors'][j]['Author_Last_Name'];
                                 }
                             }
                         }
 
                         element += '</td>';
-                    }
+                        element += '<td class="text-center">';
 
-                    element += '</tr>';
+                        if(materialCount > 0) {
+                            element += materialCount;
+                        } else {
+                            element += '0';
+                        }
+
+                        element += '</td>';
+
+                        if(response['data']['toggle_reservation'] == 'Show') {
+                            element += '<td>';
+
+                            if(issetUsername == true) {
+                                isReserved = false;
+
+                                for(var m = 0; m < response['data']['reservations'].length; m++) {
+                                    if(response['data']['reservations'][m]['Material_ID'] == response['data']['works_materials'][i]['Material_ID']) {
+                                        isReserved = true;
+
+                                        break;
+                                    }
+                                }
+
+                                if(isReserved) {
+                                    element += '<a class="btn btn-red btn-sm">Already Reserved</a>';
+                                } else {
+                                    if(response['data']['on_reserved'] < response['data']['reservation_limit']) {
+                                        if(materialCount > 0) {
+                                            element += '<a href="/opac/reserve/' + response['data']['works_materials'][i]['Material_ID'] + '" class="btn btn-orange btn-sm">Reserve</a>';
+                                        }
+                                    }
+                                }
+                            }
+
+                            element += '</td>';
+                        }
+
+                        element += '</tr>';
+                    }
                 }
 
                 element += '</tbody>';

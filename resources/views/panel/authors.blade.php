@@ -82,19 +82,24 @@
                 <table id="authors-table" class="u-full-width">
                     <thead>
                         <tr>
-                            <th>Author's Name</th>
+                            <th>First Name</th>
+                            <th>Middle Name</th>
+                            <th>Last Name</th>
                             <th width="25%"></th>
                         </tr>
                         <tbody>
                             @foreach($authors as $author)
                                 <tr>
-                                    <td>
+                                    <!-- <td>
                                         @if(strlen($author->Author_Middle_Name) > 1)
                                             {{ $author->Author_First_Name . ' ' . substr($author->Author_Middle_Name, 0, 1) . '. ' . $author->Author_Last_Name }}
                                         @else
                                             {{ $author->Author_First_Name . ' ' . $author->Author_Last_Name }}
                                         @endif
-                                    </td>
+                                    </td> -->
+                                    <td>{{ $author->Author_First_Name }}</td>
+                                    <td>{{ $author->Author_Middle_Name }}</td>
+                                    <td>{{ $author->Author_Last_Name }}</td>
                                     <td class="text-center">
                                         @if(strlen(session()->has('username')))
                                             <a href="{{ route('panel.getEdit', array($what, $author->Author_ID)) }}" class="btn btn-green btn-sm">Edit</a>

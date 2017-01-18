@@ -88,6 +88,8 @@
                                     <option value="" selected disabled>Select a type...</option>
                                     <option value="Student"{{ ($user_account->Account_Type == 'Student' ? ' selected' : '') }}>Student</option>
                                     <option value="Faculty"{{ ($user_account->Account_Type == 'Faculty' ? ' selected' : '') }}>Faculty</option>
+                                    <option value="Employee"{{ ($user_account->Account_Type == 'Employee' ? ' selected' : '') }}>Employee</option>
+                                    <option value="Guest"{{ ($user_account->Account_Type == 'Guest' ? ' selected' : '') }}>Guest</option>
                                 </select>
                             </div>
                         </div>
@@ -109,6 +111,20 @@
                             <div class="input-block">
                                 {!! Form::label('userLastName', 'Last Name:') !!}
                                 {!! Form::text('userLastName', ($user_account->Account_Type == 'Student' ? $user->Student_Last_Name : $user->Faculty_Last_Name), array('class' => 'u-full-width', 'placeholder' => 'Enter Last Name Here', 'required' => 'required')) !!}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="six columns">
+                            <div class="input-block">
+                                {!! Form::label('userEmail', 'E-mail Address:') !!}
+                                {!! Form::text('userEmail', $user_account->Email_Address, array('class' => 'u-full-width', 'placeholder' => 'Enter E-mail Address Here', 'required' => 'required')) !!}
+                            </div>
+                        </div>
+                        <div class="six columns">
+                            <div class="input-block">
+                                {!! Form::label('userContact', 'Contact Number:') !!}
+                                {!! Form::text('userContact', $user_account->Contact_Number, array('class' => 'u-full-width', 'placeholder' => 'Enter Contact Number Here', 'required' => 'required')) !!}
                             </div>
                         </div>
                     </div>

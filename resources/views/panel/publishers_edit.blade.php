@@ -70,6 +70,10 @@
                         {!! Form::label('publisherName', 'Publisher\'s Name:') !!}
                         {!! Form::text('publisherName', $publisher->Publisher_Name, array('class' => 'u-full-width', 'placeholder' => 'Enter Publisher\'s Name Here', 'required' => 'required', 'autofocus' => 'autofocus')) !!}
                     </div>
+                    <div class="input-block">
+                        {!! Form::label('publisherContact', 'Contact Number:') !!}
+                        {!! Form::text('publisherContact', $publisher->Contact_Number, array('class' => 'u-full-width', 'placeholder' => 'Enter Contact Number Here', 'required' => 'required')) !!}
+                    </div>
                     <div class="input-block text-right">
                         {!! Form::submit('Save Changes', array('class' => 'btn btn-orange')) !!}
                     </div>
