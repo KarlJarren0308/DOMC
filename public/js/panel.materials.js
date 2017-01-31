@@ -1,3 +1,14 @@
+function generateCallNumber() {
+    var section = $('input[name="materialLocation"]').val().trim();
+    var authorLastName = $('#first-author option:selected').data('lastname');
+
+    if((section.length > 1) && (authorLastName != null && authorLastName != '')) {
+        $('input[name="materialCallNumber"]').val(section.substring(0, 2).toUpperCase() + '-' + authorLastName.substring(0, 3).toUpperCase());
+    } else {
+        $('input[name="materialCallNumber"]').val('');
+    }
+}
+
 function getAuthorList(func) {
     $.ajax({
         url: '/search/authors',
@@ -241,4 +252,12 @@ $(document).ready(function() {
 
         return false;
     });*/
+
+    $('input[name="materialLocation"]').keyup(function() {
+        generateCallNumber();
+    });
+
+    $('#first-author').change(function() {
+        generateCallNumber();
+    });
 });

@@ -69,12 +69,20 @@
                     <div class="row">
                         <div class="eight columns">
                             <div class="row">
+                                <div class="four columns">
+                                    <div class="input-block">
+                                        {!! Form::label('materialCallNumber', 'Call Number:') !!}
+                                        {!! Form::text('materialCallNumber', null, array('class' => 'u-full-width', 'placeholder' => 'Enter Call Number Here', 'required' => 'required', 'readonly' => 'readonly')) !!}
+                                    </div>
+                                </div>
                                 <div class="eight columns">
                                     <div class="input-block">
                                         {!! Form::label('materialTitle', 'Book Title:') !!}
                                         {!! Form::text('materialTitle', null, array('class' => 'u-full-width', 'placeholder' => 'Enter Book Title Here', 'required' => 'required', 'autofocus' => 'autofocus')) !!}
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="four columns">
                                     <div class="input-block">
                                         {!! Form::label('materialCollectionType', 'Collection Type:') !!}
@@ -86,8 +94,6 @@
                                         </select>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="four columns">
                                     <div class="input-block">
                                         {!! Form::label('materialISBN', 'ISBN:') !!}
@@ -96,22 +102,16 @@
                                 </div>
                                 <div class="four columns">
                                     <div class="input-block">
-                                        {!! Form::label('materialCallNumber', 'Call Number:') !!}
-                                        {!! Form::text('materialCallNumber', null, array('class' => 'u-full-width', 'placeholder' => 'Enter Call Number Here', 'required' => 'required')) !!}
-                                    </div>
-                                </div>
-                                <div class="four columns">
-                                    <div class="input-block">
-                                        {!! Form::label('materialLocation', 'Location:') !!}
-                                        {!! Form::text('materialLocation', null, array('class' => 'u-full-width', 'placeholder' => 'Enter Location Here', 'required' => 'required')) !!}
+                                        {!! Form::label('materialCopyrightYear', 'Copyright Year:') !!}
+                                        {!! Form::text('materialCopyrightYear', null, array('class' => 'u-full-width', 'placeholder' => 'Enter Copyright Year Here', 'maxlength' => '4', 'onkeyup' => 'isYear(this)', 'required' => 'required')) !!}
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="four columns">
                                     <div class="input-block">
-                                        {!! Form::label('materialCopyrightYear', 'Copyright Year:') !!}
-                                        {!! Form::text('materialCopyrightYear', null, array('class' => 'u-full-width', 'placeholder' => 'Enter Copyright Year Here', 'maxlength' => '4', 'onkeyup' => 'isYear(this)', 'required' => 'required')) !!}
+                                        {!! Form::label('materialLocation', 'Section:') !!}
+                                        {!! Form::text('materialLocation', null, array('class' => 'u-full-width', 'placeholder' => 'Enter Location Here', 'required' => 'required')) !!}
                                     </div>
                                 </div>
                                 <div class="four columns">
@@ -146,13 +146,13 @@
                             <div id="authors-block" class="block" style="border: 1px solid #ccc; overflow-y: scroll; max-height: 300px;">
                                 <div class="input-block">
                                     <div class="u-three-four-width">
-                                        <select name="authors[]" class="author-dropdown u-full-width" required>
+                                        <select id="first-author" name="authors[]" class="author-dropdown u-full-width" required>
                                             <option value="" selected disabled>Select an author...</option>
                                             @foreach($authors as $author)
                                                 @if(strlen($author->Author_Middle_Name) > 1)
-                                                    <option value="{{ $author->Author_ID }}">{{ $author->Author_First_Name . ' ' . substr($author->Author_Middle_Name, 0, 1) . '. ' . $author->Author_Last_Name }}</option>
+                                                    <option value="{{ $author->Author_ID }}" data-lastname="{{ $author->Author_Last_Name }}">{{ $author->Author_First_Name . ' ' . substr($author->Author_Middle_Name, 0, 1) . '. ' . $author->Author_Last_Name }}</option>
                                                 @else
-                                                    <option value="{{ $author->Author_ID }}">{{ $author->Author_First_Name . ' ' . $author->Author_Last_Name }}</option>
+                                                    <option value="{{ $author->Author_ID }}" data-lastname="{{ $author->Author_Last_Name }}">{{ $author->Author_First_Name . ' ' . $author->Author_Last_Name }}</option>
                                                 @endif
                                             @endforeach
                                         </select>
