@@ -52,6 +52,29 @@ function setModalLoader(id) {
     }
 }
 
+function dateTimeToString(dateTime) {
+    var months = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December'
+    ];
+
+    var month = dateTime.getMonth();
+    var day = dateTime.getDate();
+    var year = dateTime.getFullYear();
+
+    return months[month] + ' ' + day + ', ' + year;
+}
+
 $(document).ready(function() {
     $('html').click(function() {
         $('.dropdown-menu').removeClass('show');
@@ -65,7 +88,7 @@ $(document).ready(function() {
 
     $('.modal').click(function() {
         if(isModalDismissableByClick) {
-            closeModal();
+            $(this).fadeOut(250);
         }
     });
 

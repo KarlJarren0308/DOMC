@@ -3,11 +3,17 @@ $(document).ready(function() {
     var usersName = '';
     var materialID = '';
     var materialTitle = '';
+    var addedAccessions = [];
+    var addedMaterials = [];
 
     $('[data-form="search-borrower-form"]').submit(function() {
         openModal(false, 'loader-modal');
 
         $('#borrowers-table-block').html('');
+        $('#pending-table-block').html('');
+
+        addedAccessions = [];
+        addedMaterials = [];
 
         $.ajax({
             url: '/search/loan_borrowers',
@@ -310,9 +316,9 @@ $(document).ready(function() {
 
                     $('[data-button="loan-book-button"]').click(function() {
                         materialID = $(this).data('var-id');
-                        /*materialTitle = $(this).data('var-title');
+                        materialTitle = $(this).data('var-title');
 
-                        $('.modal#confirmation-modal > .modal-container > .modal-body').html('Are you sure you want to lend the book title <strong>' + materialTitle + '</strong> to <strong>' + usersName + '</strong>');
+                        /*$('.modal#confirmation-modal > .modal-container > .modal-body').html('Are you sure you want to lend the book title <strong>' + materialTitle + '</strong> to <strong>' + usersName + '</strong>');
                         openModal(false, 'confirmation-modal');*/
                         openModal(false, 'loader-modal');
 
@@ -342,7 +348,7 @@ $(document).ready(function() {
                                     accessionInfo += '<tr>';
                                     accessionInfo += '<td>' + response['data'][i]['Accession_Number'] + '</td>';
                                     accessionInfo += '<td>' + response['data'][i]['Accession_Status'] + '</td>';
-                                    accessionInfo += '<td><button class="btn btn-orange btn-sm" data-button="loan-accession-button" data-var-id="' + materialID + '" data-var-accession="' + response['data'][i]['Accession_Number'] + '">Loan</button></td>';
+                                    accessionInfo += '<td><button class="btn btn-orange btn-sm" data-button="loan-accession-button" data-var-id="' + materialID + '" data-var-title="' + materialTitle + '" data-var-accession="' + response['data'][i]['Accession_Number'] + '">Loan</button></td>';
                                     accessionInfo += '</tr>';
                                 }
 
@@ -350,12 +356,21 @@ $(document).ready(function() {
                                 accessionInfo += '</table>';
 
                                 setModalContent('Loan Book(s)', accessionInfo, 'accession-modal');
-                                openModal(false, 'accession-modal');
+                                openModal(true, 'accession-modal');
 
                                 $('[data-button="loan-accession-button"]').click(function() {
-                                    openModal(false, 'loader-modal');
+                                    if($('#pending-table').length == 0) {
+                                        $('#pending-table-block').html('<form data-form="loan-list-form"><input type="hidden" name="borrowerID" value="' + usersID + '"><input type="hidden" name="borrowerName" value="' + usersName + '"><input type="hidden" name="arg0" value="1887a0a8a240d26489023340292501c0"><table id="pending-table" class="u-full-width"><thead><tr><th>Book Title</th><th>Accession Number</th><th>Date Borrowed</th><th></th></tr></thead><tbody></tbody></table><div><input type="submit" class="btn btn-orange" value="Print Loaned Books" disabled></div></form>');
+                                    }
 
-                                    $.ajax({
+                                    if(addedMaterials.indexOf($(this).data('var-id')) == -1 && addedAccessions.indexOf($(this).data('var-accession')) == -1) {
+                                        $('#pending-table tbody').append('<tr><td>' + $(this).data('var-title') + '</td><td>' + $(this).data('var-accession') + '</td><td>' + moment().format('MMMM D, YYYY') + '</td><td><input type="checkbox" name="accessionNumbers[]" value="' + $(this).data('var-accession') + '"></td></tr>');
+
+                                        addedAccessions.push($(this).data('var-accession'));
+                                        addedMaterials.push($(this).data('var-id'));
+                                    }
+
+                                    /*$.ajax({
                                         url: '/panel/loan',
                                         method: 'POST',
                                         headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
@@ -379,7 +394,7 @@ $(document).ready(function() {
                                         }
                                     });
 
-                                    return false;
+                                    return false;*/
                                 });
 
                                 console.log(response['data']);
@@ -439,5 +454,49 @@ $(document).ready(function() {
 
     $('[data-button="no-button"]').click(function() {
         closeModal('confirmation-modal');
+    });
+
+    $('body').on('change', 'input[name="accessionNumbers[]"]', function() {
+        if($('input[name="accessionNumbers[]"]:checked').length > 0) {
+            $('[data-form="loan-list-form"] input[type="submit"]').attr('disabled', false);
+        }
+    });
+
+    $('body').on('submit', '[data-form="loan-list-form"]', function() {
+        openModal(false, 'loader-modal');
+
+        $.ajax({
+            url: '/panel/loan',
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function(response) {
+                closeModal('loader-modal');
+                setModalContent('Loan Book(s)', response['message'] + '<div>If receipt did not open, <a target="_blank" href="/receipts/' + response['receipt'] + '">Click Here</a></div>', 'done-modal');
+                openModal(true, 'done-modal');
+
+                if(response['status'] == 'Success') {
+                    window.open('/receipts/' + response['receipt']);
+
+                    $('#done-modal.modal').click(function() {
+                        if(isModalDismissableByClick) {
+                            $(this).fadeOut(250);
+
+                            location.reload();
+                        }
+                    });
+
+                    $('#done-modal.modal>.modal-container').click(function(e) {
+                        e.stopPropagation();
+                    });
+                }
+            },
+            error: function(arg0, arg1, arg2) {
+                console.log(arg0.responseText)
+            }
+        });
+
+        return false;
     });
 });

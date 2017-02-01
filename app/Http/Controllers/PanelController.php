@@ -1007,6 +1007,59 @@ class PanelController extends Controller
                 }
 
                 break;
+            case '1887a0a8a240d26489023340292501c0':
+                $borrowerID = $request->input('borrowerID');
+                $borrowerName = $request->input('borrowerName');
+                $accessionNumbers = $request->input('accessionNumbers');
+                $added = 0;
+                $addedInfo = [];
+
+                foreach($accessionNumbers as $accessionNumber) {
+                    $material = Accessions::where('Accession_Number', $accessionNumber)->join('materials', 'accessions.Material_ID', '=', 'materials.Material_ID')->first();
+
+                    $query = Loans::insert([
+                        'Accession_Number' => $accessionNumber,
+                        'Material_ID' => $material->Material_ID,
+                        'Account_Username' => $borrowerID,
+                        'Loan_Date_Stamp' => date('Y-m-d'),
+                        'Loan_Time_Stamp' => date('H:i:s')
+                    ]);
+
+                    if($query) {
+                        $query = Accessions::where('Accession_Number', $accessionNumber)->update([
+                            'Accession_Status' => 'onloan'
+                        ]);
+
+                        array_push($addedInfo, [
+                            'Accession_Number' => $accessionNumber,
+                            'Material_Title' => $material->Material_Title
+                        ]);
+
+                        $added++;
+                    }
+                }
+
+                if($added > 0) {
+                    $data['addedInfo'] = $addedInfo;
+                    $data['borrowerName'] = $borrowerName;
+
+                    $stamp = date('Y_m_d_H_i_s');
+                    $pdf = PDF::loadView('pdf.loan_receipt', $data);
+                    $pdf->save('receipts/domc_loan_receipt_' . $stamp . '.pdf');
+
+                    return json_encode([
+                        'status' => 'Success',
+                        'message' => 'Loan Successful.',
+                        'receipt' => 'domc_loan_receipt_' . $stamp . '.pdf'
+                    ]);
+                } else {
+                    return json_encode([
+                        'status' => 'Failed',
+                        'message' => 'Failed to loan books to borrower.'
+                    ]);
+                }
+
+                break;
             default:
                 break;
         }

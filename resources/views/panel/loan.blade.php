@@ -84,6 +84,8 @@
                     </div>
                 </form>
                 <div id="borrowers-table-block"></div>
+                <br><br>
+                <div id="pending-table-block"></div>
             </div>
         </div>
     </div>
