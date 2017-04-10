@@ -95,7 +95,7 @@ $(document).ready(function() {
             data: $(this).serialize(),
             dataType: 'json',
             success: function(response) {
-                var element = '<table id="loans-table" class="u-full-width">';
+                var element = '<form data-form="receive-list-form"><table id="loans-table" class="u-full-width">';
                 var name = '';
                 var totalPenalty = 0;
                 var holidays;
@@ -111,6 +111,7 @@ $(document).ready(function() {
                 element += '<th>Loaned By</th>';
                 element += '<th>Date Loaned</th>';
                 element += '<th>Penalty</th>';
+                element += '<th>Status</th>';
                 element += '<th></th>';
                 element += '</tr>';
                 element += '</thead>';
@@ -202,29 +203,43 @@ $(document).ready(function() {
                     }
 
                     element += '</td>';
-                    element += '<td class="text-center">';
-
-                    if(receiveID == '') {
-                        datetimeReceived = moment().format('MMMM D, YYYY');
-                    }
-
-                    if(totalPenalty > 0) {
-                        element += '<button class="btn btn-orange btn-sm" data-button="print-receipt-button" data-var-id="' + response['data']['loans'][i]['Loan_ID'] + '" data-var-title="' + response['data']['loans'][i]['Material_Title'] + '" data-var-date-loaned="' + moment(response['data']['loans'][i]['Loan_Date_Stamp']).format('MMMM D, YYYY') + '" data-var-date-received="' + datetimeReceived + '" data-var-loaned-by="' + name + '" data-var-penalty="' + totalPenalty + '">Print Receipt</button>&nbsp;';
-                    }
+                    element += '<td>';
 
                     if(response['data']['loans'][i]['Loan_Status'] == 'active') {
-                        element += '<button class="btn btn-green btn-sm" data-button="receive-button" data-var-id="' + response['data']['loans'][i]['Loan_ID'] + '" data-var-title="' + response['data']['loans'][i]['Material_Title'] + '" data-var-date-loaned="' + moment(response['data']['loans'][i]['Loan_Date_Stamp']).format('MMMM D, YYYY') + '" data-var-loaned-by="' + name + '" data-var-penalty="';
-
-                        if(totalPenalty > 0) {
-                            element += totalPenalty;
-                        } else {
-                            element += 0;
-                        }
-
-                        element += '">Receive</button>';
+                        element += 'unpaid';
                     } else {
-                        element += '<div class="btn btn-red btn-sm">Returned</div>';
+                        for(var k = 0; k < response['data']['receives'].length; k++) {
+                            if(response['data']['loans'][i]['Loan_ID'] == response['data']['receives'][k]['Receive_Reference']) {
+                                element += response['data']['receives'][k]['Clearance'];
+                            }
+                        }
                     }
+
+                    element += '</td>';
+                    element += '<td class="text-center">';
+                    element += '<input type="checkbox">';
+
+                    // if(receiveID == '') {
+                    //     datetimeReceived = moment().format('MMMM D, YYYY');
+                    // }
+
+                    // if(totalPenalty > 0) {
+                    //     element += '<button class="btn btn-orange btn-sm" data-button="print-receipt-button" data-var-id="' + response['data']['loans'][i]['Loan_ID'] + '" data-var-title="' + response['data']['loans'][i]['Material_Title'] + '" data-var-date-loaned="' + moment(response['data']['loans'][i]['Loan_Date_Stamp']).format('MMMM D, YYYY') + '" data-var-date-received="' + datetimeReceived + '" data-var-loaned-by="' + name + '" data-var-penalty="' + totalPenalty + '">Print Receipt</button>&nbsp;';
+                    // }
+
+                    // if(response['data']['loans'][i]['Loan_Status'] == 'active') {
+                    //     element += '<button class="btn btn-green btn-sm" data-button="receive-button" data-var-id="' + response['data']['loans'][i]['Loan_ID'] + '" data-var-title="' + response['data']['loans'][i]['Material_Title'] + '" data-var-date-loaned="' + moment(response['data']['loans'][i]['Loan_Date_Stamp']).format('MMMM D, YYYY') + '" data-var-loaned-by="' + name + '" data-var-penalty="';
+
+                    //     if(totalPenalty > 0) {
+                    //         element += totalPenalty;
+                    //     } else {
+                    //         element += 0;
+                    //     }
+
+                    //     element += '">Receive</button>';
+                    // } else {
+                    //     element += '<div class="btn btn-red btn-sm">Returned</div>';
+                    // }
 
                     // element += '&nbsp;<button class="btn btn-red btn-sm" data-button="remarks-button">Remarks</button>';
                     element += '</td>';
@@ -232,15 +247,15 @@ $(document).ready(function() {
                 }
 
                 element += '</tbody>';
-                element += '</table>';
-                element += '';
+                element += '</table></form>';
+                element += '<div style="margin-top: 15px;"><button class="btn btn-orange">Print Receipt</button><button class="btn btn-green">Receive</button><button class="btn btn-red">Clear/Pay</button></div>';
 
                 $('#loans-table-block').html(element).promise().done(function() {
                     closeModal();
 
                     $('#loans-table').dataTable({
                         aoColumnDefs: [
-                            { bSearchable: false, bSortable: false, aTargets: [5] }
+                            { bSearchable: false, bSortable: false, aTargets: [7] }
                         ],
                         bFilter: false
                     });

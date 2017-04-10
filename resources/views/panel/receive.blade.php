@@ -111,8 +111,8 @@
                 @endif
                 <form data-form="search-loan-form">
                     <div class="input-block">
-                        {!! Form::label('searchKeyword', 'Search Book:') !!}
-                        {!! Form::text('searchKeyword', null, array('style' => 'margin-right: 5px; vertical-align: middle;', 'placeholder' => 'Enter Book Here', 'required' => 'required', 'autofocus' => 'autofocus')) !!}
+                        {!! Form::label('searchKeyword', 'Search User:') !!}
+                        {!! Form::text('searchKeyword', null, array('style' => 'margin-right: 5px; vertical-align: middle;', 'placeholder' => 'Enter User I.D. Number Here', 'required' => 'required', 'autofocus' => 'autofocus')) !!}
                         {!! Form::submit('Search', array('class' => 'btn btn-orange', 'style' => 'vertical-align: middle; height: 38px !important;')) !!}
                     </div>
                 </form>
